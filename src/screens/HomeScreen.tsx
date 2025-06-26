@@ -8,6 +8,7 @@ const HomeScreen: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'today' | 'month'>('today');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showMainHomepage, setShowMainHomepage] = useState(false);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -20,8 +21,20 @@ const HomeScreen: React.FC = () => {
     setShowMainHomepage(true);
   };
 
+  const handleFavoriteToggle = (recipeId: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(recipeId)) {
+        newFavorites.delete(recipeId);
+      } else {
+        newFavorites.add(recipeId);
+      }
+      return newFavorites;
+    });
+  };
+
   if (showMainHomepage) {
-    return <MainHomeScreen />;
+    return <MainHomeScreen favorites={favorites} onFavoriteToggle={handleFavoriteToggle} />;
   }
 
   const handleTabChange = (newTab: 'today' | 'month') => {
@@ -104,6 +117,8 @@ const HomeScreen: React.FC = () => {
         <FlipBook 
           cards={currentCards}
           onNavigateToHomepage={handleNavigateToHomepage}
+          favorites={favorites}
+          onFavoriteToggle={handleFavoriteToggle}
           key={selectedTab} // Force re-render when tab changes
         />
       </Animated.View>

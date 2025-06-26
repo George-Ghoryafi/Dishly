@@ -8,9 +8,11 @@ const { width: screenWidth } = Dimensions.get('window');
 interface RecipeRouletteProps {
   recipes: Recipe[];
   onRecipeSelect?: (recipe: Recipe) => void;
+  favorites?: Set<string>;
+  onFavoriteToggle?: (recipeId: string) => void;
 }
 
-const RecipeRoulette: React.FC<RecipeRouletteProps> = ({ recipes, onRecipeSelect }) => {
+const RecipeRoulette: React.FC<RecipeRouletteProps> = ({ recipes, onRecipeSelect, favorites = new Set(), onFavoriteToggle }) => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef<ScrollView>(null);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -119,6 +121,8 @@ const RecipeRoulette: React.FC<RecipeRouletteProps> = ({ recipes, onRecipeSelect
             recipe={recipe}
             variant="roulette"
             isSelected={isSelected}
+            isFavorite={favorites.has(recipe.id)}
+            onFavoritePress={() => onFavoriteToggle?.(recipe.id)}
           />
           
           <Animated.View 

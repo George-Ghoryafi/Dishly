@@ -7,6 +7,8 @@ import CompletionCard from './CompletionCard';
 interface FlipBookProps {
   cards: CardData[];
   onNavigateToHomepage?: () => void;
+  favorites?: Set<string>;
+  onFavoriteToggle?: (recipeId: string) => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -14,7 +16,7 @@ const CARD_WIDTH = screenWidth * 0.85;
 const CARD_HEIGHT = CARD_WIDTH * 1.4;
 const SWIPE_THRESHOLD = 50;
 
-const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage }) => {
+const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favorites = new Set(), onFavoriteToggle }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -153,7 +155,13 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage }) => {
         />
       );
     } else {
-      return <RecipeCard recipe={currentCard} />;
+      return (
+        <RecipeCard 
+          recipe={currentCard} 
+          isFavorite={favorites.has(currentCard.id)}
+          onFavoritePress={() => onFavoriteToggle?.(currentCard.id)}
+        />
+      );
     }
   };
 

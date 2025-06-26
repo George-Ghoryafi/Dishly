@@ -8,9 +8,11 @@ const { width: screenWidth } = Dimensions.get('window');
 interface PopularDishesProps {
   dishes: Recipe[];
   onDishPress?: (recipe: Recipe) => void;
+  favorites?: Set<string>;
+  onFavoriteToggle?: (recipeId: string) => void;
 }
 
-const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) => {
+const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress, favorites = new Set(), onFavoriteToggle }) => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const cardWidth = screenWidth * 0.4 + 16; // Card width + margin
 
@@ -47,6 +49,8 @@ const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) =>
             recipe={recipe}
             variant="popular"
             onPress={() => onDishPress?.(recipe)}
+            isFavorite={favorites.has(recipe.id)}
+            onFavoritePress={() => onFavoriteToggle?.(recipe.id)}
           />
           <Animated.View 
             style={[

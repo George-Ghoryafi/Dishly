@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
 
 interface RecipeCardProps {
@@ -7,6 +8,8 @@ interface RecipeCardProps {
   onPress?: () => void;
   variant?: 'popular' | 'quick' | 'roulette';
   isSelected?: boolean;
+  isFavorite?: boolean;
+  onFavoritePress?: () => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -18,7 +21,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   recipe, 
   onPress, 
   variant = 'popular',
-  isSelected = false 
+  isSelected = false,
+  isFavorite = false,
+  onFavoritePress 
 }) => {
   const [imageLoading, setImageLoading] = useState(!imageLoadCache.has(recipe.image));
   const [imageError, setImageError] = useState(false);
@@ -111,6 +116,20 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             <Text style={styles.placeholderText}>🍽️</Text>
           </View>
         )}
+        <TouchableOpacity 
+          style={styles.favoriteButton}
+          onPress={onFavoritePress}
+          activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <View style={styles.favoriteIconContainer}>
+            <Ionicons 
+              name={isFavorite ? "heart" : "heart-outline"} 
+              size={18} 
+              color={isFavorite ? "#FF3B30" : "#fff"} 
+            />
+          </View>
+        </TouchableOpacity>
         <View style={styles.difficultyBadge}>
           <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
         </View>
@@ -211,6 +230,19 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 24,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    zIndex: 2,
+  },
+  favoriteIconContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 12,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   difficultyBadge: {
     position: 'absolute',

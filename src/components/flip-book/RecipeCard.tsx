@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../../types/Recipe';
 
 interface RecipeCardProps {
   recipe: Recipe;
+  isFavorite?: boolean;
+  onFavoritePress?: () => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -13,7 +16,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.4;
 // Cache to track loaded images
 const imageLoadCache = new Map<string, boolean>();
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isFavorite = false, onFavoritePress }) => {
   const [imageLoading, setImageLoading] = useState(!imageLoadCache.has(recipe.image));
   const [imageError, setImageError] = useState(false);
 
@@ -55,6 +58,20 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <Text style={styles.placeholderSubtext}>Image not available</Text>
           </View>
         )}
+        <TouchableOpacity 
+          style={styles.favoriteButton}
+          onPress={onFavoritePress}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <View style={styles.favoriteIconContainer}>
+            <Ionicons 
+              name={isFavorite ? "heart" : "heart-outline"} 
+              size={24} 
+              color={isFavorite ? "#FF3B30" : "#fff"} 
+            />
+          </View>
+        </TouchableOpacity>
         <View style={styles.difficultyBadge}>
           <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
         </View>
@@ -131,6 +148,19 @@ const styles = StyleSheet.create({
   placeholderSubtext: {
     fontSize: 14,
     color: '#666',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 2,
+  },
+  favoriteIconContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 16,
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   difficultyBadge: {
     position: 'absolute',

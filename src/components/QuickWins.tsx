@@ -8,9 +8,11 @@ const { width: screenWidth } = Dimensions.get('window');
 interface QuickWinsProps {
   recipes: Recipe[];
   onRecipePress?: (recipe: Recipe) => void;
+  favorites?: Set<string>;
+  onFavoriteToggle?: (recipeId: string) => void;
 }
 
-const QuickWins: React.FC<QuickWinsProps> = ({ recipes, onRecipePress }) => {
+const QuickWins: React.FC<QuickWinsProps> = ({ recipes, onRecipePress, favorites = new Set(), onFavoriteToggle }) => {
   // Filter recipes that are 15 minutes or less
   const quickRecipes = recipes.filter(recipe => recipe.cookTime <= 15);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -49,6 +51,8 @@ const QuickWins: React.FC<QuickWinsProps> = ({ recipes, onRecipePress }) => {
             recipe={recipe}
             variant="quick"
             onPress={() => onRecipePress?.(recipe)}
+            isFavorite={favorites.has(recipe.id)}
+            onFavoritePress={() => onFavoriteToggle?.(recipe.id)}
           />
           
           <Animated.View 

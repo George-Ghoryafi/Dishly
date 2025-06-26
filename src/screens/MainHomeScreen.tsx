@@ -9,7 +9,12 @@ import { BottomTabParamList } from '../navigation/BottomTabNavigator';
 
 type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
 
-const MainHomeScreen: React.FC = () => {
+interface MainHomeScreenProps {
+  favorites?: Set<string>;
+  onFavoriteToggle?: (recipeId: string) => void;
+}
+
+const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), onFavoriteToggle }) => {
   const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
@@ -81,16 +86,22 @@ const MainHomeScreen: React.FC = () => {
           <PopularDishes 
             dishes={popularDishes} 
             onDishPress={handleDishPress}
+            favorites={favorites}
+            onFavoriteToggle={onFavoriteToggle}
           />
           
           <QuickWins 
             recipes={quickWinRecipes}
             onRecipePress={handleDishPress}
+            favorites={favorites}
+            onFavoriteToggle={onFavoriteToggle}
           />
 
           <RecipeRoulette 
             recipes={allRecipes}
             onRecipeSelect={handleRecipeSelect}
+            favorites={favorites}
+            onFavoriteToggle={onFavoriteToggle}
           />
 
           <KitchenStreak
