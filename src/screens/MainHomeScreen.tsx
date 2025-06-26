@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Animated, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal } from '../components';
@@ -19,6 +20,13 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
+  const insets = useSafeAreaInsets();
+  
+  // Header animation
+  const headerTranslateY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
+  const scrollDirection = useRef<'up' | 'down'>('up');
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   const handleProfilePress = () => {
     // TODO: Navigate to profile screen
@@ -55,6 +63,39 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
     onBackToFlipBook?.();
   };
 
+  const handleScroll = (event: any) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    const scrollDifference = currentScrollY - lastScrollY.current;
+    
+    // Only trigger animation if we've scrolled a reasonable amount
+    if (Math.abs(scrollDifference) > 5) {
+      if (scrollDifference > 0 && scrollDirection.current !== 'down' && currentScrollY > 0) {
+        // Scrolling down - hide header (but only if we're not in the bounce area)
+        scrollDirection.current = 'down';
+        Animated.timing(headerTranslateY, {
+          toValue: -(headerHeight + insets.top), // Dynamic height calculation
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      } else if (scrollDifference < 0 && scrollDirection.current !== 'up') {
+        // Scrolling up - show header
+        scrollDirection.current = 'up';
+        Animated.timing(headerTranslateY, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    }
+    
+    lastScrollY.current = currentScrollY;
+  };
+
+  const handleHeaderLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setHeaderHeight(height);
+  };
+
 
 
   // Combine and shuffle recipes for popular dishes
@@ -75,13 +116,32 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
 
   return (
     <View style={styles.container}>
-      <Header 
-        onProfilePress={handleProfilePress}
-        onSearchPress={handleSearchPress}
-        searchPlaceholder="Search for recipes and dishes..."
-      />
+      <Animated.View 
+        style={[
+          styles.headerContainer,
+          {
+            transform: [{ translateY: headerTranslateY }],
+          }
+        ]}
+        onLayout={handleHeaderLayout}
+      >
+        <Header 
+          onProfilePress={handleProfilePress}
+          onSearchPress={handleSearchPress}
+          searchPlaceholder="Search for recipes and dishes..."
+        />
+      </Animated.View>
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={[
+            styles.scrollContent,
+            { 
+              paddingTop: headerHeight + (Platform.OS === 'ios' ? -15 : 5)
+            }
+          ]}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
           <FlipBookPreview onFlipBookPress={handleFlipBookPress} />
           
           <PopularDishes 
@@ -129,13 +189,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  headerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: '#fff',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 20,
     paddingBottom: 40,
   },
 });
