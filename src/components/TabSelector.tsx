@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, LayoutChangeEvent, Platform } from 'react-native';
 
 interface TabSelectorProps {
@@ -36,14 +36,16 @@ const TabSelector: React.FC<TabSelectorProps> = ({ selectedTab, onTabChange }) =
     }
   };
 
-  const getSliderStyle = () => {
-    if (leftTabWidth === 0 || rightTabWidth === 0) return { transform: [{ translateX: 0 }] };
-    
-    const translateX = slideAnim.interpolate({
+  const translateX = useMemo(() => {
+    return slideAnim.interpolate({
       inputRange: [0, 1],
       outputRange: [0, leftTabWidth + 4], // Left tab width + margin between tabs
     });
+  }, [slideAnim, leftTabWidth]);
 
+  const getSliderStyle = () => {
+    if (leftTabWidth === 0 || rightTabWidth === 0) return { transform: [{ translateX: 0 }] };
+    
     return {
       transform: [{ translateX }],
     };

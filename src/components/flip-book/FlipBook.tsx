@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { View, StyleSheet, Dimensions, PanResponder, Animated } from 'react-native';
-import { CardData } from '../../types/Recipe';
+import { CardData, Recipe } from '../../types/Recipe';
 import RecipeCard from './RecipeCard';
 import CompletionCard from './CompletionCard';
 
@@ -26,7 +26,7 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
-      return Math.abs(gestureState.dx) > 10 && !isAnimating;
+      return Math.abs(gestureState.dx) > 10;
     },
     onPanResponderMove: (_, gestureState) => {
       const { dx } = gestureState;
@@ -41,7 +41,7 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
       const { dx, vx } = gestureState;
       const shouldSwipe = Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(vx) > 0.3;
       
-      if (shouldSwipe && !isAnimating) {
+      if (shouldSwipe) {
         if (dx > 0 || vx > 0) {
           // Swipe right - go to previous card
           animateTransition(() => goToPrevious(), 'right');
@@ -64,17 +64,17 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: targetSlide,
-        duration: 200,
+        duration: 150,
         useNativeDriver: false,
       }),
       Animated.timing(scaleAnim, {
         toValue: 0.9,
-        duration: 200,
+        duration: 150,
         useNativeDriver: false,
       }),
       Animated.timing(rotateAnim, {
         toValue: direction === 'left' ? -20 : 20,
-        duration: 200,
+        duration: 150,
         useNativeDriver: false,
       }),
     ]).start(() => {
@@ -89,20 +89,20 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
       Animated.parallel([
         Animated.spring(slideAnim, {
           toValue: 0,
-          tension: 100,
-          friction: 8,
+          tension: 150,
+          friction: 7,
           useNativeDriver: false,
         }),
         Animated.spring(scaleAnim, {
           toValue: 1,
-          tension: 100,
-          friction: 8,
+          tension: 150,
+          friction: 7,
           useNativeDriver: false,
         }),
         Animated.spring(rotateAnim, {
           toValue: 0,
-          tension: 100,
-          friction: 8,
+          tension: 150,
+          friction: 7,
           useNativeDriver: false,
         }),
       ]).start(() => {
@@ -115,20 +115,20 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
     Animated.parallel([
       Animated.spring(slideAnim, {
         toValue: 0,
-        tension: 100,
-        friction: 8,
+        tension: 150,
+        friction: 7,
         useNativeDriver: false,
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
-        tension: 100,
-        friction: 8,
+        tension: 150,
+        friction: 7,
         useNativeDriver: false,
       }),
       Animated.spring(rotateAnim, {
         toValue: 0,
-        tension: 100,
-        friction: 8,
+        tension: 150,
+        friction: 7,
         useNativeDriver: false,
       }),
     ]).start();
@@ -157,7 +157,7 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
     } else {
       return (
         <RecipeCard 
-          recipe={currentCard} 
+          recipe={currentCard as Recipe} 
           isFavorite={favorites.has(currentCard.id)}
           onFavoritePress={() => onFavoriteToggle?.(currentCard.id)}
         />
@@ -165,12 +165,14 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
     }
   };
 
-  const getAnimatedStyle = () => {
-    const rotateInterpolate = rotateAnim.interpolate({
+  const rotateInterpolate = useMemo(() => {
+    return rotateAnim.interpolate({
       inputRange: [-30, 0, 30],
       outputRange: ['-30deg', '0deg', '30deg'],
     });
+  }, [rotateAnim]);
 
+  const getAnimatedStyle = () => {
     return {
       transform: [
         { translateX: slideAnim },

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -141,30 +141,40 @@ const SearchModal: React.FC<SearchModalProps> = ({
   const initialWidth = searchButtonLayout ? searchButtonLayout.width : screenWidth - 40;
   const initialHeight = searchButtonLayout ? searchButtonLayout.height : 50;
 
-  const animatedTop = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [initialTop, 0],
-  });
+  const animatedTop = useMemo(() => {
+    return animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [initialTop, 0],
+    });
+  }, [animatedValue, initialTop]);
 
-  const animatedLeft = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [initialLeft, 0],
-  });
+  const animatedLeft = useMemo(() => {
+    return animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [initialLeft, 0],
+    });
+  }, [animatedValue, initialLeft]);
 
-  const animatedWidth = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [initialWidth, screenWidth],
-  });
+  const animatedWidth = useMemo(() => {
+    return animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [initialWidth, screenWidth],
+    });
+  }, [animatedValue, initialWidth]);
 
-  const animatedHeight = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [initialHeight, screenHeight],
-  });
+  const animatedHeight = useMemo(() => {
+    return animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [initialHeight, screenHeight],
+    });
+  }, [animatedValue, initialHeight]);
 
-  const borderRadius = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [25, 0],
-  });
+  const borderRadius = useMemo(() => {
+    return animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [25, 0],
+    });
+  }, [animatedValue]);
 
   return (
     <Modal

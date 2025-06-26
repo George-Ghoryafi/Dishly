@@ -1,7 +1,7 @@
 export * from './flip-book';
 export { default as TabSelector } from './TabSelector';
 export { default as Header } from './Header';
-export { default as SnapAndAnalyze } from './SnapAndAnalyze';
+export { default as FlipBookPreview } from './SnapAndAnalyze';
 export { default as DishCard } from './DishCard';
 export { default as RecipeCard } from './RecipeCard';
 export { default as PopularDishes } from './PopularDishes';

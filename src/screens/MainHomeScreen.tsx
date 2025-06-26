@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { Header, SnapAndAnalyze, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal } from '../components';
+import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal } from '../components';
 import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
@@ -12,9 +12,10 @@ type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 
 interface MainHomeScreenProps {
   favorites?: Set<string>;
   onFavoriteToggle?: (recipeId: string) => void;
+  onBackToFlipBook?: () => void;
 }
 
-const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), onFavoriteToggle }) => {
+const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), onFavoriteToggle, onBackToFlipBook }) => {
   const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
@@ -49,9 +50,9 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
     console.log('Recipe selected from roulette:', recipe.name);
   };
 
-  const handleSnapPress = () => {
-    console.log('Analyze Food pressed - navigating to camera screen');
-    navigation.navigate('Camera');
+  const handleFlipBookPress = () => {
+    console.log('FlipBook pressed - navigating to flipbook');
+    onBackToFlipBook?.();
   };
 
 
@@ -81,7 +82,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
       />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <SnapAndAnalyze onSnapPress={handleSnapPress} />
+          <FlipBookPreview onFlipBookPress={handleFlipBookPress} />
           
           <PopularDishes 
             dishes={popularDishes} 

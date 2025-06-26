@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Animated, Platform } from 'react-native';
 import { FlipBook, TabSelector } from '../components';
 import { todaysCards, monthlyCards } from '../data/dummyRecipes';
@@ -33,9 +33,9 @@ const HomeScreen: React.FC = () => {
     });
   };
 
-  if (showMainHomepage) {
-    return <MainHomeScreen favorites={favorites} onFavoriteToggle={handleFavoriteToggle} />;
-  }
+  const handleBackToFlipBook = () => {
+    setShowMainHomepage(false);
+  };
 
   const handleTabChange = (newTab: 'today' | 'month') => {
     if (newTab === selectedTab || isTransitioning) return;
@@ -47,17 +47,17 @@ const HomeScreen: React.FC = () => {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: newTab === 'today' ? 50 : -50,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }),
       Animated.timing(titleFadeAnim, {
         toValue: 0,
         duration: 150,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }),
     ]).start(() => {
       // Change the tab after exit animation
@@ -71,18 +71,18 @@ const HomeScreen: React.FC = () => {
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 300,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.spring(slideAnim, {
           toValue: 0,
           tension: 100,
           friction: 8,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(titleFadeAnim, {
           toValue: 1,
           duration: 250,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ]).start(() => {
         setIsTransitioning(false);
@@ -90,19 +90,29 @@ const HomeScreen: React.FC = () => {
     });
   };
 
-  const getAnimatedStyle = () => ({
+  const animatedStyle = {
     opacity: fadeAnim,
     transform: [{ translateX: slideAnim }],
-  });
+  };
 
-  const getTitleAnimatedStyle = () => ({
+  const titleAnimatedStyle = {
     opacity: titleFadeAnim,
-  });
+  };
+
+  if (showMainHomepage) {
+    return (
+      <MainHomeScreen 
+        favorites={favorites} 
+        onFavoriteToggle={handleFavoriteToggle}
+        onBackToFlipBook={handleBackToFlipBook}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Animated.View style={getTitleAnimatedStyle()}>
+        <Animated.View style={titleAnimatedStyle}>
           <Text style={styles.title}>{headerTitle}</Text>
         </Animated.View>
         <Text style={styles.subtitle}>Swipe to discover amazing recipes</Text>
@@ -113,7 +123,7 @@ const HomeScreen: React.FC = () => {
         onTabChange={handleTabChange} 
       />
       
-      <Animated.View style={[styles.flipBookContainer, getAnimatedStyle()]}>
+      <Animated.View style={[styles.flipBookContainer, animatedStyle]}>
         <FlipBook 
           cards={currentCards}
           onNavigateToHomepage={handleNavigateToHomepage}
