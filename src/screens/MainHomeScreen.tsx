@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { Header, PopularDishes, SearchModal } from '../components';
-import { todaysRecipes, monthlyRecipes } from '../data/dummyRecipes';
+import { useNavigation } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { Header, SnapAndAnalyze, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal } from '../components';
+import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
+import { BottomTabParamList } from '../navigation/BottomTabNavigator';
+
+type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
 
 const MainHomeScreen: React.FC = () => {
+  const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
 
@@ -33,8 +39,33 @@ const MainHomeScreen: React.FC = () => {
     console.log('Category pressed:', category.name);
   };
 
+  const handleRecipeSelect = (recipe: Recipe) => {
+    // TODO: Navigate to recipe detail screen or show recipe preview
+    console.log('Recipe selected from roulette:', recipe.name);
+  };
+
+  const handleSnapPress = () => {
+    console.log('Analyze Food pressed - navigating to camera screen');
+    navigation.navigate('Camera');
+  };
+
+
+
   // Combine and shuffle recipes for popular dishes
   const popularDishes = [...todaysRecipes, ...monthlyRecipes.slice(0, 3)];
+
+  // All recipes for the roulette
+  const allRecipes = [...todaysRecipes, ...monthlyRecipes, ...quickWinRecipes];
+
+  // Mock streak data - this would come from user preferences/storage
+  // Assuming today is Thursday (index 4), let's create a proper 3-day streak
+  const streakData = {
+    currentStreak: 3,
+    todayCompleted: false,
+    weekProgress: [false, true, true, true, false, false, false] // S, M, T, W, T, F, S
+    // This shows: Monday(1), Tuesday(2), Wednesday(3) cooked = 3-day streak
+    // Today is Thursday(4) - not cooked yet, opportunity to extend to 4 days
+  };
 
   return (
     <View style={styles.container}>
@@ -45,52 +76,28 @@ const MainHomeScreen: React.FC = () => {
       />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-        
-        <PopularDishes 
-          dishes={popularDishes} 
-          onDishPress={handleDishPress}
-        />
-        
-        <View style={styles.content}>
-          <View style={styles.section}>
-            <Text style={styles.sectionIcon}>🍳</Text>
-            <Text style={styles.sectionTitle}>Discover Recipes</Text>
-            <Text style={styles.sectionDescription}>
-              Explore thousands of delicious recipes from around the world
-            </Text>
-          </View>
+          <SnapAndAnalyze onSnapPress={handleSnapPress} />
           
-          <View style={styles.section}>
-            <Text style={styles.sectionIcon}>📱</Text>
-            <Text style={styles.sectionTitle}>Cook with Confidence</Text>
-            <Text style={styles.sectionDescription}>
-              Step-by-step instructions and cooking tips for every skill level
-            </Text>
-          </View>
+          <PopularDishes 
+            dishes={popularDishes} 
+            onDishPress={handleDishPress}
+          />
           
-          <View style={styles.section}>
-            <Text style={styles.sectionIcon}>❤️</Text>
-            <Text style={styles.sectionTitle}>Save Favorites</Text>
-            <Text style={styles.sectionDescription}>
-              Keep track of your favorite recipes and create custom collections
-            </Text>
-          </View>
-          
-          <View style={styles.section}>
-            <Text style={styles.sectionIcon}>🎯</Text>
-            <Text style={styles.sectionTitle}>Personalized Recommendations</Text>
-            <Text style={styles.sectionDescription}>
-              Get recipe suggestions based on your preferences and dietary needs
-            </Text>
-          </View>
-        </View>
-        
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            This is the main Dishly homepage.{'\n'}
-            More features coming soon!
-          </Text>
-        </View>
+          <QuickWins 
+            recipes={quickWinRecipes}
+            onRecipePress={handleDishPress}
+          />
+
+          <RecipeRoulette 
+            recipes={allRecipes}
+            onRecipeSelect={handleRecipeSelect}
+          />
+
+          <KitchenStreak
+            currentStreak={streakData.currentStreak}
+            todayCompleted={streakData.todayCompleted}
+            weekProgress={streakData.weekProgress}
+          />
         </ScrollView>
       </SafeAreaView>
       
@@ -117,56 +124,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingTop: 20,
-  },
-  content: {
-    flex: 1,
-    gap: 24,
-    paddingHorizontal: 20,
-  },
-  section: {
-    backgroundColor: '#fff',
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  sectionIcon: {
-    fontSize: 32,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  footer: {
-    marginTop: 40,
-    margin: 20,
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    lineHeight: 20,
+    paddingBottom: 40,
   },
 });
 

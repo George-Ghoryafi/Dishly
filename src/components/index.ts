@@ -1,7 +1,12 @@
 export * from './flip-book';
 export { default as TabSelector } from './TabSelector';
 export { default as Header } from './Header';
+export { default as SnapAndAnalyze } from './SnapAndAnalyze';
 export { default as DishCard } from './DishCard';
+export { default as RecipeCard } from './RecipeCard';
 export { default as PopularDishes } from './PopularDishes';
+export { default as QuickWins } from './QuickWins';
+export { default as RecipeRoulette } from './RecipeRoulette';
+export { default as KitchenStreak } from './KitchenStreak';
 export { default as SearchBar } from './SearchBar';
 export { default as SearchModal } from './SearchModal'; 

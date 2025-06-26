@@ -124,6 +124,83 @@ export const monthlyRecipes: Recipe[] = [
   }
 ];
 
+// Quick recipes (15 minutes or less) for the Quick Wins section
+export const quickWinRecipes: Recipe[] = [
+  {
+    id: 'q1',
+    name: 'Avocado Toast Supreme',
+    cookTime: 5,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'gluten', icon: '🌾' },
+      { type: 'nuts', icon: '🥜' }
+    ],
+    image: 'https://picsum.photos/400/300?random=11',
+    description: 'Perfectly ripe avocado on sourdough with everything seasoning and hemp hearts.'
+  },
+  {
+    id: 'q2',
+    name: 'Lightning Stir-Fry',
+    cookTime: 12,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'soy', icon: '🫘' }
+    ],
+    image: 'https://picsum.photos/400/300?random=12',
+    description: 'Quick and colorful vegetable stir-fry with ginger and soy sauce.'
+  },
+  {
+    id: 'q3',
+    name: 'Microwave Mug Cake',
+    cookTime: 3,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'dairy', icon: '🥛' },
+      { type: 'gluten', icon: '🌾' },
+      { type: 'eggs', icon: '🥚' }
+    ],
+    image: 'https://picsum.photos/400/300?random=13',
+    description: 'Fluffy chocolate cake made in minutes in your microwave.'
+  },
+  {
+    id: 'q4',
+    name: 'Protein Power Smoothie',
+    cookTime: 2,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'dairy', icon: '🥛' },
+      { type: 'nuts', icon: '🥜' }
+    ],
+    image: 'https://picsum.photos/400/300?random=14',
+    description: 'Energizing smoothie with banana, protein powder, and almond butter.'
+  },
+  {
+    id: 'q5',
+    name: 'Quick Quesadilla',
+    cookTime: 8,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'dairy', icon: '🥛' },
+      { type: 'gluten', icon: '🌾' }
+    ],
+    image: 'https://picsum.photos/400/300?random=15',
+    description: 'Crispy tortilla filled with melted cheese and your favorite fillings.'
+  },
+  {
+    id: 'q6',
+    name: 'Instant Ramen Upgrade',
+    cookTime: 10,
+    difficulty: 'Easy',
+    allergens: [
+      { type: 'gluten', icon: '🌾' },
+      { type: 'soy', icon: '🫘' },
+      { type: 'eggs', icon: '🥚' }
+    ],
+    image: 'https://picsum.photos/400/300?random=16',
+    description: 'Transform instant ramen with fresh vegetables, egg, and sriracha.'
+  }
+];
+
 const todayCompletionCard: CompletionCard = {
   id: 'today-complete',
   type: 'completion',

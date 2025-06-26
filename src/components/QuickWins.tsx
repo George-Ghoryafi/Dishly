@@ -1,20 +1,22 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated, Dimensions, Platform } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Platform, Animated, Dimensions } from 'react-native';
 import { Recipe } from '../types/Recipe';
 import RecipeCard from './RecipeCard';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-interface PopularDishesProps {
-  dishes: Recipe[];
-  onDishPress?: (recipe: Recipe) => void;
+interface QuickWinsProps {
+  recipes: Recipe[];
+  onRecipePress?: (recipe: Recipe) => void;
 }
 
-const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) => {
+const QuickWins: React.FC<QuickWinsProps> = ({ recipes, onRecipePress }) => {
+  // Filter recipes that are 15 minutes or less
+  const quickRecipes = recipes.filter(recipe => recipe.cookTime <= 15);
   const scrollX = useRef(new Animated.Value(0)).current;
-  const cardWidth = screenWidth * 0.4 + 16; // Card width + margin
+  const cardWidth = 160 + 16; // Card width + margin
 
-  const renderCard = (recipe: Recipe, index: number) => {
+  const renderQuickCard = (recipe: Recipe, index: number) => {
     const inputRange = [
       (index - 1) * cardWidth,
       index * cardWidth,
@@ -45,9 +47,10 @@ const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) =>
         >
           <RecipeCard
             recipe={recipe}
-            variant="popular"
-            onPress={() => onDishPress?.(recipe)}
+            variant="quick"
+            onPress={() => onRecipePress?.(recipe)}
           />
+          
           <Animated.View 
             style={[
               styles.blurOverlay,
@@ -62,15 +65,19 @@ const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) =>
     );
   };
 
+  if (quickRecipes.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Popular Dishes</Text>
-          <Text style={styles.subtitle}>Trending recipes you'll love</Text>
+          <Text style={styles.title}>Quick Wins</Text>
+          <Text style={styles.subtitle}>Ready in 15 minutes or less</Text>
         </View>
       </View>
-      
+
       <Animated.ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -82,7 +89,7 @@ const PopularDishes: React.FC<PopularDishesProps> = ({ dishes, onDishPress }) =>
         )}
         scrollEventThrottle={16}
       >
-        {dishes.map((recipe, index) => renderCard(recipe, index))}
+        {quickRecipes.map((recipe, index) => renderQuickCard(recipe, index))}
       </Animated.ScrollView>
     </View>
   );
@@ -128,8 +135,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 12,
+    borderRadius: 16,
   },
 });
 
-export default PopularDishes; 
+export default QuickWins; 
