@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { Header, PopularDishes } from '../components';
+import { Header, PopularDishes, SearchModal } from '../components';
 import { todaysRecipes, monthlyRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 
 const MainHomeScreen: React.FC = () => {
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
+
   const handleProfilePress = () => {
     // TODO: Navigate to profile screen
     console.log('Profile pressed');
@@ -15,18 +18,33 @@ const MainHomeScreen: React.FC = () => {
     console.log('Dish pressed:', recipe.name);
   };
 
+  const handleSearchPress = (layout: { x: number; y: number; width: number; height: number }) => {
+    setSearchButtonLayout(layout);
+    setSearchModalVisible(true);
+  };
+
+  const handleSearch = (query: string) => {
+    // TODO: Implement search functionality
+    console.log('Search query:', query);
+  };
+
+  const handleCategoryPress = (category: any) => {
+    // TODO: Navigate to category results
+    console.log('Category pressed:', category.name);
+  };
+
   // Combine and shuffle recipes for popular dishes
   const popularDishes = [...todaysRecipes, ...monthlyRecipes.slice(0, 3)];
 
   return (
     <View style={styles.container}>
-      <Header onProfilePress={handleProfilePress} />
+      <Header 
+        onProfilePress={handleProfilePress}
+        onSearchPress={handleSearchPress}
+        searchPlaceholder="Search for recipes and dishes..."
+      />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Welcome back!</Text>
-          <Text style={styles.subtitle}>Discover your next favorite dish</Text>
-        </View>
         
         <PopularDishes 
           dishes={popularDishes} 
@@ -75,6 +93,14 @@ const MainHomeScreen: React.FC = () => {
         </View>
         </ScrollView>
       </SafeAreaView>
+      
+      <SearchModal
+        visible={searchModalVisible}
+        onClose={() => setSearchModalVisible(false)}
+        onSearch={handleSearch}
+        onCategoryPress={handleCategoryPress}
+        searchButtonLayout={searchButtonLayout}
+      />
     </View>
   );
 };
@@ -90,22 +116,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  welcomeSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-    paddingTop: 10,
-    paddingHorizontal: 20,
-  },
-  welcomeText: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
+    paddingTop: 20,
   },
   content: {
     flex: 1,
