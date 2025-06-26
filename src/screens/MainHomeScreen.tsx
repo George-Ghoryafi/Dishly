@@ -1,15 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { Header, PopularDishes } from '../components';
+import { todaysRecipes, monthlyRecipes } from '../data/dummyRecipes';
+import { Recipe } from '../types/Recipe';
 
 const MainHomeScreen: React.FC = () => {
+  const handleProfilePress = () => {
+    // TODO: Navigate to profile screen
+    console.log('Profile pressed');
+  };
+
+  const handleDishPress = (recipe: Recipe) => {
+    // TODO: Navigate to recipe detail screen
+    console.log('Dish pressed:', recipe.name);
+  };
+
+  // Combine and shuffle recipes for popular dishes
+  const popularDishes = [...todaysRecipes, ...monthlyRecipes.slice(0, 3)];
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.welcomeText}>Welcome to</Text>
-          <Text style={styles.appName}>Dishly</Text>
-          <Text style={styles.subtitle}>Your culinary companion</Text>
+    <View style={styles.container}>
+      <Header onProfilePress={handleProfilePress} />
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcomeText}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Discover your next favorite dish</Text>
         </View>
+        
+        <PopularDishes 
+          dishes={popularDishes} 
+          onDishPress={handleDishPress}
+        />
         
         <View style={styles.content}>
           <View style={styles.section}>
@@ -51,44 +73,44 @@ const MainHomeScreen: React.FC = () => {
             More features coming soon!
           </Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  safeArea: {
+    flex: 1,
     backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
   },
-  header: {
+  welcomeSection: {
     alignItems: 'center',
-    marginBottom: 40,
-    paddingTop: 20,
+    marginBottom: 30,
+    paddingTop: 10,
+    paddingHorizontal: 20,
   },
   welcomeText: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 8,
-  },
-  appName: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#007AFF',
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
-    fontStyle: 'italic',
   },
   content: {
     flex: 1,
     gap: 24,
+    paddingHorizontal: 20,
   },
   section: {
     backgroundColor: '#fff',
@@ -123,6 +145,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 40,
+    margin: 20,
     padding: 20,
     backgroundColor: '#fff',
     borderRadius: 16,
