@@ -1,4 +1,4 @@
-import { Recipe } from '../types/Recipe';
+import { Recipe, CompletionCard, CardData } from '../types/Recipe';
 
 export const todaysRecipes: Recipe[] = [
   {
@@ -123,6 +123,27 @@ export const monthlyRecipes: Recipe[] = [
     description: 'Light and airy French dessert that rises majestically in the oven.'
   }
 ];
+
+const todayCompletionCard: CompletionCard = {
+  id: 'today-complete',
+  type: 'completion',
+  title: "You've seen all of today's picks! 🎉",
+  message: "Great job exploring today's recommended recipes. Ready to discover more in the full app?",
+  buttonText: "Go to Homepage",
+  period: 'today'
+};
+
+const monthCompletionCard: CompletionCard = {
+  id: 'month-complete',
+  type: 'completion',
+  title: "You've explored this month's favorites! 🌟",
+  message: "Amazing! You've seen all our top monthly picks. Let's head to the main app for more culinary adventures.",
+  buttonText: "Go to Homepage",
+  period: 'month'
+};
+
+export const todaysCards: CardData[] = [...todaysRecipes, todayCompletionCard];
+export const monthlyCards: CardData[] = [...monthlyRecipes, monthCompletionCard];
 
 // Keep the old export for backward compatibility
 export const dummyRecipes = todaysRecipes; 

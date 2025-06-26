@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Dimensions, PanResponder, Animated } from 'react-native';
-import { Recipe } from '../../types/Recipe';
+import { CardData } from '../../types/Recipe';
 import RecipeCard from './RecipeCard';
+import CompletionCard from './CompletionCard';
 
 interface FlipBookProps {
-  recipes: Recipe[];
+  cards: CardData[];
+  onNavigateToHomepage?: () => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -12,7 +14,7 @@ const CARD_WIDTH = screenWidth * 0.85;
 const CARD_HEIGHT = CARD_WIDTH * 1.4;
 const SWIPE_THRESHOLD = 50;
 
-const FlipBook: React.FC<FlipBookProps> = ({ recipes }) => {
+const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -131,16 +133,29 @@ const FlipBook: React.FC<FlipBookProps> = ({ recipes }) => {
   };
 
   const goToNext = () => {
-    const nextIndex = currentIndex === recipes.length - 1 ? 0 : currentIndex + 1;
+    const nextIndex = currentIndex === cards.length - 1 ? 0 : currentIndex + 1;
     setCurrentIndex(nextIndex);
   };
 
   const goToPrevious = () => {
-    const prevIndex = currentIndex === 0 ? recipes.length - 1 : currentIndex - 1;
+    const prevIndex = currentIndex === 0 ? cards.length - 1 : currentIndex - 1;
     setCurrentIndex(prevIndex);
   };
 
-  const currentRecipe = recipes[currentIndex];
+  const currentCard = cards[currentIndex];
+
+  const renderCard = () => {
+    if ('type' in currentCard && currentCard.type === 'completion') {
+      return (
+        <CompletionCard 
+          card={currentCard} 
+          onNavigateToHomepage={onNavigateToHomepage || (() => {})}
+        />
+      );
+    } else {
+      return <RecipeCard recipe={currentCard} />;
+    }
+  };
 
   const getAnimatedStyle = () => {
     const rotateInterpolate = rotateAnim.interpolate({
@@ -164,13 +179,13 @@ const FlipBook: React.FC<FlipBookProps> = ({ recipes }) => {
           style={[styles.cardWrapper, getAnimatedStyle()]}
           {...panResponder.panHandlers}
         >
-          <RecipeCard recipe={currentRecipe} />
+          {renderCard()}
         </Animated.View>
       </View>
       
       {/* Page indicator */}
       <View style={styles.indicatorContainer}>
-        {recipes.map((_, index) => (
+        {cards.map((_, index) => (
           <View
             key={index}
             style={[

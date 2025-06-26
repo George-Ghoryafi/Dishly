@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, LayoutChangeEvent } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, LayoutChangeEvent, Platform } from 'react-native';
 
 interface TabSelectorProps {
   selectedTab: 'today' | 'month';
@@ -103,7 +103,7 @@ const TabSelector: React.FC<TabSelectorProps> = ({ selectedTab, onTabChange }) =
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: Platform.OS === 'android' ? 30 : 20,
   },
   tabContainer: {
     flexDirection: 'row',

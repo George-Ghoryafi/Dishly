@@ -1,18 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Animated } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Animated, Platform } from 'react-native';
 import { FlipBook, TabSelector } from '../components';
-import { todaysRecipes, monthlyRecipes } from '../data/dummyRecipes';
+import { todaysCards, monthlyCards } from '../data/dummyRecipes';
+import MainHomeScreen from './MainHomeScreen';
 
 const HomeScreen: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'today' | 'month'>('today');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showMainHomepage, setShowMainHomepage] = useState(false);
   
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const titleFadeAnim = useRef(new Animated.Value(1)).current;
   
-  const currentRecipes = selectedTab === 'today' ? todaysRecipes : monthlyRecipes;
+  const currentCards = selectedTab === 'today' ? todaysCards : monthlyCards;
   const headerTitle = selectedTab === 'today' ? "Today's Top Picks" : "This Month's Favorites";
+
+  const handleNavigateToHomepage = () => {
+    setShowMainHomepage(true);
+  };
+
+  if (showMainHomepage) {
+    return <MainHomeScreen />;
+  }
 
   const handleTabChange = (newTab: 'today' | 'month') => {
     if (newTab === selectedTab || isTransitioning) return;
@@ -92,7 +102,8 @@ const HomeScreen: React.FC = () => {
       
       <Animated.View style={[styles.flipBookContainer, getAnimatedStyle()]}>
         <FlipBook 
-          recipes={currentRecipes}
+          cards={currentCards}
+          onNavigateToHomepage={handleNavigateToHomepage}
           key={selectedTab} // Force re-render when tab changes
         />
       </Animated.View>
@@ -107,14 +118,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingTop: Platform.OS === 'android' ? 50 : 20,
+    paddingBottom: Platform.OS === 'android' ? 20 : 10,
     alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: Platform.OS === 'android' ? 12 : 8,
     color: '#333',
   },
   subtitle: {
