@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Animated, Platform } from 'react-native';
-import { FlipBook, TabSelector, RecipeDetailModal } from '../components';
+import { FlipBook, TabSelector, RecipeDetailModal, CookingTimerModal } from '../components';
 import { todaysCards, monthlyCards } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import MainHomeScreen from './MainHomeScreen';
@@ -12,6 +12,8 @@ const HomeScreen: React.FC = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeModalVisible, setRecipeModalVisible] = useState(false);
+  const [cookingTimerVisible, setCookingTimerVisible] = useState(false);
+  const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
   
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -54,6 +56,24 @@ const HomeScreen: React.FC = () => {
     if (selectedRecipe) {
       handleFavoriteToggle(selectedRecipe.id);
     }
+  };
+
+  const handleStartCooking = (recipe: Recipe) => {
+    setCookingRecipe(recipe);
+    setRecipeModalVisible(false);
+    setSelectedRecipe(null);
+    setCookingTimerVisible(true);
+  };
+
+  const handleCookingTimerClose = () => {
+    setCookingTimerVisible(false);
+    setCookingRecipe(null);
+  };
+
+  const handleCookingComplete = () => {
+    setCookingTimerVisible(false);
+    setCookingRecipe(null);
+    console.log('Cooking completed!');
   };
 
   const handleTabChange = (newTab: 'today' | 'month') => {
@@ -159,6 +179,14 @@ const HomeScreen: React.FC = () => {
         onClose={handleCloseRecipeModal}
         isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
         onFavoriteToggle={handleRecipeFavoriteToggle}
+        onStartCooking={handleStartCooking}
+      />
+
+      <CookingTimerModal
+        visible={cookingTimerVisible}
+        recipe={cookingRecipe}
+        onClose={handleCookingTimerClose}
+        onComplete={handleCookingComplete}
       />
     </SafeAreaView>
   );

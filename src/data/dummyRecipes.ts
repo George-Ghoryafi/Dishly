@@ -299,7 +299,44 @@ export const todaysRecipes: Recipe[] = [
       carbs: 45,
       protein: 28,
       fat: 12
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Shrimp & Pasta",
+        instruction: "Peel and devein shrimp, pat dry and season with salt and pepper. Bring large pot of salted water to boil for pasta.",
+        duration: 5,
+        tips: "Remove shrimp tails for easier eating, or leave on for presentation"
+      },
+      {
+        stepNumber: 2,
+        title: "Start Pasta",
+        instruction: "Add linguine to boiling water and cook according to package directions until al dente. Reserve 1 cup pasta water before draining.",
+        duration: 10,
+        tips: "Start pasta when you begin cooking the shrimp"
+      },
+      {
+        stepNumber: 3,
+        title: "Cook Shrimp",
+        instruction: "Heat olive oil and 2 tbsp butter in large skillet over medium-high heat. Add shrimp and cook 1-2 minutes per side until pink. Remove shrimp and set aside.",
+        duration: 4,
+        tips: "Don't overcook shrimp - they'll finish cooking in the sauce"
+      },
+      {
+        stepNumber: 4,
+        title: "Make Sauce",
+        instruction: "In same skillet, add garlic and red pepper flakes, cook 30 seconds. Add white wine and lemon juice, simmer 2 minutes. Whisk in remaining butter.",
+        duration: 3,
+        tips: "Scrape up any browned bits for extra flavor"
+      },
+      {
+        stepNumber: 5,
+        title: "Combine & Serve",
+        instruction: "Return shrimp to skillet, add drained pasta and parsley. Toss with pasta water as needed. Season and serve immediately with lemon wedges.",
+        duration: 2,
+        tips: "Use pasta water to achieve silky sauce consistency"
+      }
+    ]
   }
 ];
 
@@ -335,7 +372,44 @@ export const monthlyRecipes: Recipe[] = [
       carbs: 35,
       protein: 42,
       fat: 38
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Sear the Beef",
+        instruction: "Season beef tenderloin with salt and pepper. Heat oil in large skillet and sear beef on all sides until browned. Brush with Dijon mustard and let cool.",
+        duration: 15,
+        tips: "Searing locks in juices and adds flavor to the final dish"
+      },
+      {
+        stepNumber: 2,
+        title: "Make Mushroom Duxelles",
+        instruction: "Finely chop mushrooms, shallots, and garlic. Cook in butter until all moisture evaporates, about 10 minutes. Season with thyme, salt, and pepper. Cool completely.",
+        duration: 20,
+        tips: "All moisture must be cooked out to prevent soggy pastry"
+      },
+      {
+        stepNumber: 3,
+        title: "Prep Assembly",
+        instruction: "Roll out puff pastry on parchment. Lay prosciutto slices overlapping on plastic wrap, spread mushroom mixture over, then wrap around beef tightly. Chill 30 minutes.",
+        duration: 15,
+        tips: "Chilling helps the wellington hold its shape during baking"
+      },
+      {
+        stepNumber: 4,
+        title: "Wrap in Pastry",
+        instruction: "Place beef roll seam-side down on pastry. Brush edges with egg wash, wrap tightly, and seal seams. Brush all over with egg wash.",
+        duration: 10,
+        tips: "Ensure no air pockets and seal well to prevent leaking"
+      },
+      {
+        stepNumber: 5,
+        title: "Bake",
+        instruction: "Preheat oven to 425°F. Bake for 25-30 minutes until pastry is golden and internal temperature reaches 125°F for medium-rare. Rest 10 minutes before slicing.",
+        duration: 40,
+        tips: "Use a meat thermometer for perfect doneness"
+      }
+    ]
   },
   {
     id: '7',
@@ -371,7 +445,44 @@ export const monthlyRecipes: Recipe[] = [
       carbs: 8,
       protein: 35,
       fat: 28
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Cook Lobsters",
+        instruction: "Boil lobsters for 8-10 minutes until bright red. Cool in ice water. Extract meat from shells, keeping shells intact. Chop meat into bite-sized pieces.",
+        duration: 20,
+        tips: "Save the shells - they'll be used for serving"
+      },
+      {
+        stepNumber: 2,
+        title: "Sauté Aromatics",
+        instruction: "Dice mushrooms and shallots finely. Sauté in butter until softened and moisture evaporates, about 5 minutes. Season with salt and pepper.",
+        duration: 8,
+        tips: "Cook until vegetables are golden for best flavor"
+      },
+      {
+        stepNumber: 3,
+        title: "Make Sauce Base",
+        instruction: "Sprinkle flour over vegetables and cook 1 minute. Gradually whisk in cognac and cream. Add mustard, tarragon, and cayenne. Simmer until thickened.",
+        duration: 10,
+        tips: "Whisk constantly to prevent lumps from forming"
+      },
+      {
+        stepNumber: 4,
+        title: "Finish Sauce",
+        instruction: "Remove from heat. Whisk in egg yolks one at a time. Add lobster meat and gently fold to combine. Adjust seasoning.",
+        duration: 5,
+        tips: "Don't let sauce boil after adding egg yolks or they'll curdle"
+      },
+      {
+        stepNumber: 5,
+        title: "Assemble & Broil",
+        instruction: "Divide mixture among lobster shells. Top with breadcrumb and Gruyère mixture. Broil 2-3 minutes until golden and bubbling. Serve immediately.",
+        duration: 5,
+        tips: "Watch carefully under broiler to prevent burning"
+      }
+    ]
   },
   {
     id: '8',
@@ -400,7 +511,44 @@ export const monthlyRecipes: Recipe[] = [
       carbs: 52,
       protein: 12,
       fat: 14
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep & Heat Stock",
+        instruction: "Finely dice onion. Heat vegetable stock in a separate pot and keep warm on low heat. This ensures consistent temperature when adding to rice.",
+        duration: 5,
+        tips: "Warm stock is essential for proper risotto texture"
+      },
+      {
+        stepNumber: 2,
+        title: "Toast Rice",
+        instruction: "Heat 2 tbsp butter in heavy-bottomed pan over medium heat. Add onion and cook until translucent. Add Arborio rice and stir for 2 minutes until edges are translucent.",
+        duration: 5,
+        tips: "Toasting develops nutty flavors in the rice"
+      },
+      {
+        stepNumber: 3,
+        title: "Add Wine",
+        instruction: "Pour in white wine and stir until absorbed. The wine adds acidity that balances the rich creaminess of the finished dish.",
+        duration: 3,
+        tips: "Let wine cook out completely to avoid harsh alcohol taste"
+      },
+      {
+        stepNumber: 4,
+        title: "Add Stock Gradually",
+        instruction: "Add warm stock one ladle at a time, stirring constantly until each addition is absorbed before adding more. Continue for 18-20 minutes until rice is creamy but still has bite.",
+        duration: 20,
+        tips: "Patience is key - rushing this step ruins the texture"
+      },
+      {
+        stepNumber: 5,
+        title: "Finish with Luxury",
+        instruction: "Remove from heat. Stir in remaining butter, Parmesan cheese, and truffle oil. Season with salt and pepper. Serve immediately topped with fresh truffle shavings.",
+        duration: 2,
+        tips: "Add truffle at the end to preserve its delicate aroma"
+      }
+    ]
   },
   {
     id: '9',
@@ -426,7 +574,44 @@ export const monthlyRecipes: Recipe[] = [
       carbs: 2,
       protein: 32,
       fat: 38
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Cure the Duck",
+        instruction: "Rub duck legs with salt, pepper, thyme, and rosemary. Place in dish with bay leaves and garlic. Cover and refrigerate overnight (24 hours is ideal).",
+        duration: 30,
+        tips: "Curing draws out moisture and concentrates flavors"
+      },
+      {
+        stepNumber: 2,
+        title: "Prep for Confit",
+        instruction: "Remove duck from cure and pat completely dry. Preheat oven to 225°F. Heat duck fat in large oven-safe pot until melted.",
+        duration: 15,
+        tips: "Low temperature is crucial for tender, not tough, meat"
+      },
+      {
+        stepNumber: 3,
+        title: "Slow Cook",
+        instruction: "Submerge duck legs completely in melted fat with shallots and herb sprigs. Cover and cook in oven for 2.5-3 hours until meat easily pulls from bone.",
+        duration: 180,
+        tips: "Duck should be completely covered by fat throughout cooking"
+      },
+      {
+        stepNumber: 4,
+        title: "Rest & Store",
+        instruction: "Let duck cool in the fat for 30 minutes. Can be stored in fat in refrigerator for up to 1 month.",
+        duration: 30,
+        tips: "Storing in fat preserves the duck and adds flavor"
+      },
+      {
+        stepNumber: 5,
+        title: "Crisp & Serve",
+        instruction: "To serve, remove duck from fat and pat dry. Sear skin-side down in hot pan for 3-4 minutes until crispy. Serve immediately.",
+        duration: 5,
+        tips: "High heat at the end creates perfect crispy skin"
+      }
+    ]
   },
   {
     id: '10',
@@ -455,7 +640,44 @@ export const monthlyRecipes: Recipe[] = [
       carbs: 28,
       protein: 8,
       fat: 16
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Ramekins",
+        instruction: "Preheat oven to 375°F. Butter 4 ramekins thoroughly and dust with sugar, tapping out excess. This helps the soufflé climb the walls.",
+        duration: 5,
+        tips: "Proper ramekin prep is crucial for rising"
+      },
+      {
+        stepNumber: 2,
+        title: "Make Chocolate Base",
+        instruction: "Melt chocolate and butter in double boiler until smooth. Whisk in flour, then gradually add milk. Cook stirring constantly until thickened, about 3 minutes.",
+        duration: 8,
+        tips: "Base should be thick enough to coat a spoon"
+      },
+      {
+        stepNumber: 3,
+        title: "Add Egg Yolks",
+        instruction: "Remove from heat and whisk in egg yolks one at a time. Add vanilla and a pinch of salt. Let cool slightly.",
+        duration: 3,
+        tips: "Let base cool to prevent cooking the yolks"
+      },
+      {
+        stepNumber: 4,
+        title: "Whip Egg Whites",
+        instruction: "In clean bowl, whip egg whites to soft peaks. Gradually add remaining sugar and whip to firm, glossy peaks. Don't overbeat.",
+        duration: 5,
+        tips: "Clean bowl is essential - any fat will prevent proper whipping"
+      },
+      {
+        stepNumber: 5,
+        title: "Fold & Bake",
+        instruction: "Fold 1/3 of whites into chocolate base to lighten. Gently fold in remaining whites in 2 additions. Fill ramekins and bake 12-15 minutes until risen and golden.",
+        duration: 15,
+        tips: "Gentle folding preserves the air bubbles that create the rise"
+      }
+    ]
   }
 ];
 
@@ -486,7 +708,30 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 28,
       protein: 8,
       fat: 18
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Toast Bread",
+        instruction: "Toast sourdough slices until golden brown and crispy on both sides.",
+        duration: 3,
+        tips: "Use a medium heat setting for even browning"
+      },
+      {
+        stepNumber: 2,
+        title: "Prepare Avocado",
+        instruction: "Cut avocado in half, remove pit, and mash with lemon juice, salt, and pepper until smooth but still chunky.",
+        duration: 2,
+        tips: "Choose a ripe avocado that yields slightly to pressure"
+      },
+      {
+        stepNumber: 3,
+        title: "Assemble & Serve",
+        instruction: "Spread mashed avocado generously on toast, sprinkle with everything seasoning and hemp hearts. Serve immediately.",
+        duration: 1,
+        tips: "Serve right away to prevent bread from getting soggy"
+      }
+    ]
   },
   {
     id: 'q2',
@@ -511,7 +756,37 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 18,
       protein: 4,
       fat: 4
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Aromatics",
+        instruction: "Mince ginger and garlic, chop green onions separating white and green parts. Have all vegetables ready.",
+        duration: 3,
+        tips: "Prep everything first - stir-frying happens fast"
+      },
+      {
+        stepNumber: 2,
+        title: "Heat Wok",
+        instruction: "Heat vegetable oil in a wok or large skillet over high heat until shimmering and almost smoking.",
+        duration: 2,
+        tips: "High heat is key for proper stir-frying"
+      },
+      {
+        stepNumber: 3,
+        title: "Stir-Fry",
+        instruction: "Add ginger, garlic, and white parts of green onions. Stir-fry for 30 seconds, then add vegetables and stir-fry for 3-4 minutes.",
+        duration: 5,
+        tips: "Keep ingredients moving constantly in the pan"
+      },
+      {
+        stepNumber: 4,
+        title: "Season & Serve",
+        instruction: "Add soy sauce and toss for 1 minute. Remove from heat, garnish with green onion tops, and serve immediately.",
+        duration: 2,
+        tips: "Vegetables should be crisp-tender, not soft"
+      }
+    ]
   },
   {
     id: 'q3',
@@ -539,7 +814,30 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 32,
       protein: 6,
       fat: 8
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Mix Dry Ingredients",
+        instruction: "In a microwave-safe mug, whisk together flour, sugar, cocoa powder, and baking powder until well combined.",
+        duration: 1,
+        tips: "Use a large mug to prevent overflow during cooking"
+      },
+      {
+        stepNumber: 2,
+        title: "Add Wet Ingredients",
+        instruction: "Beat in the egg, then stir in milk and vegetable oil until batter is smooth with no lumps.",
+        duration: 1,
+        tips: "Make sure egg is fully incorporated for even texture"
+      },
+      {
+        stepNumber: 3,
+        title: "Microwave",
+        instruction: "Microwave on high for 60-90 seconds, checking at 60 seconds. Cake should spring back when lightly touched.",
+        duration: 2,
+        tips: "Start with less time - you can always add more"
+      }
+    ]
   },
   {
     id: 'q4',
@@ -565,7 +863,23 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 24,
       protein: 28,
       fat: 8
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Ingredients",
+        instruction: "Peel and slice banana. Measure out protein powder, almond butter, and honey.",
+        duration: 1,
+        tips: "Frozen banana makes the smoothie extra creamy"
+      },
+      {
+        stepNumber: 2,
+        title: "Blend",
+        instruction: "Add all ingredients to blender in order: liquid first, then banana, protein powder, almond butter, honey, and ice. Blend on high until smooth and creamy.",
+        duration: 1,
+        tips: "Start blending slowly, then increase speed for best results"
+      }
+    ]
   },
   {
     id: 'q5',
@@ -591,7 +905,37 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 32,
       protein: 18,
       fat: 22
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Fillings",
+        instruction: "Chop green onions and shred cheese if needed. Drain and rinse black beans.",
+        duration: 2,
+        tips: "Pat beans dry to prevent soggy quesadilla"
+      },
+      {
+        stepNumber: 2,
+        title: "Assemble",
+        instruction: "Spread salsa on one tortilla, add cheese, black beans, and green onions. Top with second tortilla.",
+        duration: 2,
+        tips: "Don't overfill or it will be messy to flip"
+      },
+      {
+        stepNumber: 3,
+        title: "Cook",
+        instruction: "Heat butter in a skillet over medium heat. Cook quesadilla 2-3 minutes per side until golden brown and cheese melts.",
+        duration: 5,
+        tips: "Use medium heat to ensure cheese melts before tortilla burns"
+      },
+      {
+        stepNumber: 4,
+        title: "Serve",
+        instruction: "Remove from heat, let cool for 1 minute, then cut into wedges and serve with extra salsa.",
+        duration: 1,
+        tips: "Let it rest briefly so cheese doesn't ooze out when cut"
+      }
+    ]
   },
   {
     id: 'q6',
@@ -618,7 +962,37 @@ export const quickWinRecipes: Recipe[] = [
       carbs: 38,
       protein: 12,
       fat: 6
-    }
+    },
+    preparationSteps: [
+      {
+        stepNumber: 1,
+        title: "Prep Vegetables",
+        instruction: "Julienne carrot into thin strips, roughly chop spinach, and slice green onions separating white and green parts.",
+        duration: 3,
+        tips: "Cut carrots thin so they cook quickly in the hot broth"
+      },
+      {
+        stepNumber: 2,
+        title: "Cook Base",
+        instruction: "Bring water to boil, add noodles and seasoning packet. Cook for 2 minutes, then add carrots and white parts of green onions.",
+        duration: 4,
+        tips: "Don't overcook noodles - they'll continue cooking in the hot broth"
+      },
+      {
+        stepNumber: 3,
+        title: "Add Egg & Finish",
+        instruction: "Crack egg directly into the simmering broth and gently stir to create egg ribbons. Add spinach and cook 1 more minute.",
+        duration: 2,
+        tips: "Stir gently to create silky egg strands throughout"
+      },
+      {
+        stepNumber: 4,
+        title: "Serve",
+        instruction: "Remove from heat, stir in sriracha, and garnish with green onion tops. Serve immediately while hot.",
+        duration: 1,
+        tips: "Adjust sriracha to taste - start with less if sensitive to heat"
+      }
+    ]
   }
 ];
 

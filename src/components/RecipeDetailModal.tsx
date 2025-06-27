@@ -22,6 +22,7 @@ interface RecipeDetailModalProps {
   onClose: () => void;
   isFavorite?: boolean;
   onFavoriteToggle?: () => void;
+  onStartCooking?: (recipe: Recipe) => void;
 }
 
 const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
@@ -30,6 +31,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   onClose,
   isFavorite = false,
   onFavoriteToggle,
+  onStartCooking,
 }) => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
   const [portionSize, setPortionSize] = useState(1);
@@ -96,6 +98,15 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
     }
   };
 
+  // Function to handle start cooking
+  const handleStartCooking = () => {
+    if (recipe && onStartCooking) {
+      onStartCooking(recipe);
+    } else {
+      console.log('Starting cooking timer for recipe:', recipe?.name);
+    }
+  };
+
   // Function to split description into paragraphs
   const formatDescription = (description: string) => {
     // Split by periods followed by space and capital letter, or by double spaces
@@ -148,12 +159,12 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             onScroll={handleScroll}
             scrollEventThrottle={16}
           >
-            {/* Recipe Image */}
-            <View style={styles.imageContainer}>
-              <Image source={{ uri: recipe.image }} style={styles.image} />
-              <View style={styles.difficultyBadge}>
-                <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
-              </View>
+          {/* Recipe Image */}
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: recipe.image }} style={styles.image} />
+            <View style={styles.difficultyBadge}>
+              <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
+            </View>
               {/* Overlay with recipe name and cook time */}
               <View style={styles.nameOverlay}>
                 <Text style={styles.overlayRecipeName}>{recipe.name}</Text>
@@ -162,10 +173,10 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                   <Text style={styles.overlayCookTimeText}>{recipe.cookTime} minutes</Text>
                 </View>
               </View>
-            </View>
+          </View>
 
-            {/* Recipe Info */}
-            <View style={styles.infoContainer}>
+          {/* Recipe Info */}
+          <View style={styles.infoContainer}>
             {/* Description Section */}
             <View style={styles.descriptionSection}>
               <TouchableOpacity 
@@ -211,7 +222,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               <View style={styles.ingredientsSection}>
                 <View style={styles.ingredientsHeader}>
                   <View style={styles.ingredientsTitleContainer}>
-                    <Text style={styles.sectionTitle}>Ingredients</Text>
+              <Text style={styles.sectionTitle}>Ingredients</Text>
                     <Text style={styles.ingredientsSubtitle}>
                       {recipe.ingredients.length} ingredients • Tap to add to shopping list
                     </Text>
@@ -354,8 +365,8 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                             <Text style={styles.stepDuration}>{step.duration} min</Text>
                           </View>
                         </View>
-                      </View>
-                      
+            </View>
+
                       {/* Step Content */}
                       <View style={styles.stepContent}>
                         <Text style={styles.stepInstruction}>{step.instruction}</Text>
@@ -373,10 +384,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                   {!isButtonFloating && (
                     <TouchableOpacity 
                       style={styles.contextualCookingButton}
-                      onPress={() => {
-                        console.log('Starting cooking timer for recipe:', recipe.name);
-                        // TODO: Navigate to cooking timer screen
-                      }}
+                      onPress={handleStartCooking}
                       activeOpacity={0.8}
                     >
                       <View style={styles.startCookingButtonContent}>
@@ -409,10 +417,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             >
               <TouchableOpacity 
                 style={styles.startCookingButton}
-                onPress={() => {
-                  console.log('Starting cooking timer for recipe:', recipe.name);
-                  // TODO: Navigate to cooking timer screen
-                }}
+                onPress={handleStartCooking}
                 activeOpacity={0.8}
               >
                 <View style={styles.startCookingButtonContent}>
@@ -426,7 +431,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               </TouchableOpacity>
             </Animated.View>
           )}
-        </View>
+          </View>
       </SafeAreaView>
     </Modal>
   );

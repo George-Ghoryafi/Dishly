@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView, Animated, Platform } 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal, RecipeDetailModal } from '../components';
+import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal, RecipeDetailModal, CookingTimerModal } from '../components';
 import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
@@ -22,6 +22,8 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeModalVisible, setRecipeModalVisible] = useState(false);
+  const [cookingTimerVisible, setCookingTimerVisible] = useState(false);
+  const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
   const insets = useSafeAreaInsets();
   
   // Header animation
@@ -74,6 +76,25 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
     if (selectedRecipe) {
       onFavoriteToggle?.(selectedRecipe.id);
     }
+  };
+
+  const handleStartCooking = (recipe: Recipe) => {
+    setCookingRecipe(recipe);
+    setRecipeModalVisible(false);
+    setSelectedRecipe(null);
+    setCookingTimerVisible(true);
+  };
+
+  const handleCookingTimerClose = () => {
+    setCookingTimerVisible(false);
+    setCookingRecipe(null);
+  };
+
+  const handleCookingComplete = () => {
+    setCookingTimerVisible(false);
+    setCookingRecipe(null);
+    // TODO: Update cooking streak or other completion logic
+    console.log('Cooking completed!');
   };
 
   const handleScroll = (event: any) => {
@@ -200,6 +221,14 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
         onClose={handleCloseRecipeModal}
         isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
         onFavoriteToggle={handleRecipeFavoriteToggle}
+        onStartCooking={handleStartCooking}
+      />
+      
+      <CookingTimerModal
+        visible={cookingTimerVisible}
+        recipe={cookingRecipe}
+        onClose={handleCookingTimerClose}
+        onComplete={handleCookingComplete}
       />
     </View>
   );
