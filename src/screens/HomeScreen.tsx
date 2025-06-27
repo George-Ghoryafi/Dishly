@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, Animated, Platform } from 'react-
 import { FlipBook, TabSelector, RecipeDetailModal, CookingTimerModal } from '../components';
 import { todaysCards, monthlyCards } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
+import { favoritesService } from '../services';
 import MainHomeScreen from './MainHomeScreen';
 
 const HomeScreen: React.FC = () => {
@@ -15,6 +16,20 @@ const HomeScreen: React.FC = () => {
   const [cookingTimerVisible, setCookingTimerVisible] = useState(false);
   const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
   
+  // Load favorites on component mount
+  useEffect(() => {
+    const loadFavorites = async () => {
+      try {
+        const favoriteIds = await favoritesService.getFavorites();
+        setFavorites(favoriteIds);
+      } catch (error) {
+        console.error('Error loading favorites:', error);
+      }
+    };
+    
+    loadFavorites();
+  }, []);
+  
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const titleFadeAnim = useRef(new Animated.Value(1)).current;
@@ -26,16 +41,23 @@ const HomeScreen: React.FC = () => {
     setShowMainHomepage(true);
   };
 
-  const handleFavoriteToggle = (recipeId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(recipeId)) {
-        newFavorites.delete(recipeId);
-      } else {
-        newFavorites.add(recipeId);
-      }
-      return newFavorites;
-    });
+  const handleFavoriteToggle = async (recipeId: string) => {
+    try {
+      const newStatus = await favoritesService.toggleFavorite(recipeId);
+      
+      // Update local state
+      setFavorites(prev => {
+        const newFavorites = new Set(prev);
+        if (newStatus) {
+          newFavorites.add(recipeId);
+        } else {
+          newFavorites.delete(recipeId);
+        }
+        return newFavorites;
+      });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   };
 
   const handleBackToFlipBook = () => {

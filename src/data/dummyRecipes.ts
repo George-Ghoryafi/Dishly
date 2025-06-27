@@ -1018,4 +1018,14 @@ export const todaysCards: CardData[] = [...todaysRecipes, todayCompletionCard];
 export const monthlyCards: CardData[] = [...monthlyRecipes, monthCompletionCard];
 
 // Keep the old export for backward compatibility
-export const dummyRecipes = todaysRecipes; 
+export const dummyRecipes = todaysRecipes;
+
+// Helper function to get all recipes
+export function getAllRecipes(): Recipe[] {
+  return [...todaysRecipes, ...monthlyRecipes, ...quickWinRecipes];
+}
+
+// Helper function to find a recipe by ID from all recipe collections
+export function findRecipeById(id: string): Recipe | undefined {
+  return getAllRecipes().find(recipe => recipe.id === id);
+} 

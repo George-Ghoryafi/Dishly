@@ -15,29 +15,51 @@ const KitchenStreak: React.FC<KitchenStreakProps> = ({
   const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
 
+  // Calculate the actual current streak based on weekProgress
+  const calculateActualStreak = (): number => {
+    let streak = 0;
+    
+    // Start from today and work backwards
+    for (let i = 0; i <= 6; i++) {
+      const dayIndex = (today - i + 7) % 7;
+      const isCompleted = weekProgress[dayIndex];
+      
+      if (isCompleted) {
+        streak++;
+      } else {
+        // If we hit an incomplete day, stop counting
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
+  const actualStreak = calculateActualStreak();
+
   const getStreakEmoji = () => {
-    if (currentStreak === 0) return '🍳';
-    if (currentStreak < 3) return '🔥';
-    if (currentStreak < 7) return '🚀';
-    if (currentStreak < 14) return '⭐';
-    if (currentStreak < 30) return '👑';
+    if (actualStreak === 0) return '🍳';
+    if (actualStreak < 3) return '🔥';
+    if (actualStreak < 7) return '🚀';
+    if (actualStreak < 14) return '⭐';
+    if (actualStreak < 30) return '👑';
     return '🏆';
   };
 
   const getMotivationalMessage = () => {
-    if (currentStreak === 0) {
+    if (actualStreak === 0) {
       return "Start your cooking journey today!";
     }
     if (todayCompleted) {
-      return `Amazing! ${currentStreak} days strong 💪`;
+      return `Amazing! ${actualStreak} days strong 💪`;
     }
-    if (currentStreak === 1) {
+    if (actualStreak === 1) {
       return "Keep the momentum going!";
     }
-    if (currentStreak < 7) {
-      return `${7 - currentStreak} more days to reach a week!`;
+    if (actualStreak < 7) {
+      return `${7 - actualStreak} more days to reach a week!`;
     }
-    if (currentStreak < 30) {
+    if (actualStreak < 30) {
       return "You're on fire! Keep cooking!";
     }
     return "Cooking legend in the making!";
@@ -96,11 +118,11 @@ const KitchenStreak: React.FC<KitchenStreakProps> = ({
         <View style={styles.streakDisplay}>
           <View style={styles.streakInfo}>
             <View style={styles.streakNumberContainer}>
-              <Text style={styles.streakNumber}>{currentStreak}</Text>
+              <Text style={styles.streakNumber}>{actualStreak}</Text>
               <Text style={styles.streakEmoji}>{getStreakEmoji()}</Text>
             </View>
             <Text style={styles.streakLabel}>
-              day{currentStreak !== 1 ? 's' : ''} streak
+              day{actualStreak !== 1 ? 's' : ''} streak
             </Text>
           </View>
         </View>

@@ -8,6 +8,8 @@ interface CookingTimerModalProps {
   recipe: Recipe | null;
   onClose: () => void;
   onComplete: () => void;
+  currentStreak?: number;
+  todayCompleted?: boolean;
 }
 
 const CookingTimerModal: React.FC<CookingTimerModalProps> = ({
@@ -15,6 +17,8 @@ const CookingTimerModal: React.FC<CookingTimerModalProps> = ({
   recipe,
   onClose,
   onComplete,
+  currentStreak,
+  todayCompleted,
 }) => {
   if (!recipe) return null;
 
@@ -29,6 +33,8 @@ const CookingTimerModal: React.FC<CookingTimerModalProps> = ({
         recipe={recipe}
         onBack={onClose}
         onComplete={onComplete}
+        currentStreak={currentStreak}
+        todayCompleted={todayCompleted}
       />
     </Modal>
   );

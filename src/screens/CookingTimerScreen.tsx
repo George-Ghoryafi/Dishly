@@ -8,28 +8,78 @@ import {
   ScrollView,
   Animated,
   Alert,
+  AppState,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
+import NotificationService from '../services/NotificationService';
+import CookingCompletionScreen from '../components/CookingCompletionScreen';
 
 interface CookingTimerScreenProps {
   recipe: Recipe;
   onBack: () => void;
   onComplete: () => void;
+  currentStreak?: number;
+  todayCompleted?: boolean;
 }
 
 const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
   recipe,
   onBack,
   onComplete,
+  currentStreak = 0,
+  todayCompleted = false,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [totalElapsedTime, setTotalElapsedTime] = useState(0);
+  const [isAppInBackground, setIsAppInBackground] = useState(false);
+  const [showCompletionScreen, setShowCompletionScreen] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressAnim = useRef(new Animated.Value(0)).current;
+  const totalProgressAnim = useRef(new Animated.Value(0)).current;
+  
+  // Initialize total progress animation value on mount
+  useEffect(() => {
+    const totalRecipeDuration = recipe.preparationSteps?.reduce((total, step) => total + step.duration, 0) || 0;
+    const completedDuration = recipe.preparationSteps?.slice(0, currentStepIndex).reduce((total, step) => total + step.duration, 0) || 0;
+    const initialProgress = totalRecipeDuration > 0 ? (completedDuration / totalRecipeDuration) : 0;
+    totalProgressAnim.setValue(initialProgress);
+  }, []);
+
+  // Initialize notification service and setup app state handling
+  useEffect(() => {
+    NotificationService.initialize();
+
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === 'background' && isTimerRunning && timeRemaining > 0) {
+        // App is going to background with active timer
+        setIsAppInBackground(true);
+        NotificationService.startTimerNotification(
+          recipe.name,
+          currentStep?.title || 'Cooking Step',
+          timeRemaining,
+          () => {
+            // Timer completed in background
+            handleStepComplete();
+          }
+        );
+      } else if (nextAppState === 'active' && isAppInBackground) {
+        // App is coming back to foreground
+        setIsAppInBackground(false);
+        NotificationService.stopTimerNotification();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+      NotificationService.stopTimerNotification();
+    };
+  }, [isTimerRunning, timeRemaining, currentStepIndex, recipe.name]);
   
   const currentStep = recipe.preparationSteps?.[currentStepIndex];
   const totalSteps = recipe.preparationSteps?.length || 0;
@@ -51,8 +101,19 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
       
       // Reset progress animation
       progressAnim.setValue(0);
+      
+      // Animate total progress to current step completion
+      const totalRecipeDuration = recipe.preparationSteps?.reduce((total, step) => total + step.duration, 0) || 0;
+      const completedDuration = recipe.preparationSteps?.slice(0, currentStepIndex).reduce((total, step) => total + step.duration, 0) || 0;
+      const newTotalProgress = totalRecipeDuration > 0 ? (completedDuration / totalRecipeDuration) : 0;
+      
+      Animated.timing(totalProgressAnim, {
+        toValue: newTotalProgress,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
     }
-  }, [currentStepIndex, currentStep]);
+  }, [currentStepIndex, currentStep, recipe.preparationSteps]);
   
   // Timer logic
   useEffect(() => {
@@ -62,12 +123,23 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
           const newTime = prev - 1;
           setTotalElapsedTime(elapsed => elapsed + 1);
           
-          // Update progress animation
+          // Update progress animations
           if (currentStep) {
             const stepDuration = currentStep.duration * 60;
             const progress = (stepDuration - newTime) / stepDuration;
             Animated.timing(progressAnim, {
               toValue: progress,
+              duration: 100,
+              useNativeDriver: false,
+            }).start();
+            
+            // Update total progress with smooth animation
+            const totalRecipeDuration = recipe.preparationSteps?.reduce((total, step) => total + step.duration, 0) || 0;
+            const completedDuration = recipe.preparationSteps?.slice(0, currentStepIndex).reduce((total, step) => total + step.duration, 0) || 0;
+            const newTotalProgress = totalRecipeDuration > 0 ? 
+              ((completedDuration + (currentStep.duration * progress)) / totalRecipeDuration) : 0;
+            Animated.timing(totalProgressAnim, {
+              toValue: newTotalProgress,
               duration: 100,
               useNativeDriver: false,
             }).start();
@@ -140,16 +212,41 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
   };
   
   const handleCookingComplete = () => {
-    Alert.alert(
-      'Cooking Complete! 🎉',
-      `Congratulations! You've finished cooking ${recipe.name}. Total time: ${formatTotalTime(totalElapsedTime)}`,
-      [
-        {
-          text: 'Done',
-          onPress: onComplete,
-        }
-      ]
-    );
+    // Stop any background notifications
+    NotificationService.stopTimerNotification();
+    
+    // Show completion notification if app was in background
+    if (isAppInBackground) {
+      NotificationService.showCookingCompleteNotification(recipe.name);
+    }
+
+    // Show the custom completion screen
+    setShowCompletionScreen(true);
+  };
+
+  const handleCompletionFinish = () => {
+    setShowCompletionScreen(false);
+    onComplete();
+  };
+
+  // Calculate what the new streak will be after completing cooking today
+  const calculateNewStreak = () => {
+    if (todayCompleted) {
+      // If today was already completed, streak doesn't change
+      return currentStreak;
+    }
+    
+    // If today wasn't completed, completing today will either:
+    // 1. Start a new streak of 1 (if current streak is 0 - streak was broken)
+    // 2. Continue the existing streak + 1 (if current streak > 0)
+    
+    if (currentStreak === 0) {
+      // Streak was broken, starting fresh
+      return 1;
+    } else {
+      // Continue existing streak
+      return currentStreak + 1;
+    }
   };
   
   const handlePreviousStep = () => {
@@ -164,7 +261,15 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
       'Are you sure you want to exit? Your progress will be lost.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Exit', style: 'destructive', onPress: onBack },
+        { 
+          text: 'Exit', 
+          style: 'destructive', 
+          onPress: () => {
+            // Stop any background notifications when exiting
+            NotificationService.stopTimerNotification();
+            onBack();
+          }
+        },
       ]
     );
   };
@@ -251,11 +356,15 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressTrack}>
-            <View 
+            <Animated.View 
               style={[
                 styles.progressFill,
                 {
-                  width: `${Math.min(totalTimeProgress * 100, 100)}%`
+                  width: totalProgressAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0%', '100%'],
+                    extrapolate: 'clamp',
+                  })
                 }
               ]} 
             />
@@ -303,6 +412,20 @@ const CookingTimerScreen: React.FC<CookingTimerScreenProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Completion Screen Overlay */}
+      {showCompletionScreen && (
+        <View style={styles.completionOverlay}>
+          <CookingCompletionScreen
+            recipeName={recipe.name}
+            recipeImage={recipe.image}
+            totalElapsedTime={totalElapsedTime}
+            currentStreak={calculateNewStreak()}
+            streakUpdated={!todayCompleted}
+            onComplete={handleCompletionFinish}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -549,6 +672,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  completionOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#f8fffe',
+    zIndex: 1000,
   },
 });
 

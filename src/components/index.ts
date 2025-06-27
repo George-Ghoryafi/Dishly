@@ -11,4 +11,6 @@ export { default as KitchenStreak } from './KitchenStreak';
 export { default as SearchBar } from './SearchBar';
 export { default as SearchModal } from './SearchModal';
 export { default as RecipeDetailModal } from './RecipeDetailModal';
-export { default as CookingTimerModal } from './CookingTimerModal'; 
+export { default as CookingTimerModal } from './CookingTimerModal';
+export { default as CookingCompletionScreen } from './CookingCompletionScreen';
+export { default as FavoritesSearchModal } from './FavoritesSearchModal'; 

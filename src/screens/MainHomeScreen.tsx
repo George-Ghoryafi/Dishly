@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Animated, Platform } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Animated, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal, RecipeDetailModal, CookingTimerModal } from '../components';
 import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
+import { favoritesService } from '../services';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
 
 type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
@@ -16,7 +18,52 @@ interface MainHomeScreenProps {
   onBackToFlipBook?: () => void;
 }
 
-const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), onFavoriteToggle, onBackToFlipBook }) => {
+const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorites, onFavoriteToggle: propOnFavoriteToggle, onBackToFlipBook }) => {
+  const [localFavorites, setLocalFavorites] = useState<Set<string>>(new Set());
+  
+  // Use prop favorites if provided, otherwise use local favorites
+  const favorites = propFavorites || localFavorites;
+  
+  // Load favorites if not provided as props
+  useEffect(() => {
+    if (!propFavorites) {
+      const loadFavorites = async () => {
+        try {
+          const favoriteIds = await favoritesService.getFavorites();
+          setLocalFavorites(favoriteIds);
+        } catch (error) {
+          console.error('Error loading favorites:', error);
+        }
+      };
+      
+      loadFavorites();
+    }
+  }, [propFavorites]);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = async (recipeId: string) => {
+    if (propOnFavoriteToggle) {
+      // Use prop handler if provided
+      propOnFavoriteToggle(recipeId);
+    } else {
+      // Use local favorites service
+      try {
+        const newStatus = await favoritesService.toggleFavorite(recipeId);
+        
+        setLocalFavorites(prev => {
+          const newFavorites = new Set(prev);
+          if (newStatus) {
+            newFavorites.add(recipeId);
+          } else {
+            newFavorites.delete(recipeId);
+          }
+          return newFavorites;
+        });
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+      }
+    }
+  };
   const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
@@ -31,6 +78,37 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   const lastScrollY = useRef(0);
   const scrollDirection = useRef<'up' | 'down'>('up');
   const [headerHeight, setHeaderHeight] = useState(0);
+
+  // Streak state management
+  const [streakData, setStreakData] = useState({
+    todayCompleted: false,
+    weekProgress: [false, true, true, true, false, false, false] // S, M, T, W, T, F, S
+    // This shows: Monday(1), Tuesday(2), Wednesday(3) cooked = 3-day streak broken on Thursday
+    // Today is Friday(5) - not cooked yet, opportunity to start new streak
+  });
+
+  // Calculate the actual current streak based on weekProgress (same logic as KitchenStreak)
+  const calculateCurrentStreak = (): number => {
+    const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+    let streak = 0;
+    
+    // Start from today and work backwards
+    for (let i = 0; i <= 6; i++) {
+      const dayIndex = (today - i + 7) % 7;
+      const isCompleted = streakData.weekProgress[dayIndex];
+      
+      if (isCompleted) {
+        streak++;
+      } else {
+        // If we hit an incomplete day, stop counting
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
+  const currentCalculatedStreak = calculateCurrentStreak();
 
   const handleProfilePress = () => {
     // TODO: Navigate to profile screen
@@ -74,7 +152,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
 
   const handleRecipeFavoriteToggle = () => {
     if (selectedRecipe) {
-      onFavoriteToggle?.(selectedRecipe.id);
+      handleFavoriteToggle(selectedRecipe.id);
     }
   };
 
@@ -93,8 +171,21 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   const handleCookingComplete = () => {
     setCookingTimerVisible(false);
     setCookingRecipe(null);
-    // TODO: Update cooking streak or other completion logic
-    console.log('Cooking completed!');
+    
+    // Update streak data - mark today as completed
+    const today = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+    setStreakData(prevStreakData => {
+      const newWeekProgress = [...prevStreakData.weekProgress];
+      newWeekProgress[today] = true; // Mark today as completed
+      
+      return {
+        ...prevStreakData,
+        todayCompleted: true,
+        weekProgress: newWeekProgress
+      };
+    });
+    
+    console.log('Cooking completed! Streak updated for day', today);
   };
 
   const handleScroll = (event: any) => {
@@ -130,23 +221,11 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
     setHeaderHeight(height);
   };
 
-
-
   // Combine and shuffle recipes for popular dishes
   const popularDishes = [...todaysRecipes, ...monthlyRecipes.slice(0, 3)];
 
   // All recipes for the roulette
   const allRecipes = [...todaysRecipes, ...monthlyRecipes, ...quickWinRecipes];
-
-  // Mock streak data - this would come from user preferences/storage
-  // Assuming today is Thursday (index 4), let's create a proper 3-day streak
-  const streakData = {
-    currentStreak: 3,
-    todayCompleted: false,
-    weekProgress: [false, true, true, true, false, false, false] // S, M, T, W, T, F, S
-    // This shows: Monday(1), Tuesday(2), Wednesday(3) cooked = 3-day streak
-    // Today is Thursday(4) - not cooked yet, opportunity to extend to 4 days
-  };
 
   return (
     <View style={styles.container}>
@@ -182,25 +261,25 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
             dishes={popularDishes} 
             onDishPress={handleDishPress}
             favorites={favorites}
-            onFavoriteToggle={onFavoriteToggle}
+            onFavoriteToggle={handleFavoriteToggle}
           />
           
           <QuickWins 
             recipes={quickWinRecipes}
             onRecipePress={handleDishPress}
             favorites={favorites}
-            onFavoriteToggle={onFavoriteToggle}
+            onFavoriteToggle={handleFavoriteToggle}
           />
 
           <RecipeRoulette 
             recipes={allRecipes}
             onRecipeSelect={handleRecipeSelect}
             favorites={favorites}
-            onFavoriteToggle={onFavoriteToggle}
+            onFavoriteToggle={handleFavoriteToggle}
           />
 
           <KitchenStreak
-            currentStreak={streakData.currentStreak}
+            currentStreak={currentCalculatedStreak}
             todayCompleted={streakData.todayCompleted}
             weekProgress={streakData.weekProgress}
           />
@@ -229,6 +308,8 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
         recipe={cookingRecipe}
         onClose={handleCookingTimerClose}
         onComplete={handleCookingComplete}
+        currentStreak={currentCalculatedStreak}
+        todayCompleted={streakData.todayCompleted}
       />
     </View>
   );
@@ -237,7 +318,6 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   headerContainer: {
     position: 'absolute',
@@ -249,11 +329,13 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'none',
+
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 40,
+    paddingBottom: 10,
+    backgroundColor: 'none',
   },
 });
 
