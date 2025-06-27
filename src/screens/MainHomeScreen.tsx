@@ -4,13 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal, RecipeDetailModal, CookingTimerModal } from '../components';
 import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import { favoritesService } from '../services';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
+type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'> & StackNavigationProp<RootStackParamList>;
 
 interface MainHomeScreenProps {
   favorites?: Set<string>;
@@ -111,8 +113,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
   const currentCalculatedStreak = calculateCurrentStreak();
 
   const handleProfilePress = () => {
-    // TODO: Navigate to profile screen
-    console.log('Profile pressed');
+    navigation.navigate('Profile');
   };
 
   const handleDishPress = (recipe: Recipe) => {
