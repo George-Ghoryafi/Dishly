@@ -249,7 +249,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
           contentContainerStyle={[
             styles.scrollContent,
             { 
-              paddingTop: headerHeight + (Platform.OS === 'ios' ? -15 : 5)
+              paddingTop: headerHeight + (Platform.OS === 'ios' ? -15 : -30)
             }
           ]}
           onScroll={handleScroll}
