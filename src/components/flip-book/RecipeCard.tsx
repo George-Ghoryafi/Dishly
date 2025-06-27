@@ -7,6 +7,7 @@ interface RecipeCardProps {
   recipe: Recipe;
   isFavorite?: boolean;
   onFavoritePress?: () => void;
+  onPress?: () => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -16,7 +17,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.4;
 // Cache to track loaded images
 const imageLoadCache = new Map<string, boolean>();
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isFavorite = false, onFavoritePress }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isFavorite = false, onFavoritePress, onPress }) => {
   const [imageLoading, setImageLoading] = useState(!imageLoadCache.has(recipe.image));
   const [imageError, setImageError] = useState(false);
 
@@ -32,7 +33,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isFavorite = false, onF
   }, [recipe.image]);
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.95}>
       <View style={styles.imageContainer}>
         {imageLoading && !imageError && (
           <View style={styles.loadingContainer}>
@@ -96,7 +97,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isFavorite = false, onF
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

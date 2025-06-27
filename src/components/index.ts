@@ -9,4 +9,5 @@ export { default as QuickWins } from './QuickWins';
 export { default as RecipeRoulette } from './RecipeRoulette';
 export { default as KitchenStreak } from './KitchenStreak';
 export { default as SearchBar } from './SearchBar';
-export { default as SearchModal } from './SearchModal'; 
+export { default as SearchModal } from './SearchModal';
+export { default as RecipeDetailModal } from './RecipeDetailModal'; 

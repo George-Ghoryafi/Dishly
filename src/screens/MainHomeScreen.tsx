@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView, Animated, Platform } 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal } from '../components';
+import { Header, FlipBookPreview, PopularDishes, QuickWins, RecipeRoulette, KitchenStreak, SearchModal, RecipeDetailModal } from '../components';
 import { todaysRecipes, monthlyRecipes, quickWinRecipes } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
@@ -20,6 +20,8 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   const navigation = useNavigation<MainHomeScreenNavigationProp>();
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchButtonLayout, setSearchButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | undefined>();
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [recipeModalVisible, setRecipeModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
   
   // Header animation
@@ -34,8 +36,8 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   };
 
   const handleDishPress = (recipe: Recipe) => {
-    // TODO: Navigate to recipe detail screen
-    console.log('Dish pressed:', recipe.name);
+    setSelectedRecipe(recipe);
+    setRecipeModalVisible(true);
   };
 
   const handleSearchPress = (layout: { x: number; y: number; width: number; height: number }) => {
@@ -54,13 +56,24 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
   };
 
   const handleRecipeSelect = (recipe: Recipe) => {
-    // TODO: Navigate to recipe detail screen or show recipe preview
-    console.log('Recipe selected from roulette:', recipe.name);
+    setSelectedRecipe(recipe);
+    setRecipeModalVisible(true);
   };
 
   const handleFlipBookPress = () => {
     console.log('FlipBook pressed - navigating to flipbook');
     onBackToFlipBook?.();
+  };
+
+  const handleCloseRecipeModal = () => {
+    setRecipeModalVisible(false);
+    setSelectedRecipe(null);
+  };
+
+  const handleRecipeFavoriteToggle = () => {
+    if (selectedRecipe) {
+      onFavoriteToggle?.(selectedRecipe.id);
+    }
   };
 
   const handleScroll = (event: any) => {
@@ -179,6 +192,14 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites = new Set(), 
         onSearch={handleSearch}
         onCategoryPress={handleCategoryPress}
         searchButtonLayout={searchButtonLayout}
+      />
+      
+      <RecipeDetailModal
+        visible={recipeModalVisible}
+        recipe={selectedRecipe}
+        onClose={handleCloseRecipeModal}
+        isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
+        onFavoriteToggle={handleRecipeFavoriteToggle}
       />
     </View>
   );

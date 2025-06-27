@@ -9,6 +9,7 @@ interface FlipBookProps {
   onNavigateToHomepage?: () => void;
   favorites?: Set<string>;
   onFavoriteToggle?: (recipeId: string) => void;
+  onRecipePress?: (recipe: Recipe) => void;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -16,7 +17,7 @@ const CARD_WIDTH = screenWidth * 0.85;
 const CARD_HEIGHT = CARD_WIDTH * 1.4;
 const SWIPE_THRESHOLD = 50;
 
-const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favorites = new Set(), onFavoriteToggle }) => {
+const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favorites = new Set(), onFavoriteToggle, onRecipePress }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -160,6 +161,7 @@ const FlipBook: React.FC<FlipBookProps> = ({ cards, onNavigateToHomepage, favori
           recipe={currentCard as Recipe} 
           isFavorite={favorites.has(currentCard.id)}
           onFavoritePress={() => onFavoriteToggle?.(currentCard.id)}
+          onPress={() => onRecipePress?.(currentCard as Recipe)}
         />
       );
     }

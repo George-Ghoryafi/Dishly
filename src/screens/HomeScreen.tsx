@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Animated, Platform } from 'react-native';
-import { FlipBook, TabSelector } from '../components';
+import { FlipBook, TabSelector, RecipeDetailModal } from '../components';
 import { todaysCards, monthlyCards } from '../data/dummyRecipes';
+import { Recipe } from '../types/Recipe';
 import MainHomeScreen from './MainHomeScreen';
 
 const HomeScreen: React.FC = () => {
@@ -9,6 +10,8 @@ const HomeScreen: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showMainHomepage, setShowMainHomepage] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [recipeModalVisible, setRecipeModalVisible] = useState(false);
   
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -35,6 +38,22 @@ const HomeScreen: React.FC = () => {
 
   const handleBackToFlipBook = () => {
     setShowMainHomepage(false);
+  };
+
+  const handleRecipePress = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setRecipeModalVisible(true);
+  };
+
+  const handleCloseRecipeModal = () => {
+    setRecipeModalVisible(false);
+    setSelectedRecipe(null);
+  };
+
+  const handleRecipeFavoriteToggle = () => {
+    if (selectedRecipe) {
+      handleFavoriteToggle(selectedRecipe.id);
+    }
   };
 
   const handleTabChange = (newTab: 'today' | 'month') => {
@@ -129,9 +148,18 @@ const HomeScreen: React.FC = () => {
           onNavigateToHomepage={handleNavigateToHomepage}
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
+          onRecipePress={handleRecipePress}
           key={selectedTab} // Force re-render when tab changes
         />
       </Animated.View>
+
+      <RecipeDetailModal
+        visible={recipeModalVisible}
+        recipe={selectedRecipe}
+        onClose={handleCloseRecipeModal}
+        isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
+        onFavoriteToggle={handleRecipeFavoriteToggle}
+      />
     </SafeAreaView>
   );
 };
