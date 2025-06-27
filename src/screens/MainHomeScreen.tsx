@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Animated, Platform } from 'react-native';
+import { View, StyleSheet, FlatList, Animated, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -228,7 +228,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
   const allRecipes = [...todaysRecipes, ...monthlyRecipes, ...quickWinRecipes];
 
   return (
-    <View style={styles.container}>
+    <>
       <Animated.View 
         style={[
           styles.headerContainer,
@@ -244,74 +244,71 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
           searchPlaceholder="Search for recipes and dishes..."
         />
       </Animated.View>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView 
+        <FlatList 
+          data={[
+            { id: 'header', component: <FlipBookPreview onFlipBookPress={handleFlipBookPress} /> },
+            { id: 'popularDishes', component: <PopularDishes 
+              dishes={popularDishes} 
+              onDishPress={handleDishPress}
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            /> },
+            { id: 'quickWins', component: <QuickWins 
+              recipes={quickWinRecipes}
+              onRecipePress={handleDishPress}
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            /> },
+            { id: 'recipeRoulette', component: <RecipeRoulette 
+              recipes={allRecipes}
+              onRecipeSelect={handleRecipeSelect}
+              favorites={favorites}
+              onFavoriteToggle={handleFavoriteToggle}
+            /> },
+            { id: 'kitchenStreak', component: <KitchenStreak
+              currentStreak={currentCalculatedStreak}
+              todayCompleted={streakData.todayCompleted}
+              weekProgress={streakData.weekProgress}
+            /> }
+          ]}
+          renderItem={({ item }) => item.component}
+          keyExtractor={item => item.id}
           contentContainerStyle={[
             styles.scrollContent,
             { 
-              paddingTop: headerHeight + (Platform.OS === 'ios' ? -15 : -30)
+              paddingTop: headerHeight + (Platform.OS === 'ios' ? 10 : 15), 
             }
           ]}
           onScroll={handleScroll}
           scrollEventThrottle={16}
-        >
-          <FlipBookPreview onFlipBookPress={handleFlipBookPress} />
-          
-          <PopularDishes 
-            dishes={popularDishes} 
-            onDishPress={handleDishPress}
-            favorites={favorites}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-          
-          <QuickWins 
-            recipes={quickWinRecipes}
-            onRecipePress={handleDishPress}
-            favorites={favorites}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
+        />
 
-          <RecipeRoulette 
-            recipes={allRecipes}
-            onRecipeSelect={handleRecipeSelect}
-            favorites={favorites}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
+        <SearchModal
+          visible={searchModalVisible}
+          onClose={() => setSearchModalVisible(false)}
+          onSearch={handleSearch}
+          onCategoryPress={handleCategoryPress}
+          searchButtonLayout={searchButtonLayout}
+        />
 
-          <KitchenStreak
-            currentStreak={currentCalculatedStreak}
-            todayCompleted={streakData.todayCompleted}
-            weekProgress={streakData.weekProgress}
-          />
-        </ScrollView>
-      </SafeAreaView>
-      
-      <SearchModal
-        visible={searchModalVisible}
-        onClose={() => setSearchModalVisible(false)}
-        onSearch={handleSearch}
-        onCategoryPress={handleCategoryPress}
-        searchButtonLayout={searchButtonLayout}
-      />
-      
-      <RecipeDetailModal
-        visible={recipeModalVisible}
-        recipe={selectedRecipe}
-        onClose={handleCloseRecipeModal}
-        isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
-        onFavoriteToggle={handleRecipeFavoriteToggle}
-        onStartCooking={handleStartCooking}
-      />
-      
-      <CookingTimerModal
-        visible={cookingTimerVisible}
-        recipe={cookingRecipe}
-        onClose={handleCookingTimerClose}
-        onComplete={handleCookingComplete}
-        currentStreak={currentCalculatedStreak}
-        todayCompleted={streakData.todayCompleted}
-      />
-    </View>
+        <RecipeDetailModal
+          visible={recipeModalVisible}
+          recipe={selectedRecipe}
+          onClose={handleCloseRecipeModal}
+          isFavorite={selectedRecipe ? favorites.has(selectedRecipe.id) : false}
+          onFavoriteToggle={handleRecipeFavoriteToggle}
+          onStartCooking={handleStartCooking}
+        />
+
+        <CookingTimerModal
+          visible={cookingTimerVisible}
+          recipe={cookingRecipe}
+          onClose={handleCookingTimerClose}
+          onComplete={handleCookingComplete}
+          currentStreak={currentCalculatedStreak}
+          todayCompleted={streakData.todayCompleted}
+        />
+      </>
   );
 };
 
@@ -330,12 +327,10 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'none',
-
   },
   scrollContent: {
-    flexGrow: 1,
     paddingBottom: 10,
-    backgroundColor: 'none',
+    paddingTop: -15,
   },
 });
 
