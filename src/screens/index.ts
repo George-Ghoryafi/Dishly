@@ -6,4 +6,6 @@ export { default as CookingTimerScreen } from './CookingTimerScreen';
 export { default as ProfileScreen } from './ProfileScreen';
 export { default as EditProfileScreen } from './EditProfileScreen';
 export { default as NotificationsScreen } from './NotificationsScreen';
-export { default as PrivacyScreen } from './PrivacyScreen'; 
+export { default as PrivacyScreen } from './PrivacyScreen';
+export { default as HelpSupportScreen } from './HelpSupportScreen';
+export { default as AboutScreen } from './AboutScreen'; 

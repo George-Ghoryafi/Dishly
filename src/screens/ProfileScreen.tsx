@@ -33,8 +33,11 @@ const ProfileScreen: React.FC = () => {
   };
 
   const handleHelp = () => {
-    // TODO: Navigate to help screen
-    console.log('Help pressed');
+    navigation.navigate('HelpSupport');
+  };
+
+  const handleAbout = () => {
+    navigation.navigate('About');
   };
 
   return (
@@ -116,7 +119,7 @@ const ProfileScreen: React.FC = () => {
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleHelp}>
               <View style={styles.menuItemLeft}>
                 <View style={styles.menuIconContainer}>
                   <Ionicons name="help-circle-outline" size={20} color="#007AFF" />
@@ -126,7 +129,7 @@ const ProfileScreen: React.FC = () => {
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
               <View style={styles.menuItemLeft}>
                 <View style={styles.menuIconContainer}>
                   <Ionicons name="information-circle-outline" size={20} color="#007AFF" />
