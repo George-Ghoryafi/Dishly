@@ -6,7 +6,7 @@ import { ProfileScreen, EditProfileScreen } from '../screens';
 
 export type RootStackParamList = {
   MainTabs: undefined;
-  Profile: undefined;
+  Profile: { saveStatus?: 'success' | 'error' } | undefined;
   EditProfile: undefined;
 };
 

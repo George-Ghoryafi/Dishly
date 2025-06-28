@@ -1,37 +1,145 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, BackHandler, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { SaveStatus } from '../components';
+
+type EditProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const EditProfileScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<EditProfileScreenNavigationProp>();
   
   // Form state
   const [firstName, setFirstName] = useState('John');
   const [lastName, setLastName] = useState('Doe');
   const [username, setUsername] = useState('johndoe');
-  const [email, setEmail] = useState('john.doe@example.com');
+  const email = 'john.doe@example.com'; // Read-only, would come from user data
   const [membershipStatus] = useState('Free'); // This would come from user data
 
+  // Track original values to detect changes
+  const [originalValues, setOriginalValues] = useState({
+    firstName: 'John',
+    lastName: 'Doe',
+    username: 'johndoe'
+  });
+
+  // Track if user is saving to prevent warning - use ref for immediate access
+  const isSavingRef = useRef(false);
+
+  // Success overlay state
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = () => {
+    const hasChanges = !isSavingRef.current && (
+      firstName !== originalValues.firstName ||
+      lastName !== originalValues.lastName ||
+      username !== originalValues.username
+    );
+    console.log('hasUnsavedChanges:', hasChanges, 'isSaving:', isSavingRef.current);
+    return hasChanges;
+  };
+
   const handleBackPress = () => {
+    if (hasUnsavedChanges()) {
+      Alert.alert(
+        'Unsaved Changes',
+        'You have unsaved changes. Are you sure you want to leave?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Leave', style: 'destructive', onPress: () => navigation.goBack() }
+        ]
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  const handleSaveComplete = () => {
     navigation.goBack();
   };
 
   const handleSave = () => {
-    // TODO: Implement save functionality
-    Alert.alert('Success', 'Profile updated successfully!');
-    navigation.goBack();
-  };
-
-  const handleCancel = () => {
-    navigation.goBack();
+    console.log('Save button pressed, setting isSaving to true');
+    
+    // Dismiss keyboard first
+    Keyboard.dismiss();
+    
+    // Set saving flag immediately to prevent warning
+    isSavingRef.current = true;
+    
+    // TODO: Implement save functionality (API call, etc.)
+    // For now, we'll simulate saving by updating the original values
+    setOriginalValues({
+      firstName,
+      lastName,
+      username
+    });
+    
+    // Show success animation
+    setShowSuccess(true);
   };
 
   const handleUpgradeMembership = () => {
     // TODO: Navigate to membership upgrade screen
     Alert.alert('Upgrade Membership', 'Navigate to membership upgrade screen');
   };
+
+  // Handle back gesture and hardware back button
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (hasUnsavedChanges()) {
+          Alert.alert(
+            'Unsaved Changes',
+            'You have unsaved changes. Are you sure you want to leave?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Leave', style: 'destructive', onPress: () => navigation.goBack() }
+            ]
+          );
+          return true; // Prevent default back action
+        }
+        return false; // Allow default back action
+      };
+
+      // Add hardware back button listener for Android
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      // Add navigation listener for back gesture and header back button
+      const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+        console.log('beforeRemove triggered, isSaving:', isSavingRef.current);
+        if (hasUnsavedChanges()) {
+          console.log('Preventing navigation due to unsaved changes');
+          // Prevent default action
+          e.preventDefault();
+
+          Alert.alert(
+            'Unsaved Changes',
+            'You have unsaved changes. Are you sure you want to leave?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Leave', 
+                style: 'destructive', 
+                onPress: () => navigation.dispatch(e.data.action)
+              }
+            ]
+          );
+        } else {
+          console.log('Allowing navigation - no unsaved changes or saving in progress');
+        }
+      });
+
+      return () => {
+        backHandler.remove();
+        unsubscribe();
+      };
+    }, [firstName, lastName, username, navigation])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,8 +149,20 @@ const EditProfileScreen: React.FC = () => {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
-        <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Save</Text>
+        <TouchableOpacity 
+          onPress={handleSave} 
+          style={[
+            styles.saveButton,
+            !hasUnsavedChanges() && styles.saveButtonDisabled
+          ]}
+          disabled={!hasUnsavedChanges()}
+        >
+          <Text style={[
+            styles.saveButtonText,
+            !hasUnsavedChanges() && styles.saveButtonTextDisabled
+          ]}>
+            Save
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -98,47 +218,54 @@ const EditProfileScreen: React.FC = () => {
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Email Address</Text>
-            <TextInput
-              style={styles.textInput}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+            <View style={styles.readOnlyInput}>
+              <Text style={styles.readOnlyText}>{email}</Text>
+            </View>
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Membership Status</Text>
             <View style={styles.membershipContainer}>
-              <View style={[
-                styles.membershipBadge,
-                { backgroundColor: membershipStatus === 'Pro' ? '#FFD700' : '#E0E0E0' }
-              ]}>
-                <Text style={[
-                  styles.membershipText,
-                  { color: membershipStatus === 'Pro' ? '#333' : '#666' }
+              <View style={styles.membershipInfo}>
+                <View style={[
+                  styles.membershipBadge,
+                  { backgroundColor: membershipStatus === 'Pro' ? '#007AFF' : '#f8f9fa' }
                 ]}>
-                  {membershipStatus}
+                  <Ionicons 
+                    name={membershipStatus === 'Pro' ? 'star' : 'person'} 
+                    size={16} 
+                    color={membershipStatus === 'Pro' ? '#fff' : '#666'} 
+                  />
+                  <Text style={[
+                    styles.membershipText,
+                    { color: membershipStatus === 'Pro' ? '#fff' : '#666' }
+                  ]}>
+                    {membershipStatus}
+                  </Text>
+                </View>
+                <Text style={styles.membershipDescription}>
+                  {membershipStatus === 'Pro' 
+                    ? 'Unlimited AI analysis and premium features' 
+                    : 'Basic features with limited AI analysis'
+                  }
                 </Text>
               </View>
               {membershipStatus === 'Free' && (
                 <TouchableOpacity style={styles.upgradeButton} onPress={handleUpgradeMembership}>
-                  <Text style={styles.upgradeButtonText}>Upgrade to Pro</Text>
+                  <Text style={styles.upgradeButtonText}>Upgrade</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
         </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionSection}>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
+
+      {/* Success Overlay */}
+      <SaveStatus
+        visible={showSuccess}
+        onComplete={handleSaveComplete}
+        message="Profile Updated!"
+      />
     </SafeAreaView>
   );
 };
@@ -172,10 +299,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#007AFF',
   },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
+  },
+  saveButtonTextDisabled: {
+    color: '#999',
   },
   content: {
     flex: 1,
@@ -241,48 +374,61 @@ const styles = StyleSheet.create({
     color: '#333',
     backgroundColor: '#fff',
   },
+  readOnlyInput: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#666',
+    backgroundColor: '#fff',
+  },
+  readOnlyText: {
+    fontSize: 16,
+    color: '#666',
+  },
   membershipContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 10,
+  },
+  membershipInfo: {
+    flex: 1,
+    marginRight: 15,
   },
   membershipBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 8,
+    alignSelf: 'flex-start',
   },
   membershipText: {
     fontSize: 14,
     fontWeight: '600',
+    marginLeft: 6,
+  },
+  membershipDescription: {
+    fontSize: 12,
+    color: '#666',
+    lineHeight: 16,
   },
   upgradeButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#007AFF',
+    minWidth: 80,
+    alignItems: 'center',
   },
   upgradeButtonText: {
-    color: '#333',
+    color: '#fff',
     fontSize: 14,
     fontWeight: '600',
-  },
-  actionSection: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    marginBottom: 30,
-  },
-  cancelButton: {
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
   },
 });
 
