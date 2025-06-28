@@ -24,6 +24,14 @@ const ProfileScreen: React.FC = () => {
     console.log('Settings pressed');
   };
 
+  const handleNotifications = () => {
+    navigation.navigate('Notifications');
+  };
+
+  const handlePrivacy = () => {
+    navigation.navigate('Privacy');
+  };
+
   const handleHelp = () => {
     // TODO: Navigate to help screen
     console.log('Help pressed');
@@ -88,7 +96,7 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Settings</Text>
           
           <View style={styles.menuContainer}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleNotifications}>
               <View style={styles.menuItemLeft}>
                 <View style={styles.menuIconContainer}>
                   <Ionicons name="notifications-outline" size={20} color="#007AFF" />
@@ -98,7 +106,7 @@ const ProfileScreen: React.FC = () => {
               <Ionicons name="chevron-forward" size={16} color="#ccc" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handlePrivacy}>
               <View style={styles.menuItemLeft}>
                 <View style={styles.menuIconContainer}>
                   <Ionicons name="lock-closed-outline" size={20} color="#007AFF" />

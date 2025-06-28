@@ -2,12 +2,14 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from './BottomTabNavigator';
-import { ProfileScreen, EditProfileScreen } from '../screens';
+import { ProfileScreen, EditProfileScreen, NotificationsScreen, PrivacyScreen } from '../screens';
 
 export type RootStackParamList = {
   MainTabs: undefined;
   Profile: { saveStatus?: 'success' | 'error' } | undefined;
   EditProfile: undefined;
+  Notifications: undefined;
+  Privacy: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -23,6 +25,8 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="Privacy" component={PrivacyScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
