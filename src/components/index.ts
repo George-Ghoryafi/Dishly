@@ -13,4 +13,5 @@ export { default as SearchModal } from './SearchModal';
 export { default as RecipeDetailModal } from './RecipeDetailModal';
 export { default as CookingTimerModal } from './CookingTimerModal';
 export { default as CookingCompletionScreen } from './CookingCompletionScreen';
-export { default as FavoritesSearchModal } from './FavoritesSearchModal'; 
+export { default as FavoritesSearchModal } from './FavoritesSearchModal';
+export { default as SaveStatus } from './SaveStatus'; 

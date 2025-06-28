@@ -59,6 +59,9 @@ const BottomTabNavigator: React.FC = () => {
       <Tab.Screen 
         name="Camera" 
         component={CameraScreen}
+        options={{
+          tabBarStyle: { display: 'none' }, // Hide tab bar on Camera screen
+        }}
       />
       <Tab.Screen 
         name="Favorites" 
