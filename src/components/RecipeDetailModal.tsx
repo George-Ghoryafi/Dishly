@@ -10,9 +10,11 @@ import {
   SafeAreaView,
   Dimensions,
   Animated,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
+import { shoppingListService } from '../services';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -104,6 +106,41 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
       onStartCooking(recipe);
     } else {
       console.log('Starting cooking timer for recipe:', recipe?.name);
+    }
+  };
+
+  // Function to add selected ingredients to shopping list
+  const addSelectedToShoppingList = async () => {
+    if (!recipe || selectedIngredients.size === 0) return;
+
+    try {
+      const selectedIngredientsList = Array.from(selectedIngredients).map(
+        index => recipe.ingredients[index]
+      );
+
+      await shoppingListService.addIngredients(
+        recipe.id,
+        recipe.name,
+        selectedIngredientsList,
+        portionSize
+      );
+
+      // Clear selected ingredients
+      setSelectedIngredients(new Set());
+
+      // Show success message
+      Alert.alert(
+        'Added to Shopping List',
+        `${selectedIngredientsList.length} ingredient${selectedIngredientsList.length > 1 ? 's' : ''} from "${recipe.name}" ${selectedIngredientsList.length > 1 ? 'have' : 'has'} been added to your shopping list.`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error adding ingredients to shopping list:', error);
+      Alert.alert(
+        'Error',
+        'Failed to add ingredients to shopping list. Please try again.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
@@ -267,7 +304,6 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                             newSelected.add(idx);
                           }
                           setSelectedIngredients(newSelected);
-                          console.log('Ingredient toggled:', ingredient.name, isSelected ? 'removed' : 'added');
                         }}
                         activeOpacity={0.8}
                       >
@@ -295,6 +331,22 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                     );
                   })}
                 </View>
+                
+                {/* Add to Shopping List Button */}
+                {selectedIngredients.size > 0 && (
+                  <TouchableOpacity 
+                    style={styles.addToShoppingListButton}
+                    onPress={addSelectedToShoppingList}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.addToShoppingListContent}>
+                      <Ionicons name="basket" size={20} color="#fff" />
+                      <Text style={styles.addToShoppingListText}>
+                        Add {selectedIngredients.size} ingredient{selectedIngredients.size > 1 ? 's' : ''} to Shopping List
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
@@ -932,6 +984,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
+  },
+  addToShoppingListButton: {
+    backgroundColor: '#34C759',
+    borderRadius: 12,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  addToShoppingListContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  addToShoppingListText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 

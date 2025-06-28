@@ -3,12 +3,14 @@ import { TouchableWithoutFeedback, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-import { HomeScreen, CameraScreen, FavoritesScreen } from '../screens';
+import { HomeScreen, CameraScreen, FavoritesScreen, ShoppingListScreen, LeaderboardScreen } from '../screens';
 
 export type BottomTabParamList = {
   Home: undefined;
   Camera: undefined;
   Favorites: undefined;
+  ShoppingList: undefined;
+  Leaderboard: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -26,6 +28,10 @@ const BottomTabNavigator: React.FC = () => {
             iconName = focused ? 'camera' : 'camera-outline';
           } else if (route.name === 'Favorites') {
             iconName = focused ? 'heart' : 'heart-outline';
+          } else if (route.name === 'ShoppingList') {
+            iconName = focused ? 'basket' : 'basket-outline';
+          } else if (route.name === 'Leaderboard') {
+            iconName = focused ? 'trophy' : 'trophy-outline';
           } else {
             iconName = 'help-outline';
           }
@@ -57,6 +63,10 @@ const BottomTabNavigator: React.FC = () => {
         component={HomeScreen}
       />
       <Tab.Screen 
+        name="ShoppingList" 
+        component={ShoppingListScreen}
+      />
+      <Tab.Screen 
         name="Camera" 
         component={CameraScreen}
         options={{
@@ -66,6 +76,10 @@ const BottomTabNavigator: React.FC = () => {
       <Tab.Screen 
         name="Favorites" 
         component={FavoritesScreen}
+      />
+      <Tab.Screen 
+        name="Leaderboard" 
+        component={LeaderboardScreen}
       />
     </Tab.Navigator>
   );
