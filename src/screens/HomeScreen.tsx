@@ -9,7 +9,7 @@ import MainHomeScreen from './MainHomeScreen';
 const HomeScreen: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'today' | 'month'>('today');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showMainHomepage, setShowMainHomepage] = useState(false);
+  const [showMainHomepage, setShowMainHomepage] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeModalVisible, setRecipeModalVisible] = useState(false);
@@ -61,6 +61,10 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleBackToFlipBook = () => {
+    setShowMainHomepage(false);
+  };
+
+  const handleNavigateToFlipBook = () => {
     setShowMainHomepage(false);
   };
 
@@ -165,7 +169,7 @@ const HomeScreen: React.FC = () => {
       <MainHomeScreen 
         favorites={favorites} 
         onFavoriteToggle={handleFavoriteToggle}
-        onBackToFlipBook={handleBackToFlipBook}
+        onBackToFlipBook={handleNavigateToFlipBook}
       />
     );
   }

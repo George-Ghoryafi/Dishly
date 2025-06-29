@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
-import { shoppingListService } from '../services';
+import { ShoppingListService } from '../services';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -118,7 +118,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         index => recipe.ingredients[index]
       );
 
-      await shoppingListService.addIngredients(
+      await ShoppingListService.addIngredients(
         recipe.id,
         recipe.name,
         selectedIngredientsList,
