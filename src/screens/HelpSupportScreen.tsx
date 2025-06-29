@@ -64,7 +64,7 @@ const HelpSupportScreen: React.FC = () => {
           </View>
           <Text style={styles.welcomeTitle}>How can we help you?</Text>
           <Text style={styles.welcomeSubtitle}>
-            We're here to help you get the most out of Dishly
+            We're here to help you get the most out of Recipic
           </Text>
         </View>
 
@@ -144,8 +144,8 @@ const HelpSupportScreen: React.FC = () => {
 
         {/* App Info */}
         <View style={styles.appInfoSection}>
-          <Text style={styles.appInfoText}>Dishly v1.0.0</Text>
-          <Text style={styles.appInfoText}>© 2024 Dishly. All rights reserved.</Text>
+                      <Text style={styles.appInfoText}>Recipic v1.0.0</Text>
+            <Text style={styles.appInfoText}>© 2024 Recipic. All rights reserved.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

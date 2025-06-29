@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { supabaseAuthService } from '../services/SupabaseAuthService';
+import { EmailConfirmationModal, AlertModal } from '../components';
 
 interface SignUpScreenProps {
   onSignUp: () => void;
@@ -19,6 +21,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [showEmailConfirmationModal, setShowEmailConfirmationModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorTitle, setErrorTitle] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Password strength requirements based on 2024 NIST guidelines
   const getPasswordStrength = (password: string) => {
@@ -112,7 +119,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 
   const passwordStrength = getPasswordStrength(password);
 
-  // Check username availability (mock implementation)
+  // Helper function to show error modal
+  const showError = (title: string, message: string) => {
+    setErrorTitle(title);
+    setErrorMessage(message);
+    setShowErrorModal(true);
+  };
+
+  // Check username availability using Supabase
   const checkUsernameAvailability = async (username: string) => {
     if (username.length < 3) {
       setUsernameAvailable(null);
@@ -121,14 +135,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 
     setIsCheckingUsername(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
-      // Mock list of taken usernames
-      const takenUsernames = ['admin', 'user', 'test', 'dishly', 'chef', 'cook', 'food', 'recipe', 'nathan'];
-      const isAvailable = !takenUsernames.includes(username.toLowerCase());
+    try {
+      const isAvailable = await supabaseAuthService.isUsernameAvailable(username);
       setUsernameAvailable(isAvailable);
+    } catch (error) {
+      console.error('Username check error:', error);
+      setUsernameAvailable(null);
+    } finally {
       setIsCheckingUsername(false);
-    }, 800);
+    }
   };
 
   // Check username when it changes
@@ -147,70 +162,70 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 
   const validateForm = () => {
     if (!firstName.trim()) {
-      Alert.alert('Error', 'Please enter your first name');
+      showError('Error', 'Please enter your first name');
       return false;
     }
 
     if (!lastName.trim()) {
-      Alert.alert('Error', 'Please enter your last name');
+      showError('Error', 'Please enter your last name');
       return false;
     }
 
     if (!username.trim()) {
-      Alert.alert('Error', 'Please enter a username');
+      showError('Error', 'Please enter a username');
       return false;
     }
 
     if (username.length < 3) {
-      Alert.alert('Error', 'Username must be at least 3 characters long');
+      showError('Error', 'Username must be at least 3 characters long');
       return false;
     }
 
     // Basic username validation (alphanumeric and underscores only)
     const usernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!usernameRegex.test(username)) {
-      Alert.alert('Error', 'Username can only contain letters, numbers, and underscores');
+      showError('Error', 'Username can only contain letters, numbers, and underscores');
       return false;
     }
 
     if (usernameAvailable === false) {
-      Alert.alert('Error', 'This username is already taken. Please choose another one.');
+      showError('Error', 'This username is already taken. Please choose another one.');
       return false;
     }
 
     if (usernameAvailable === null && username.length >= 3) {
-      Alert.alert('Error', 'Please wait while we check username availability');
+      showError('Error', 'Please wait while we check username availability');
       return false;
     }
 
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+      showError('Error', 'Please enter your email');
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      showError('Error', 'Please enter a valid email address');
       return false;
     }
 
     if (!password) {
-      Alert.alert('Error', 'Please enter a password');
+      showError('Error', 'Please enter a password');
       return false;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters long');
+      showError('Error', 'Password must be at least 8 characters long');
       return false;
     }
 
     if (isCommonPassword(password)) {
-      Alert.alert('Error', 'Please choose a less common password for better security');
+      showError('Error', 'Please choose a less common password for better security');
       return false;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      showError('Error', 'Passwords do not match');
       return false;
     }
 
@@ -223,18 +238,21 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
     setIsLoading(true);
     
     try {
-      Alert.alert(
-        'Success!', 
-        'Account created successfully! You can now sign in with your credentials.',
-        [
-          {
-            text: 'OK',
-            onPress: onBackToLogin
-          }
-        ]
-      );
-    } catch (error) {
-      Alert.alert('Sign Up Failed', 'Something went wrong. Please try again.');
+      await supabaseAuthService.signUp({
+        email: email.trim(),
+        password,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+      });
+
+      // Show email confirmation modal instead of alert
+      setRegisteredEmail(email.trim());
+      setShowEmailConfirmationModal(true);
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      const message = error?.message || 'Something went wrong. Please try again.';
+      showError('Sign Up Failed', message);
     } finally {
       setIsLoading(false);
     }
@@ -248,9 +266,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             <TouchableOpacity style={styles.backButton} onPress={onBackToLogin}>
               <Ionicons name="arrow-back" size={24} color="#007AFF" />
             </TouchableOpacity>
-            <Text style={styles.appName}>Dishly</Text>
+            <Text style={styles.appName}>Recipic</Text>
             <Text style={styles.welcomeText}>Create Account</Text>
-            <Text style={styles.subtitle}>Join the Dishly community and start cooking!</Text>
+            <Text style={styles.subtitle}>Join the Recipic community and start cooking!</Text>
           </View>
 
           <View style={styles.form}>
@@ -468,7 +486,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
               <View style={styles.comingSoonContent}>
                 <Ionicons name="rocket-outline" size={24} color="#007AFF" />
                 <Text style={styles.comingSoonTitle}>More sign-up options coming soon</Text>
-                <Text style={styles.comingSoonSubtitle}>We're working on additional ways to join Dishly</Text>
+                <Text style={styles.comingSoonSubtitle}>We're working on additional ways to join Recipic</Text>
               </View>
             </View>
           </View>
@@ -481,6 +499,28 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
           </View>
         </View>
       </ScrollView>
+
+      <EmailConfirmationModal
+        visible={showEmailConfirmationModal}
+        onClose={() => {
+          setShowEmailConfirmationModal(false);
+          onBackToLogin();
+        }}
+        email={registeredEmail}
+        type="signup"
+      />
+
+      <AlertModal
+        visible={showErrorModal}
+        title={errorTitle}
+        message={errorMessage}
+        buttons={[
+          {
+            text: 'OK',
+            onPress: () => setShowErrorModal(false),
+          },
+        ]}
+      />
     </SafeAreaView>
   );
 };

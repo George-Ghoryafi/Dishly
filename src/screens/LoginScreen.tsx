@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { authService } from '../services';
+import { supabaseAuthService } from '../services/SupabaseAuthService';
+import { EmailConfirmationModal, AlertModal, ForgotPasswordModal } from '../components';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -9,24 +10,41 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailConfirmationModal, setShowEmailConfirmationModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
+    if (!emailOrUsername || !password) {
+      setErrorMessage('Please enter both email/username and password');
+      setShowErrorModal(true);
       return;
     }
 
     setIsLoading(true);
     
     try {
-      await authService.login(email, password);
+      await supabaseAuthService.signInWithEmailOrUsername(emailOrUsername, password);
       onLogin();
-    } catch (error) {
-      Alert.alert('Login Failed', 'Please check your credentials and try again');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Check if it's an email confirmation error
+      if (error?.message?.includes('email') && 
+          (error.message.includes('confirm') || error.message.includes('not confirmed'))) {
+        setPendingEmail(emailOrUsername);
+        setShowEmailConfirmationModal(true);
+      } else {
+        const message = error?.message || 'Please check your credentials and try again';
+        setErrorMessage(message);
+        setShowErrorModal(true);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -37,7 +55,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
   };
 
   const handleForgotPassword = () => {
-    Alert.alert('Forgot Password', 'Password reset functionality will be implemented soon!');
+    setShowForgotPasswordModal(true);
   };
 
   return (
@@ -45,23 +63,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.appName}>Dishly</Text>
+          <Text style={styles.appName}>Recipic</Text>
           <Text style={styles.welcomeText}>Welcome back!</Text>
           <Text style={styles.subtitle}>Sign in to continue your culinary journey</Text>
         </View>
 
         {/* Login Form */}
         <View style={styles.form}>
-          {/* Email Input */}
+          {/* Email or Username Input */}
           <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+            <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="Email address"
+              placeholder="Email address or username"
               placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              value={emailOrUsername}
+              onChangeText={setEmailOrUsername}
+              keyboardType="default"
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -113,7 +131,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
             <View style={styles.comingSoonContent}>
               <Ionicons name="rocket-outline" size={24} color="#007AFF" />
               <Text style={styles.comingSoonTitle}>More sign-in options coming soon</Text>
-              <Text style={styles.comingSoonSubtitle}>We're working on additional ways to access Dishly</Text>
+              <Text style={styles.comingSoonSubtitle}>We're working on additional ways to access Recipic</Text>
             </View>
           </View>
         </View>
@@ -126,6 +144,30 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <EmailConfirmationModal
+        visible={showEmailConfirmationModal}
+        onClose={() => setShowEmailConfirmationModal(false)}
+        email={pendingEmail}
+        type="login"
+      />
+
+      <AlertModal
+        visible={showErrorModal}
+        title="Login Error"
+        message={errorMessage}
+        buttons={[
+          {
+            text: 'OK',
+            onPress: () => setShowErrorModal(false),
+          },
+        ]}
+      />
+
+      <ForgotPasswordModal
+        visible={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+      />
     </SafeAreaView>
   );
 };

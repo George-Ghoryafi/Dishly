@@ -26,11 +26,18 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <View style={styles.outerContainer}>
       <View style={styles.topRow}>
-        {/* Left spacer to help center the title */}
-        <View style={styles.leftSpacer} />
+        {/* Left side search icon */}
+        <TouchableOpacity 
+          ref={searchButtonRef}
+          style={styles.searchIconButton}
+          onPress={handleSearchPress}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="search" size={24} color="#007AFF" />
+        </TouchableOpacity>
         
         {/* Centered app name */}
-        <Text style={styles.appName}>Dishly</Text>
+        <Text style={styles.appName}>Recipic</Text>
         
         {/* Right side profile icon */}
         <TouchableOpacity 
@@ -41,19 +48,6 @@ const Header: React.FC<HeaderProps> = ({
           <View style={styles.profileIcon}>
             <Text style={styles.profileText}>👤</Text>
           </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Button Row */}
-      <View style={styles.searchRow}>
-        <TouchableOpacity 
-          ref={searchButtonRef}
-          style={styles.searchButton}
-          onPress={handleSearchPress}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="search" size={18} color="#666" style={styles.searchIcon} />
-          <Text style={styles.searchPlaceholder}>{searchPlaceholder}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -77,16 +71,15 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 12,
   },
-  searchRow: {
-    paddingHorizontal: 20,
-  },
-  leftSpacer: {
-    width: 44, // Same width as profile button to center the title
+  searchIconButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   appName: {
     fontSize: 24,
@@ -114,24 +107,6 @@ const styles = StyleSheet.create({
   profileText: {
     fontSize: 18,
     color: '#666',
-  },
-  searchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchPlaceholder: {
-    flex: 1,
-    fontSize: 15,
-    color: '#999',
   },
 });
 

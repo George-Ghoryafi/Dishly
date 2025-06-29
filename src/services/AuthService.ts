@@ -11,11 +11,11 @@ export interface User {
 // Dummy accounts for testing
 const DUMMY_ACCOUNTS = [
   {
-    email: 'nathan@dishly.com',
+    email: 'nathan@recipic.com',
     password: '1234',
     user: {
       id: 'nathan_001',
-      email: 'nathan@dishly.com',
+      email: 'nathan@recipic.com',
       name: 'Nathan',
     }
   }

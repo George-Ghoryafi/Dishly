@@ -228,7 +228,7 @@ const CameraScreen: React.FC = () => {
             <Ionicons name="camera-outline" size={80} color="#666" />
             <Text style={styles.permissionTitle}>Camera Access Required</Text>
             <Text style={styles.permissionMessage}>
-              Dishly needs access to your camera to take photos of ingredients and dishes.
+              Recipic needs access to your camera to take photos of ingredients and dishes.
             </Text>
             <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
               <Text style={styles.permissionButtonText}>Grant Permission</Text>
