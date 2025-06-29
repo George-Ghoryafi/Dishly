@@ -143,7 +143,9 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
 
   const handleFlipBookPress = () => {
     console.log('FlipBook pressed - navigating to flipbook');
-    onBackToFlipBook?.();
+    if (onBackToFlipBook) {
+      onBackToFlipBook();
+    }
   };
 
   const handleCloseRecipeModal = () => {
