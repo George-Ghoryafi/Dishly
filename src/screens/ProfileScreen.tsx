@@ -8,7 +8,11 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
-const ProfileScreen: React.FC = () => {
+interface ProfileScreenProps {
+  onLogout?: () => void;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ onLogout }) => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   const handleBackPress = () => {
@@ -38,6 +42,12 @@ const ProfileScreen: React.FC = () => {
 
   const handleAbout = () => {
     navigation.navigate('About');
+  };
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
   };
 
   return (
@@ -141,7 +151,7 @@ const ProfileScreen: React.FC = () => {
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
               <View style={styles.menuItemLeft}>
                 <View style={styles.logoutIconContainer}>
                   <Ionicons name="log-out-outline" size={20} color="#FF3B30" />

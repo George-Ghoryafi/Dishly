@@ -1,4 +1,6 @@
 export { default as LoadingScreen } from './LoadingScreen';
+export { default as LoginScreen } from './LoginScreen';
+export { default as SignUpScreen } from './SignUpScreen';
 export { default as HomeScreen } from './HomeScreen';
 export { default as CameraScreen } from './CameraScreen';
 export { default as FavoritesScreen } from './FavoritesScreen';
