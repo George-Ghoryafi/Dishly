@@ -6,6 +6,9 @@ export interface AuthUser {
   email: string;
   name: string;
   username?: string;
+  subscriptionStatus: 'free' | 'pro';
+  subscriptionEndDate?: string;
+  isProUser: boolean;
 }
 
 export interface SignUpData {
@@ -71,6 +74,9 @@ class SupabaseAuthService {
         email: authData.user.email!,
         name: `${firstName} ${lastName}`,
         username,
+        subscriptionStatus: 'free' as const,
+        subscriptionEndDate: undefined,
+        isProUser: false,
       };
     } catch (error: any) {
       console.error('Sign up error:', error);
@@ -179,6 +185,10 @@ class SupabaseAuthService {
         email: data.user.email!,
         name: profile ? `${profile.first_name} ${profile.last_name}` : data.user.email!,
         username: profile?.username,
+        subscriptionStatus: profile?.subscription_status || 'free',
+        subscriptionEndDate: profile?.subscription_end_date,
+        isProUser: profile?.subscription_status === 'pro' && 
+                   (!profile?.subscription_end_date || new Date(profile.subscription_end_date) > new Date()),
       };
     } catch (error) {
       console.error('Sign in error:', error);
@@ -216,6 +226,10 @@ class SupabaseAuthService {
         email: user.email!,
         name: profile ? `${profile.first_name} ${profile.last_name}` : user.email!,
         username: profile?.username,
+        subscriptionStatus: profile?.subscription_status || 'free',
+        subscriptionEndDate: profile?.subscription_end_date,
+        isProUser: profile?.subscription_status === 'pro' && 
+                   (!profile?.subscription_end_date || new Date(profile.subscription_end_date) > new Date()),
       };
     } catch (error) {
       console.error('Get current user error:', error);
@@ -275,6 +289,97 @@ class SupabaseAuthService {
   }
 
 
+
+  // Upgrade user to Pro subscription
+  async upgradeToProSubscription(
+    userId: string,
+    durationMonths: number = 1,
+    pricePaid: number = 9.99,
+    paymentMethod: string = 'stripe',
+    transactionId?: string
+  ): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('upgrade_to_pro', {
+        user_id_input: userId,
+        duration_months: durationMonths,
+        price_paid_input: pricePaid,
+        payment_method_input: paymentMethod,
+        transaction_id_input: transactionId,
+      });
+
+      if (error) {
+        console.error('Error upgrading to Pro:', error);
+        return false;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error upgrading to Pro:', error);
+      return false;
+    }
+  }
+
+  // Downgrade user to Free subscription
+  async downgradeToFreeSubscription(userId: string, reason: string = 'user_cancelled'): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('downgrade_to_free', {
+        user_id_input: userId,
+        reason: reason,
+      });
+
+      if (error) {
+        console.error('Error downgrading to Free:', error);
+        return false;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error downgrading to Free:', error);
+      return false;
+    }
+  }
+
+  // Get user's subscription history
+  async getSubscriptionHistory(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('subscription_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching subscription history:', error);
+        return [];
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching subscription history:', error);
+      return [];
+    }
+  }
+
+  // Check if user has active Pro subscription
+  async hasActiveProSubscription(userId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('subscription_status, subscription_end_date')
+        .eq('id', userId)
+        .single();
+
+      if (error || !data) {
+        return false;
+      }
+
+      return data.subscription_status === 'pro' && 
+             (!data.subscription_end_date || new Date(data.subscription_end_date) > new Date());
+    } catch (error) {
+      console.error('Error checking Pro subscription:', error);
+      return false;
+    }
+  }
 
   // Listen to auth state changes
   onAuthStateChange(callback: (user: AuthUser | null) => void) {

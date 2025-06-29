@@ -38,6 +38,26 @@ export interface Profile {
   first_name: string;
   last_name: string;
   avatar_url?: string;
+  subscription_status: 'free' | 'pro';
+  subscription_start_date?: string;
+  subscription_end_date?: string;
+  subscription_auto_renew: boolean;
+  subscription_updated_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Subscription history interface
+export interface SubscriptionHistory {
+  id: string;
+  user_id: string;
+  subscription_type: 'free' | 'pro';
+  start_date: string;
+  end_date?: string;
+  price_paid?: number;
+  payment_method?: string;
+  transaction_id?: string;
+  status: 'active' | 'cancelled' | 'expired' | 'refunded';
   created_at: string;
   updated_at: string;
 } 
