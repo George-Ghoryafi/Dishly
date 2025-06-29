@@ -16,4 +16,7 @@ export { default as CookingCompletionScreen } from './CookingCompletionScreen';
 export { default as FavoritesSearchModal } from './FavoritesSearchModal';
 export { default as SaveStatus } from './SaveStatus';
 export { default as CustomFolderModal } from './CustomFolderModal';
-export { default as FolderOptionsModal } from './FolderOptionsModal'; 
+export { default as FolderOptionsModal } from './FolderOptionsModal';
+export { default as EmailConfirmationModal } from './EmailConfirmationModal';
+export { default as AlertModal } from './AlertModal';
+export { default as ForgotPasswordModal } from './ForgotPasswordModal'; 
