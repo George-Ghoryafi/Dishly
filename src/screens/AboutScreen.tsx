@@ -17,22 +17,22 @@ const AboutScreen: React.FC = () => {
 
   const handleWebsite = () => {
     // TODO: Replace with actual website URL
-    Linking.openURL('https://dishly.app');
+    Linking.openURL('https://recipic.app');
   };
 
   const handleTwitter = () => {
     // TODO: Replace with actual Twitter URL
-    Linking.openURL('https://twitter.com/dishly');
+    Linking.openURL('https://twitter.com/recipic');
   };
 
   const handleInstagram = () => {
     // TODO: Replace with actual Instagram URL
-    Linking.openURL('https://instagram.com/dishly');
+    Linking.openURL('https://instagram.com/recipic');
   };
 
   const handleEmail = () => {
     // TODO: Replace with actual support email
-    Linking.openURL('mailto:support@dishly.app');
+    Linking.openURL('mailto:support@recipic.app');
   };
 
   return (
@@ -52,18 +52,18 @@ const AboutScreen: React.FC = () => {
           <View style={styles.logoContainer}>
             <Ionicons name="restaurant" size={48} color="#007AFF" />
           </View>
-          <Text style={styles.appName}>Dishly</Text>
+          <Text style={styles.appName}>Recipic</Text>
           <Text style={styles.appTagline}>Your personal cooking companion</Text>
           <Text style={styles.versionText}>Version 1.0.0</Text>
         </View>
 
         {/* App Description */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About Dishly</Text>
+          <Text style={styles.sectionTitle}>About Recipic</Text>
           <Text style={styles.descriptionText}>
-            Dishly is your ultimate cooking companion, designed to make your culinary journey 
+            Recipic is your ultimate cooking companion, designed to make your culinary journey 
             easier, more enjoyable, and more rewarding. Whether you're a seasoned chef or just 
-            starting your cooking adventure, Dishly provides the tools and inspiration you need 
+            starting your cooking adventure, Recipic provides the tools and inspiration you need 
             to create delicious meals.
           </Text>
         </View>
@@ -127,7 +127,7 @@ const AboutScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Our Team</Text>
           <Text style={styles.descriptionText}>
-            Dishly is built with love by a team passionate about food, technology, and 
+            Recipic is built with love by a team passionate about food, technology, and 
             helping people discover the joy of cooking. We believe that everyone deserves 
             to enjoy delicious, home-cooked meals.
           </Text>
@@ -182,7 +182,7 @@ const AboutScreen: React.FC = () => {
 
         {/* App Info */}
         <View style={styles.appInfoSection}>
-          <Text style={styles.appInfoText}>© 2024 Dishly. All rights reserved.</Text>
+          <Text style={styles.appInfoText}>© 2024 Recipic. All rights reserved.</Text>
           <Text style={styles.appInfoText}>Made with ❤️ for food lovers everywhere</Text>
         </View>
       </ScrollView>

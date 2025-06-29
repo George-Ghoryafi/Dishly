@@ -45,7 +45,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.appName}>Dishly</Text>
+          <Text style={styles.appName}>Recipic</Text>
           <Text style={styles.welcomeText}>Welcome back!</Text>
           <Text style={styles.subtitle}>Sign in to continue your culinary journey</Text>
         </View>
@@ -113,7 +113,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
             <View style={styles.comingSoonContent}>
               <Ionicons name="rocket-outline" size={24} color="#007AFF" />
               <Text style={styles.comingSoonTitle}>More sign-in options coming soon</Text>
-              <Text style={styles.comingSoonSubtitle}>We're working on additional ways to access Dishly</Text>
+              <Text style={styles.comingSoonSubtitle}>We're working on additional ways to access Recipic</Text>
             </View>
           </View>
         </View>

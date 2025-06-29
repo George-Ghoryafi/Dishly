@@ -124,7 +124,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
     // Simulate API call delay
     setTimeout(() => {
       // Mock list of taken usernames
-      const takenUsernames = ['admin', 'user', 'test', 'dishly', 'chef', 'cook', 'food', 'recipe', 'nathan'];
+      const takenUsernames = ['admin', 'user', 'test', 'recipic', 'chef', 'cook', 'food', 'recipe', 'nathan'];
       const isAvailable = !takenUsernames.includes(username.toLowerCase());
       setUsernameAvailable(isAvailable);
       setIsCheckingUsername(false);
@@ -248,9 +248,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             <TouchableOpacity style={styles.backButton} onPress={onBackToLogin}>
               <Ionicons name="arrow-back" size={24} color="#007AFF" />
             </TouchableOpacity>
-            <Text style={styles.appName}>Dishly</Text>
+            <Text style={styles.appName}>Recipic</Text>
             <Text style={styles.welcomeText}>Create Account</Text>
-            <Text style={styles.subtitle}>Join the Dishly community and start cooking!</Text>
+            <Text style={styles.subtitle}>Join the Recipic community and start cooking!</Text>
           </View>
 
           <View style={styles.form}>
@@ -468,7 +468,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
               <View style={styles.comingSoonContent}>
                 <Ionicons name="rocket-outline" size={24} color="#007AFF" />
                 <Text style={styles.comingSoonTitle}>More sign-up options coming soon</Text>
-                <Text style={styles.comingSoonSubtitle}>We're working on additional ways to join Dishly</Text>
+                <Text style={styles.comingSoonSubtitle}>We're working on additional ways to join Recipic</Text>
               </View>
             </View>
           </View>

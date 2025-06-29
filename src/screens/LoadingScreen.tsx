@@ -40,7 +40,7 @@ const LoadingScreen: React.FC = () => {
               style={styles.lottieAnimation}
             />
           </View>
-          <Text style={styles.appName}>Dishly</Text>
+          <Text style={styles.appName}>Recipic</Text>
         </Animated.View>
         
         <Animated.View style={[styles.taglineContainer, animatedStyle]}>

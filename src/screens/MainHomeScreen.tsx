@@ -244,7 +244,6 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
         <Header 
           onProfilePress={handleProfilePress}
           onSearchPress={handleSearchPress}
-          searchPlaceholder="Search for recipes and dishes..."
         />
       </Animated.View>
         <FlatList 

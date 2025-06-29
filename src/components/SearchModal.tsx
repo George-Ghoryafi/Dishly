@@ -202,33 +202,15 @@ const SearchModal: React.FC<SearchModalProps> = ({
               <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Search Recipes</Text>
+              <Text style={styles.headerTitle}>Coming Soon</Text>
               <View style={styles.placeholder} />
             </Animated.View>
 
             <View style={styles.searchSection}>
-              <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-                <TextInput
-                  ref={searchInputRef}
-                  style={styles.searchInput}
-                  placeholder="Search for recipes and dishes..."
-                  placeholderTextColor="#999"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  onSubmitEditing={handleSearch}
-                  returnKeyType="search"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity 
-                    onPress={() => setSearchQuery('')} 
-                    style={styles.clearButton}
-                  >
-                    <Ionicons name="close-circle" size={20} color="#999" />
-                  </TouchableOpacity>
-                )}
+              <View style={styles.comingSoonBanner}>
+                <Ionicons name="rocket-outline" size={32} color="#007AFF" />
+                <Text style={styles.comingSoonTitle}>Coming Soon!</Text>
+                <Text style={styles.comingSoonSubtitle}>We're working hard to bring you these amazing features</Text>
               </View>
             </View>
 
@@ -241,23 +223,74 @@ const SearchModal: React.FC<SearchModalProps> = ({
                 <TouchableWithoutFeedback onPress={dismissKeyboard}>
                   <View>
                     <View style={styles.section}>
-                      <Text style={styles.sectionTitle}>Browse Categories</Text>
-                      <Text style={styles.sectionSubtitle}>Find recipes by type</Text>
+                      <Text style={styles.sectionTitle}>Upcoming Features</Text>
+                      <Text style={styles.sectionSubtitle}>Here's what we're building for you</Text>
                     </View>
 
-                    <View style={styles.categoriesGrid}>
-                      {categories.map((category) => (
-                        <TouchableOpacity
-                          key={category.id}
-                          style={styles.categoryCard}
-                          onPress={() => handleCategoryPress(category)}
-                          activeOpacity={0.7}
-                        >
-                          <Text style={styles.categoryIcon}>{category.icon}</Text>
-                          <Text style={styles.categoryName}>{category.name}</Text>
-                          <Text style={styles.categoryDescription}>{category.description}</Text>
-                        </TouchableOpacity>
-                      ))}
+                    <View style={styles.featuresGrid}>
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="search" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Recipe Search</Text>
+                        <Text style={styles.featureDescription}>Search through thousands of recipes by name, ingredient, or cuisine type</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="filter" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Advanced Filtering</Text>
+                        <Text style={styles.featureDescription}>Filter recipes by dietary restrictions, cooking time, difficulty, and more</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="chatbubble-ellipses" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>AI Recipe Creation</Text>
+                        <Text style={styles.featureDescription}>Create custom recipes using AI by describing what you want to cook</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="bookmark" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Smart Collections</Text>
+                        <Text style={styles.featureDescription}>Automatically organize recipes into smart collections based on your preferences</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="people" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Recipe Sharing</Text>
+                        <Text style={styles.featureDescription}>Share your favorite recipes with friends and discover what others are cooking</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="nutrition" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Nutrition Tracking</Text>
+                        <Text style={styles.featureDescription}>Track calories, macros, and nutritional information for all your meals</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="calendar" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Meal Planning</Text>
+                        <Text style={styles.featureDescription}>Plan your weekly meals and automatically generate shopping lists</Text>
+                      </View>
+
+                      <View style={styles.featureCard}>
+                        <View style={styles.featureIconContainer}>
+                          <Ionicons name="school" size={24} color="#007AFF" />
+                        </View>
+                        <Text style={styles.featureName}>Cooking Tutorials</Text>
+                        <Text style={styles.featureDescription}>Step-by-step video tutorials and cooking tips from professional chefs</Text>
+                      </View>
                     </View>
                   </View>
                 </TouchableWithoutFeedback>
@@ -346,11 +379,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  categoriesGrid: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+  comingSoonBanner: {
+    alignItems: 'center',
+    paddingVertical: 24,
   },
-  categoryCard: {
+  comingSoonTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  comingSoonSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  featuresGrid: {
+    paddingHorizontal: 20,
+    paddingBottom: Platform.OS === 'android' ? 80 : 40,
+  },
+  featureCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
@@ -370,17 +420,22 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  categoryIcon: {
-    fontSize: 32,
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f0f8ff',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  categoryName: {
+  featureName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  categoryDescription: {
+  featureDescription: {
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
