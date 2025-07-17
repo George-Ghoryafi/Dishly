@@ -5,6 +5,7 @@ export interface ShoppingListFolder {
   name: string;
   description?: string;
   color: string;
+  icon?: string; // Emoji or icon identifier
   is_favorite: boolean;
   item_count: number;
   created_at: string;
@@ -36,6 +37,7 @@ export interface CreateShoppingListFolderInput {
   name: string;
   description?: string;
   color?: string;
+  icon?: string;
   is_favorite?: boolean;
 }
 
@@ -43,6 +45,7 @@ export interface UpdateShoppingListFolderInput {
   name?: string;
   description?: string;
   color?: string;
+  icon?: string;
   is_favorite?: boolean;
 }
 
@@ -100,4 +103,24 @@ export const FOLDER_COLORS = [
   '#F97316', // orange
   '#EC4899', // pink
   '#6B7280', // gray
+] as const;
+
+// Default folder icons/emojis
+export const FOLDER_ICONS = [
+  '📁', // default folder
+  '🛒', // shopping cart
+  '🥕', // vegetables
+  '🍎', // fruits
+  '🥛', // dairy
+  '🍞', // bakery
+  '🥩', // meat
+  '🐟', // seafood
+  '🍝', // pantry/pasta
+  '❄️', // frozen
+  '🧴', // household
+  '🍕', // dinner
+  '🎂', // desserts
+  '☕', // beverages
+  '🍿', // snacks
+  '💊', // pharmacy
 ] as const; 

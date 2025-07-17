@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
 import { shoppingListService } from '../services/ShoppingListService';
 import { ShoppingListFolderSummary, ShoppingListItem } from '../types/ShoppingList';
-import { CustomFolderModal, FolderOptionsModal } from '../components';
+import { CustomFolderModal, FolderOptionsModal, RenameFolderModal } from '../components';
 
 interface FolderWithItems extends ShoppingListFolderSummary {
   items: ShoppingListItem[];
@@ -13,12 +14,15 @@ interface FolderWithItems extends ShoppingListFolderSummary {
 
 const ShoppingListScreen: React.FC = () => {
   const [folders, setFolders] = useState<FolderWithItems[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCachedData, setHasCachedData] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState<'createFolder' | 'addItem'>('createFolder');
   const [selectedFolder, setSelectedFolder] = useState<{ id: string; name: string } | undefined>();
   const [optionsModalVisible, setOptionsModalVisible] = useState(false);
   const [selectedFolder2, setSelectedFolder2] = useState<FolderWithItems | null>(null);
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
   const isMountedRef = useRef(true);
 
@@ -35,8 +39,13 @@ const ShoppingListScreen: React.FC = () => {
     }
   }, []);
 
-  const loadShoppingList = useCallback(async () => {
+  const loadShoppingList = useCallback(async (forceShowLoading = false) => {
     try {
+      // Only show loading screen if we don't have cached data OR force is requested
+      if (!hasCachedData || forceShowLoading) {
+        setIsLoading(true);
+      }
+      
       const folderSummaries = await shoppingListService.getFoldersSummary();
       const foldersWithItems: FolderWithItems[] = [];
 
@@ -49,10 +58,50 @@ const ShoppingListScreen: React.FC = () => {
         });
       }
 
-      setFolders(foldersWithItems);
+      // Compare new data with existing data to see if update is needed
+      const hasDataChanged = !hasCachedData || hasShoppingListChanged(folders, foldersWithItems);
+      
+      if (hasDataChanged) {
+        setFolders(foldersWithItems);
+        setHasCachedData(true);
+      }
+      
     } catch (error) {
       console.error('Error loading shopping list:', error);
+    } finally {
+      // Only hide loading if we were showing it
+      if (!hasCachedData || forceShowLoading) {
+        setIsLoading(false);
+      }
     }
+  }, [folders, hasCachedData]);
+
+  // Helper function to compare shopping list data
+  const hasShoppingListChanged = useCallback((oldFolders: FolderWithItems[], newFolders: FolderWithItems[]) => {
+    if (oldFolders.length !== newFolders.length) return true;
+    
+    return oldFolders.some((oldFolder, index) => {
+      const newFolder = newFolders[index];
+      if (!newFolder) return true;
+      
+      // Compare folder properties
+      if (oldFolder.id !== newFolder.id || 
+          oldFolder.name !== newFolder.name || 
+          oldFolder.items.length !== newFolder.items.length) {
+        return true;
+      }
+      
+      // Compare items
+      return oldFolder.items.some((oldItem, itemIndex) => {
+        const newItem = newFolder.items[itemIndex];
+        if (!newItem) return true;
+        
+        return oldItem.id !== newItem.id ||
+               oldItem.name !== newItem.name ||
+               oldItem.is_completed !== newItem.is_completed ||
+               oldItem.quantity !== newItem.quantity;
+      });
+    });
   }, []);
 
   // Update folder collapse states when collapsedFolders changes
@@ -67,13 +116,15 @@ const ShoppingListScreen: React.FC = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await loadShoppingList();
+    await loadShoppingList(false); // Don't force loading screen during refresh
     setRefreshing(false);
   }, [loadShoppingList]);
 
   useFocusEffect(
     useCallback(() => {
-      loadShoppingList();
+      // On focus: if we have cached data, show it immediately and refresh in background
+      // If no cached data, show loading screen while fetching
+      loadShoppingList(false);
     }, [loadShoppingList])
   );
 
@@ -236,9 +287,13 @@ const ShoppingListScreen: React.FC = () => {
     });
   };
 
-  const handleCreateFolder = async (name: string) => {
+  const handleCreateFolder = async (name: string, color?: string, icon?: string) => {
     try {
-      await shoppingListService.createFolder({ name });
+      const folderData: any = { name };
+      if (color) folderData.color = color;
+      if (icon !== undefined) folderData.icon = icon;
+      
+      await shoppingListService.createFolder(folderData);
       await loadShoppingList();
     } catch (error) {
       console.error('Error creating custom folder:', error);
@@ -253,8 +308,8 @@ const ShoppingListScreen: React.FC = () => {
       folder_id: folderId,
       name: itemName,
       quantity: `${amount} ${unit}`,
-      category: null,
-      notes: null,
+      category: undefined,
+      notes: undefined,
       is_completed: false,
       priority: 0,
       created_at: new Date().toISOString(),
@@ -330,6 +385,10 @@ const ShoppingListScreen: React.FC = () => {
         setModalVisible(true);
         break;
 
+      case 'rename':
+        setRenameModalVisible(true);
+        break;
+
       case 'clearCompleted':
         handleClearCompletedFromFolder(selectedFolder2.id, selectedFolder2.name);
         break;
@@ -338,15 +397,22 @@ const ShoppingListScreen: React.FC = () => {
         break;
     }
     
-    setSelectedFolder2(null);
+    // Don't close selectedFolder2 if we're showing rename modal
+    if (optionId !== 'rename') {
+      setSelectedFolder2(null);
+    }
   };
 
-  const handleRenameFolder = async (folderId: string, newName: string) => {
+  const handleRenameFolder = async (folderId: string, newName: string, color?: string, icon?: string) => {
     try {
-      await shoppingListService.updateFolder(folderId, { name: newName });
+      const updateData: any = { name: newName };
+      if (color) updateData.color = color;
+      if (icon !== undefined) updateData.icon = icon; // Allow clearing icon with undefined
+      
+      await shoppingListService.updateFolder(folderId, updateData);
       await loadShoppingList();
     } catch (error) {
-      console.error('Error renaming folder:', error);
+      console.error('Error updating folder:', error);
       throw error; // Re-throw so the modal can handle the error
     }
   };
@@ -435,101 +501,127 @@ const ShoppingListScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {!folders || folders.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="basket-outline" size={80} color="#ccc" />
-            <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
-            <Text style={styles.emptySubtitle}>
-              Add ingredients from recipes to get started
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.itemsList}>
-            {(folders || []).map((folder) => (
-              <View key={folder.id} style={styles.recipeGroup}>
-                {/* Folder Header */}
-                <TouchableOpacity 
-                  style={styles.recipeHeader}
-                  onPress={() => handleToggleCollapse(folder.id)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.recipeHeaderLeft}>
-                    <Ionicons 
-                      name="folder" 
-                      size={20} 
-                      color={folder.color || "#007AFF"} 
-                    />
-                    <Text style={styles.recipeName}>{folder.name}</Text>
-                    <Text style={styles.recipeItemCount}>
-                      {(folder.items || []).filter(item => !item.is_completed).length} items
-                    </Text>
-                  </View>
-                  <View style={styles.recipeHeaderRight}>
-                    <TouchableOpacity
-                      style={styles.moreButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        showFolderOptions(folder);
-                      }}
+                 {isLoading && !hasCachedData ? (
+           <View style={styles.loadingContainer}>
+             <View style={styles.loadingContent}>
+               <View style={styles.animationWrapper}>
+                 <LottieView
+                   source={require('../../assets/animations/cooking-professional.json')}
+                   autoPlay
+                   loop
+                   style={styles.loadingAnimation}
+                 />
+               </View>
+               <Text style={styles.loadingTitle}>Preparing your shopping list</Text>
+               <Text style={styles.loadingSubtitle}>Organizing your favorite ingredients...</Text>
+               <View style={styles.loadingIndicator}>
+                 <ActivityIndicator size="small" color="#007AFF" />
+               </View>
+             </View>
+           </View>
+         ) : (
+          <>
+            {!folders || folders.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="basket-outline" size={80} color="#ccc" />
+                <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
+                <Text style={styles.emptySubtitle}>
+                  Add ingredients from recipes to get started
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.itemsList}>
+                {(folders || []).map((folder) => (
+                  <View key={folder.id} style={styles.recipeGroup}>
+                    {/* Folder Header */}
+                    <TouchableOpacity 
+                      style={styles.recipeHeader}
+                      onPress={() => handleToggleCollapse(folder.id)}
+                      activeOpacity={0.7}
                     >
-                      <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.collapseButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleToggleCollapse(folder.id);
-                      }}
-                    >
+                                        <View style={styles.recipeHeaderLeft}>
+                    {folder.icon ? (
+                      <Text style={styles.folderEmoji}>{folder.icon}</Text>
+                    ) : (
                       <Ionicons 
-                        name={folder.isCollapsed ? "chevron-down" : "chevron-up"} 
-                        size={18} 
-                        color="#666" 
+                        name="folder" 
+                        size={20} 
+                        color={folder.color || "#007AFF"} 
                       />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-
-                {/* Folder Items */}
-                {!folder.isCollapsed && (
-                  <View style={styles.recipeItems}>
-                    {(folder.items || []).map((item) => (
-                      <View key={item.id} style={[styles.shoppingItem, item.is_completed && styles.checkedItem]}>
+                    )}
+                    <Text style={styles.recipeName}>{folder.name}</Text>
+                        <Text style={styles.recipeItemCount}>
+                          {(folder.items || []).filter(item => !item.is_completed).length} items
+                        </Text>
+                      </View>
+                      <View style={styles.recipeHeaderRight}>
                         <TouchableOpacity
-                          style={styles.checkboxContainer}
-                          onPress={() => handleToggleItem(item.id)}
+                          style={styles.moreButton}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            showFolderOptions(folder);
+                          }}
                         >
-                          <Ionicons
-                            name={item.is_completed ? "checkmark-circle" : "ellipse-outline"}
-                            size={24}
-                            color={item.is_completed ? "#34C759" : "#ccc"}
+                          <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.collapseButton}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            handleToggleCollapse(folder.id);
+                          }}
+                        >
+                          <Ionicons 
+                            name={folder.isCollapsed ? "chevron-down" : "chevron-up"} 
+                            size={18} 
+                            color="#666" 
                           />
                         </TouchableOpacity>
-                        
-                        <View style={styles.itemInfo}>
-                          <Text style={[styles.itemName, item.is_completed && styles.checkedText]}>
-                            {item.name}
-                          </Text>
-                          {item.quantity && (
-                            <Text style={[styles.itemAmount, item.is_completed && styles.checkedText]}>
-                              {item.quantity}
-                            </Text>
-                          )}
-                        </View>
-
-                        <TouchableOpacity
-                          style={styles.removeItemButton}
-                          onPress={() => handleRemoveItem(item.id)}
-                        >
-                          <Ionicons name="close" size={20} color="#999" />
-                        </TouchableOpacity>
                       </View>
-                    ))}
+                    </TouchableOpacity>
+
+                    {/* Folder Items */}
+                    {!folder.isCollapsed && (
+                      <View style={styles.recipeItems}>
+                        {(folder.items || []).map((item) => (
+                          <View key={item.id} style={[styles.shoppingItem, item.is_completed && styles.checkedItem]}>
+                            <TouchableOpacity
+                              style={styles.checkboxContainer}
+                              onPress={() => handleToggleItem(item.id)}
+                            >
+                              <Ionicons
+                                name={item.is_completed ? "checkmark-circle" : "ellipse-outline"}
+                                size={24}
+                                color={item.is_completed ? "#34C759" : "#ccc"}
+                              />
+                            </TouchableOpacity>
+                            
+                            <View style={styles.itemInfo}>
+                              <Text style={[styles.itemName, item.is_completed && styles.checkedText]}>
+                                {item.name}
+                              </Text>
+                              {item.quantity && (
+                                <Text style={[styles.itemAmount, item.is_completed && styles.checkedText]}>
+                                  {item.quantity}
+                                </Text>
+                              )}
+                            </View>
+
+                            <TouchableOpacity
+                              style={styles.removeItemButton}
+                              onPress={() => handleRemoveItem(item.id)}
+                            >
+                              <Ionicons name="close" size={20} color="#999" />
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    )}
                   </View>
-                )}
+                ))}
               </View>
-            ))}
-          </View>
+            )}
+          </>
         )}
         </ScrollView>
 
@@ -553,12 +645,26 @@ const ShoppingListScreen: React.FC = () => {
           folderName={selectedFolder2?.name || ''}
           isCustomFolder={true}
           onOptionSelect={handleOptionSelect}
-          onRenameFolder={async (newName: string) => {
+          itemCount={selectedFolder2?.items.length || 0}
+        />
+
+        {/* Rename Folder Modal */}
+        <RenameFolderModal
+          visible={renameModalVisible}
+          onClose={() => {
+            setRenameModalVisible(false);
+            setSelectedFolder2(null);
+          }}
+          onRename={async (newName: string, color: string, icon?: string) => {
             if (selectedFolder2) {
-              await handleRenameFolder(selectedFolder2.id, newName);
+              await handleRenameFolder(selectedFolder2.id, newName, color, icon);
             }
           }}
+          currentName={selectedFolder2?.name || ''}
+          currentColor={selectedFolder2?.color || '#007AFF'}
+          currentIcon={selectedFolder2?.icon}
           itemCount={selectedFolder2?.items.length || 0}
+          isCustomFolder={true}
         />
       </View>
     );
@@ -610,6 +716,55 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  loadingContent: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
+  animationWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  loadingAnimation: {
+    width: 100,
+    height: 100,
+  },
+  loadingTitle: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  loadingSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  loadingIndicator: {
+    marginTop: 8,
   },
   emptyState: {
     flex: 1,
@@ -666,6 +821,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     flex: 1,
+  },
+  folderEmoji: {
+    fontSize: 20,
+    width: 20,
+    textAlign: 'center',
   },
   recipeItemCount: {
     fontSize: 12,

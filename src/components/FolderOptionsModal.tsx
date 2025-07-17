@@ -31,7 +31,6 @@ interface FolderOptionsModalProps {
   folderName: string;
   isCustomFolder: boolean;
   onOptionSelect: (optionId: string) => void;
-  onRenameFolder: (newName: string) => void;
   itemCount: number;
 }
 
@@ -41,14 +40,10 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
   folderName,
   isCustomFolder,
   onOptionSelect,
-  onRenameFolder,
   itemCount,
 }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(screenHeight)).current;
-  const [showRenameInput, setShowRenameInput] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
-  const [isRenaming, setIsRenaming] = useState(false);
   const [isModalReady, setIsModalReady] = useState(false);
 
   const options: FolderOption[] = [
@@ -88,7 +83,6 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
   useEffect(() => {
     if (visible) {
       setIsModalReady(false);
-      setShowRenameInput(false); // Reset rename input when modal opens
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -124,41 +118,8 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
   const handleOptionPress = (optionId: string) => {
     if (!isModalReady) return; // Prevent interactions until modal is fully visible
     
-    if (optionId === 'rename') {
-      setNewFolderName(folderName);
-      setShowRenameInput(true);
-    } else {
-      onOptionSelect(optionId);
-      onClose();
-    }
-  };
-
-  const handleRename = async () => {
-    if (!newFolderName.trim()) {
-      Alert.alert('Error', 'Please enter a folder name.');
-      return;
-    }
-
-    if (newFolderName.trim() === folderName) {
-      setShowRenameInput(false);
-      return;
-    }
-
-    setIsRenaming(true);
-    try {
-      await onRenameFolder(newFolderName.trim());
-      setShowRenameInput(false);
-      onClose();
-    } catch (error) {
-      Alert.alert('Error', 'Failed to rename folder. Please try again.');
-    } finally {
-      setIsRenaming(false);
-    }
-  };
-
-  const handleCancelRename = () => {
-    setShowRenameInput(false);
-    setNewFolderName('');
+    onOptionSelect(optionId);
+    onClose();
   };
 
   return (
@@ -211,101 +172,62 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
               </TouchableOpacity>
             </View>
 
-            {/* Options or Rename Input */}
-            {showRenameInput ? (
-              <View style={styles.renameContainer}>
-                <Text style={styles.renameTitle}>Rename Folder</Text>
-                <View style={styles.renameInputContainer}>
-                  <TextInput
-                    style={styles.renameInput}
-                    value={newFolderName}
-                    onChangeText={setNewFolderName}
-                    placeholder="Enter folder name"
-                    autoFocus
-                    selectTextOnFocus
-                    maxLength={50}
-                  />
-                </View>
-                <View style={styles.renameButtons}>
-                  <TouchableOpacity 
-                    style={styles.renameCancelButton} 
-                    onPress={handleCancelRename}
-                    disabled={isRenaming}
-                  >
-                    <Text style={styles.renameCancelText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.renameConfirmButton, isRenaming && styles.renameButtonDisabled]} 
-                    onPress={handleRename}
-                    disabled={isRenaming}
-                  >
-                    {isRenaming ? (
-                      <Text style={styles.renameConfirmText}>Renaming...</Text>
-                    ) : (
-                      <Text style={styles.renameConfirmText}>Rename</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <View style={styles.optionsContainer}>
-                {options.map((option, index) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.optionItem,
-                      option.destructive && styles.destructiveOption,
-                    ]}
-                    onPress={() => handleOptionPress(option.id)}
-                    activeOpacity={0.6}
-                  >
-                    <View style={styles.optionContent}>
-                      <View style={[
-                        styles.optionIconContainer, 
-                        { backgroundColor: `${option.color}15` },
-                        option.destructive && styles.destructiveIconContainer,
-                      ]}>
-                        <Ionicons 
-                          name={option.icon as any} 
-                          size={22} 
-                          color={option.color} 
-                        />
-                      </View>
-                      <View style={styles.optionTextContainer}>
-                        <Text style={[
-                          styles.optionTitle,
-                          option.destructive && styles.destructiveText,
-                        ]}>
-                          {option.title}
-                        </Text>
-                        {option.subtitle && (
-                          <Text style={[
-                            styles.optionSubtitle,
-                            option.destructive && styles.destructiveSubtitle,
-                          ]}>
-                            {option.subtitle}
-                          </Text>
-                        )}
-                      </View>
+            {/* Options */}
+            <View style={styles.optionsContainer}>
+              {options.map((option, index) => (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.optionItem,
+                    option.destructive && styles.destructiveOption,
+                  ]}
+                  onPress={() => handleOptionPress(option.id)}
+                  activeOpacity={0.6}
+                >
+                  <View style={styles.optionContent}>
+                    <View style={[
+                      styles.optionIconContainer, 
+                      { backgroundColor: `${option.color}15` },
+                      option.destructive && styles.destructiveIconContainer,
+                    ]}>
+                      <Ionicons 
+                        name={option.icon as any} 
+                        size={22} 
+                        color={option.color} 
+                      />
                     </View>
-                    <Ionicons 
-                      name="chevron-forward" 
-                      size={18} 
-                      color={option.destructive ? "#FF3B30" : "#ccc"} 
-                    />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            {/* Footer - only show when not in rename mode */}
-            {!showRenameInput && (
-              <View style={styles.footer}>
-                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <View style={styles.optionTextContainer}>
+                      <Text style={[
+                        styles.optionTitle,
+                        option.destructive && styles.destructiveText,
+                      ]}>
+                        {option.title}
+                      </Text>
+                      {option.subtitle && (
+                        <Text style={[
+                          styles.optionSubtitle,
+                          option.destructive && styles.destructiveSubtitle,
+                        ]}>
+                          {option.subtitle}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <Ionicons 
+                    name="chevron-forward" 
+                    size={18} 
+                    color={option.destructive ? "#FF3B30" : "#ccc"} 
+                  />
                 </TouchableOpacity>
-              </View>
-            )}
+              ))}
+            </View>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </SafeAreaView>
         </Animated.View>
       </Animated.View>
@@ -466,63 +388,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#666',
   },
-  renameContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-  },
-  renameTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  renameInputContainer: {
-    marginBottom: 20,
-  },
-  renameInput: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#1a1a1a',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  renameButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  renameCancelButton: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  renameCancelText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  renameConfirmButton: {
-    flex: 1,
-    backgroundColor: '#007AFF',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  renameConfirmText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-  renameButtonDisabled: {
-    backgroundColor: '#cccccc',
-  },
+
 });
 
 export default FolderOptionsModal; 
