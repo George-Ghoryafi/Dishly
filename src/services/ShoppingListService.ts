@@ -1,7 +1,19 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../config/supabase';
 import { Ingredient } from '../types/Recipe';
+import {
+  ShoppingListFolder,
+  ShoppingListItem,
+  ShoppingListFolderSummary,
+  CreateShoppingListFolderInput,
+  UpdateShoppingListFolderInput,
+  CreateShoppingListItemInput,
+  UpdateShoppingListItemInput,
+  FOLDER_COLORS,
+  PRIORITY_LEVELS
+} from '../types/ShoppingList';
 
-export interface ShoppingListItem {
+// Legacy interfaces for backward compatibility
+export interface LegacyShoppingListItem {
   id: string;
   recipeName: string;
   recipeId: string;
@@ -9,392 +21,723 @@ export interface ShoppingListItem {
   portionSize: number;
   addedAt: Date;
   isChecked: boolean;
-  isCustom?: boolean; // Flag to indicate if this is a custom item
+  isCustom?: boolean;
 }
 
 export interface ShoppingListGroup {
   recipeName: string;
   recipeId: string;
-  items: ShoppingListItem[];
-  isCustomFolder?: boolean; // Flag to indicate if this is a custom folder
-  isCollapsed?: boolean; // Flag to track collapse state
-}
-
-const SHOPPING_LIST_KEY = '@dishly_shopping_list';
-const FOLDER_STATES_KEY = '@dishly_folder_states';
-const CUSTOM_FOLDERS_KEY = '@dishly_custom_folders';
-
-interface FolderState {
-  [folderId: string]: boolean; // true = collapsed, false = expanded
-}
-
-interface CustomFolder {
-  id: string;
-  name: string;
-  createdAt: Date;
+  items: LegacyShoppingListItem[];
+  isCustomFolder?: boolean;
+  isCollapsed?: boolean;
 }
 
 class ShoppingListService {
-  private async getShoppingList(): Promise<ShoppingListItem[]> {
+  // =============================================
+  // FOLDER MANAGEMENT METHODS
+  // =============================================
+
+  async getFolders(): Promise<ShoppingListFolder[]> {
     try {
-      const data = await AsyncStorage.getItem(SHOPPING_LIST_KEY);
-      if (data) {
-        const items = JSON.parse(data);
-        // Convert date strings back to Date objects
-        return items.map((item: any) => ({
-          ...item,
-          addedAt: new Date(item.addedAt),
-        }));
+      const { data, error } = await supabase
+        .from('shopping_list_folders')
+        .select('*')
+        .order('is_favorite', { ascending: false })
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting shopping list folders:', error);
+      return [];
+    }
+  }
+
+  async getFoldersSummary(): Promise<ShoppingListFolderSummary[]> {
+    try {
+      const { data, error } = await supabase
+        .from('shopping_list_folder_summary')
+        .select('*')
+        .order('is_favorite', { ascending: false })
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting shopping list folders summary:', error);
+      return [];
+    }
+  }
+
+  async createFolder(input: CreateShoppingListFolderInput): Promise<ShoppingListFolder | null> {
+    try {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('User not authenticated:', userError);
+        return null;
       }
+
+      const color = input.color || FOLDER_COLORS[Math.floor(Math.random() * FOLDER_COLORS.length)];
+      
+      const { data, error } = await supabase
+        .from('shopping_list_folders')
+        .insert({
+          user_id: user.id,
+          name: input.name,
+          description: input.description,
+          color,
+          is_favorite: input.is_favorite || false,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating shopping list folder:', error);
+      return null;
+    }
+  }
+
+  async updateFolder(folderId: string, input: UpdateShoppingListFolderInput): Promise<ShoppingListFolder | null> {
+    try {
+      const { data, error } = await supabase
+        .from('shopping_list_folders')
+        .update(input)
+        .eq('id', folderId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error updating shopping list folder:', error);
+      return null;
+    }
+  }
+
+  async deleteFolder(folderId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('shopping_list_folders')
+        .delete()
+        .eq('id', folderId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting shopping list folder:', error);
+      return false;
+    }
+  }
+
+  // =============================================
+  // ITEM MANAGEMENT METHODS
+  // =============================================
+
+  async getFolderItems(folderId: string): Promise<ShoppingListItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('shopping_list_items')
+        .select('*')
+        .eq('folder_id', folderId)
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting shopping list items:', error);
       return [];
-    } catch (error) {
-      console.error('Error getting shopping list:', error);
-      return [];
     }
   }
 
-  private async saveShoppingList(items: ShoppingListItem[]): Promise<void> {
+  async addItem(input: CreateShoppingListItemInput): Promise<ShoppingListItem | null> {
     try {
-      await AsyncStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(items));
+      const { data, error } = await supabase
+        .from('shopping_list_items')
+        .insert({
+          folder_id: input.folder_id,
+          name: input.name,
+          quantity: input.quantity,
+          category: input.category,
+          notes: input.notes,
+          priority: input.priority || PRIORITY_LEVELS.NORMAL,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Error saving shopping list:', error);
+      console.error('Error adding shopping list item:', error);
+      return null;
     }
   }
 
-  private async getFolderStates(): Promise<FolderState> {
+  async updateItem(itemId: string, input: UpdateShoppingListItemInput): Promise<ShoppingListItem | null> {
     try {
-      const data = await AsyncStorage.getItem(FOLDER_STATES_KEY);
-      return data ? JSON.parse(data) : {};
+      const { data, error } = await supabase
+        .from('shopping_list_items')
+        .update(input)
+        .eq('id', itemId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Error getting folder states:', error);
-      return {};
+      console.error('Error updating shopping list item:', error);
+      return null;
     }
   }
 
-  private async saveFolderStates(states: FolderState): Promise<void> {
+  async deleteItem(itemId: string): Promise<boolean> {
     try {
-      await AsyncStorage.setItem(FOLDER_STATES_KEY, JSON.stringify(states));
+      const { error } = await supabase
+        .from('shopping_list_items')
+        .delete()
+        .eq('id', itemId);
+
+      if (error) throw error;
+      return true;
     } catch (error) {
-      console.error('Error saving folder states:', error);
+      console.error('Error deleting shopping list item:', error);
+      return false;
     }
   }
 
-  private async getCustomFolders(): Promise<CustomFolder[]> {
+  async toggleItemCompleted(itemId: string): Promise<boolean> {
     try {
-      const data = await AsyncStorage.getItem(CUSTOM_FOLDERS_KEY);
-      if (data) {
-        const folders = JSON.parse(data);
-        return folders.map((folder: any) => ({
-          ...folder,
-          createdAt: new Date(folder.createdAt),
-        }));
+      // First get the current state
+      const { data: currentItem, error: fetchError } = await supabase
+        .from('shopping_list_items')
+        .select('is_completed')
+        .eq('id', itemId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Toggle the completion state
+      const { error: updateError } = await supabase
+        .from('shopping_list_items')
+        .update({ is_completed: !currentItem.is_completed })
+        .eq('id', itemId);
+
+      if (updateError) throw updateError;
+      return true;
+    } catch (error) {
+      console.error('Error toggling item completion:', error);
+      return false;
+    }
+  }
+
+  // =============================================
+  // BULK OPERATIONS
+  // =============================================
+
+  async clearCompletedItems(folderId?: string): Promise<boolean> {
+    try {
+      let query = supabase
+        .from('shopping_list_items')
+        .delete()
+        .eq('is_completed', true);
+
+      if (folderId) {
+        query = query.eq('folder_id', folderId);
       }
-      return [];
+
+      const { error } = await query;
+      if (error) throw error;
+      return true;
     } catch (error) {
-      console.error('Error getting custom folders:', error);
-      return [];
+      console.error('Error clearing completed items:', error);
+      return false;
     }
   }
 
-  private async saveCustomFolders(folders: CustomFolder[]): Promise<void> {
+  async clearAllItems(folderId?: string): Promise<boolean> {
     try {
-      await AsyncStorage.setItem(CUSTOM_FOLDERS_KEY, JSON.stringify(folders));
+      let query = supabase.from('shopping_list_items').delete();
+
+      if (folderId) {
+        query = query.eq('folder_id', folderId);
+      } else {
+        // Clear all items for the current user's folders
+        query = query.in('folder_id', 
+          supabase
+            .from('shopping_list_folders')
+            .select('id')
+        );
+      }
+
+      const { error } = await query;
+      if (error) throw error;
+      return true;
     } catch (error) {
-      console.error('Error saving custom folders:', error);
+      console.error('Error clearing all items:', error);
+      return false;
     }
   }
 
+  // =============================================
+  // RECIPE INTEGRATION METHODS
+  // =============================================
+
+  async addIngredientsToFolder(
+    folderId: string,
+    ingredients: Ingredient[],
+    portionSize: number = 1
+  ): Promise<boolean> {
+    try {
+      const itemsToAdd = ingredients.map(ingredient => ({
+        folder_id: folderId,
+        name: ingredient.name,
+        quantity: `${(ingredient.amount * portionSize)} ${ingredient.unit}`,
+        category: this.categorizeIngredient(ingredient.name),
+        priority: PRIORITY_LEVELS.NORMAL,
+      }));
+
+      const { error } = await supabase
+        .from('shopping_list_items')
+        .insert(itemsToAdd);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error adding ingredients to shopping list:', error);
+      return false;
+    }
+  }
+
+  async createFolderFromRecipe(
+    recipeName: string,
+    ingredients: Ingredient[],
+    portionSize: number = 1
+  ): Promise<string | null> {
+    try {
+      // Create folder first
+      const folder = await this.createFolder({
+        name: recipeName,
+        description: `Shopping list for ${recipeName}`,
+      });
+
+      if (!folder) return null;
+
+      // Add ingredients to the folder
+      const success = await this.addIngredientsToFolder(folder.id, ingredients, portionSize);
+      
+      if (!success) {
+        // Cleanup folder if adding ingredients failed
+        await this.deleteFolder(folder.id);
+        return null;
+      }
+
+      return folder.id;
+    } catch (error) {
+      console.error('Error creating folder from recipe:', error);
+      return null;
+    }
+  }
+
+  private categorizeIngredient(ingredientName: string): string {
+    const name = ingredientName.toLowerCase();
+    
+    // Produce
+    if (name.includes('tomato') || name.includes('lettuce') || name.includes('onion') || 
+        name.includes('carrot') || name.includes('pepper') || name.includes('fruit') ||
+        name.includes('vegetable') || name.includes('herb') || name.includes('garlic')) {
+      return 'produce';
+    }
+    
+    // Dairy
+    if (name.includes('milk') || name.includes('cheese') || name.includes('butter') || 
+        name.includes('cream') || name.includes('yogurt') || name.includes('egg')) {
+      return 'dairy';
+    }
+    
+    // Meat
+    if (name.includes('chicken') || name.includes('beef') || name.includes('pork') || 
+        name.includes('meat') || name.includes('bacon') || name.includes('sausage')) {
+      return 'meat';
+    }
+    
+    // Seafood
+    if (name.includes('fish') || name.includes('salmon') || name.includes('tuna') || 
+        name.includes('shrimp') || name.includes('crab')) {
+      return 'seafood';
+    }
+    
+    // Pantry
+    if (name.includes('flour') || name.includes('sugar') || name.includes('salt') || 
+        name.includes('oil') || name.includes('vinegar') || name.includes('spice') ||
+        name.includes('pasta') || name.includes('rice')) {
+      return 'pantry';
+    }
+    
+    // Bakery
+    if (name.includes('bread') || name.includes('bun') || name.includes('roll')) {
+      return 'bakery';
+    }
+    
+    return 'other';
+  }
+
+  // =============================================
+  // RECIPE INTEGRATION SMART METHODS
+  // =============================================
+
+  async findFolderByRecipeName(recipeName: string): Promise<ShoppingListFolder | null> {
+    try {
+      const { data, error } = await supabase
+        .from('shopping_list_folders')
+        .select('*')
+        .ilike('name', recipeName.trim())
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows returned
+      return data || null;
+    } catch (error) {
+      console.error('Error finding folder by recipe name:', error);
+      return null;
+    }
+  }
+
+  async getRecipeIngredientsInList(recipeName: string): Promise<string[]> {
+    try {
+      const folder = await this.findFolderByRecipeName(recipeName);
+      if (!folder) return [];
+
+      const items = await this.getFolderItems(folder.id);
+      return items.map(item => item.name.toLowerCase().trim());
+    } catch (error) {
+      console.error('Error getting recipe ingredients in list:', error);
+      return [];
+    }
+  }
+
+  async getIngredientStatus(recipeName: string, ingredientNames: string[]): Promise<{
+    inCurrentRecipe: Set<string>;
+    inOtherRecipes: Map<string, string[]>; // ingredient -> folder names
+  }> {
+    try {
+      // Get current recipe's folder and ingredients
+      const currentFolder = await this.findFolderByRecipeName(recipeName);
+      const currentIngredients = new Set<string>();
+      
+      if (currentFolder) {
+        const items = await this.getFolderItems(currentFolder.id);
+        items.forEach(item => {
+          currentIngredients.add(item.name.toLowerCase().trim());
+        });
+      }
+
+      // Get all user's folders and check for ingredients in other folders
+      const allFolders = await this.getFolders();
+      const inOtherRecipes = new Map<string, string[]>();
+
+      for (const folder of allFolders) {
+        // Skip the current recipe's folder
+        if (folder.id === currentFolder?.id) continue;
+
+        const items = await this.getFolderItems(folder.id);
+        
+        for (const item of items) {
+          const ingredientName = item.name.toLowerCase().trim();
+          
+          // Check if this ingredient is one we're looking for
+          if (ingredientNames.some(name => name.toLowerCase().trim() === ingredientName)) {
+            if (!inOtherRecipes.has(ingredientName)) {
+              inOtherRecipes.set(ingredientName, []);
+            }
+            inOtherRecipes.get(ingredientName)!.push(folder.name);
+          }
+        }
+      }
+
+      return {
+        inCurrentRecipe: currentIngredients,
+        inOtherRecipes
+      };
+    } catch (error) {
+      console.error('Error getting ingredient status:', error);
+      return {
+        inCurrentRecipe: new Set(),
+        inOtherRecipes: new Map()
+      };
+    }
+  }
+
+  async smartAddIngredientsFromRecipe(
+    recipeName: string,
+    ingredients: Ingredient[],
+    portionSize: number = 1
+  ): Promise<{ folderId: string; isNewFolder: boolean; addedCount: number }> {
+    try {
+      let folder = await this.findFolderByRecipeName(recipeName);
+      let isNewFolder = false;
+
+      if (!folder) {
+        // Create new folder
+        folder = await this.createFolder({
+          name: recipeName,
+          description: `Shopping list for ${recipeName}`,
+        });
+        isNewFolder = true;
+        
+        if (!folder) {
+          throw new Error('Failed to create folder');
+        }
+      }
+
+      // Get existing ingredients to avoid duplicates
+      const existingItems = await this.getFolderItems(folder.id);
+      const existingIngredientNames = new Set(
+        existingItems.map(item => item.name.toLowerCase().trim())
+      );
+
+      // Filter out ingredients that are already in the list
+      const newIngredients = ingredients.filter(ingredient => 
+        !existingIngredientNames.has(ingredient.name.toLowerCase().trim())
+      );
+
+      if (newIngredients.length > 0) {
+        await this.addIngredientsToFolder(folder.id, newIngredients, portionSize);
+      }
+
+      return {
+        folderId: folder.id,
+        isNewFolder,
+        addedCount: newIngredients.length
+      };
+    } catch (error) {
+      console.error('Error smart adding ingredients from recipe:', error);
+      throw error;
+    }
+  }
+
+  // =============================================
+  // UTILITY METHODS
+  // =============================================
+
+  async getTotalItemCount(): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from('shopping_list_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_completed', false);
+
+      if (error) throw error;
+      return data?.length || 0;
+    } catch (error) {
+      console.error('Error getting total item count:', error);
+      return 0;
+    }
+  }
+
+  async getFolderItemCount(folderId: string): Promise<{ total: number; completed: number }> {
+    try {
+      const [totalResult, completedResult] = await Promise.all([
+        supabase
+          .from('shopping_list_items')
+          .select('id', { count: 'exact', head: true })
+          .eq('folder_id', folderId),
+        supabase
+          .from('shopping_list_items')
+          .select('id', { count: 'exact', head: true })
+          .eq('folder_id', folderId)
+          .eq('is_completed', true)
+      ]);
+
+      if (totalResult.error) throw totalResult.error;
+      if (completedResult.error) throw completedResult.error;
+
+      return {
+        total: totalResult.data?.length || 0,
+        completed: completedResult.data?.length || 0,
+      };
+    } catch (error) {
+      console.error('Error getting folder item count:', error);
+      return { total: 0, completed: 0 };
+    }
+  }
+
+  // =============================================
+  // LEGACY COMPATIBILITY METHODS
+  // =============================================
+
+  /**
+   * @deprecated Use smartAddIngredientsFromRecipe instead
+   */
   async addIngredients(
     recipeId: string,
     recipeName: string,
     ingredients: Ingredient[],
     portionSize: number = 1
   ): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      
-      const newItems: ShoppingListItem[] = ingredients.map((ingredient) => ({
-        id: `${recipeId}_${ingredient.name}_${Date.now()}_${Math.random()}`,
-        recipeName,
-        recipeId,
-        ingredient: {
-          ...ingredient,
-          amount: ingredient.amount * portionSize,
-        },
-        portionSize,
-        addedAt: new Date(),
-        isChecked: false,
-      }));
-
-      const updatedList = [...currentList, ...newItems];
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error adding ingredients to shopping list:', error);
-    }
+    console.warn('addIngredients is deprecated. Use smartAddIngredientsFromRecipe instead.');
+    await this.smartAddIngredientsFromRecipe(recipeName, ingredients, portionSize);
   }
 
+  /**
+   * @deprecated Use deleteItem instead
+   */
   async removeItem(itemId: string): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.filter(item => item.id !== itemId);
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error removing item from shopping list:', error);
-    }
+    console.warn('removeItem is deprecated. Use deleteItem instead.');
+    await this.deleteItem(itemId);
   }
 
+  /**
+   * @deprecated Use toggleItemCompleted instead
+   */
   async toggleItemChecked(itemId: string): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.map(item =>
-        item.id === itemId ? { ...item, isChecked: !item.isChecked } : item
-      );
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error toggling item checked status:', error);
-    }
+    console.warn('toggleItemChecked is deprecated. Use toggleItemCompleted instead.');
+    await this.toggleItemCompleted(itemId);
   }
 
+  /**
+   * @deprecated Use clearAllItems with folderId instead
+   */
   async removeRecipeItems(recipeId: string): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.filter(item => item.recipeId !== recipeId);
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error removing recipe items from shopping list:', error);
-    }
+    console.warn('removeRecipeItems is deprecated. Use clearAllItems with folderId instead.');
+    await this.clearAllItems(recipeId);
   }
 
+  /**
+   * @deprecated Use getFoldersSummary and getFolderItems instead
+   */
   async getGroupedItems(): Promise<ShoppingListGroup[]> {
+    console.warn('getGroupedItems is deprecated. Use getFoldersSummary and getFolderItems instead.');
+    
     try {
-      const [items, folderStates, customFolders] = await Promise.all([
-        this.getShoppingList(),
-        this.getFolderStates(),
-        this.getCustomFolders(),
-      ]);
-      
-      // Group items by recipe
-      const grouped = items.reduce((acc, item) => {
-        const existingGroup = acc.find(group => group.recipeId === item.recipeId);
-        
-        if (existingGroup) {
-          existingGroup.items.push(item);
-        } else {
-          acc.push({
-            recipeName: item.recipeName,
-            recipeId: item.recipeId,
-            items: [item],
-            isCustomFolder: item.isCustom || false,
-            isCollapsed: folderStates[item.recipeId] || false,
-          });
-        }
-        
-        return acc;
-      }, [] as ShoppingListGroup[]);
+      const folders = await this.getFoldersSummary();
+      const groups: ShoppingListGroup[] = [];
 
-      // Add empty custom folders that don't have items yet
-      customFolders.forEach(folder => {
-        const existingGroup = grouped.find(group => group.recipeId === folder.id);
-        if (!existingGroup) {
-          grouped.push({
-            recipeName: folder.name,
-            recipeId: folder.id,
-            items: [],
-            isCustomFolder: true,
-            isCollapsed: folderStates[folder.id] || false,
-          });
-        }
-      });
+      for (const folder of folders) {
+        const items = await this.getFolderItems(folder.id);
+        const legacyItems: LegacyShoppingListItem[] = items.map(item => ({
+          id: item.id,
+          recipeName: folder.name,
+          recipeId: folder.id,
+          ingredient: {
+            name: item.name,
+            amount: parseFloat(item.quantity?.split(' ')[0] || '1'),
+            unit: item.quantity?.split(' ').slice(1).join(' ') || 'item',
+          },
+          portionSize: 1,
+          addedAt: new Date(item.created_at),
+          isChecked: item.is_completed,
+          isCustom: true,
+        }));
 
-      // Sort groups by most recent addition, but keep custom folders at the end
-      return grouped.sort((a, b) => {
-        // Custom folders go to the end
-        if (a.isCustomFolder && !b.isCustomFolder) return 1;
-        if (!a.isCustomFolder && b.isCustomFolder) return -1;
-        if (a.isCustomFolder && b.isCustomFolder) {
-          // Sort custom folders alphabetically
-          return a.recipeName.localeCompare(b.recipeName);
-        }
-        
-        // Regular recipe folders sorted by most recent addition
-        const aLatest = a.items.length > 0 ? Math.max(...a.items.map(item => item.addedAt.getTime())) : 0;
-        const bLatest = b.items.length > 0 ? Math.max(...b.items.map(item => item.addedAt.getTime())) : 0;
-        return bLatest - aLatest;
-      });
+        groups.push({
+          recipeName: folder.name,
+          recipeId: folder.id,
+          items: legacyItems,
+          isCustomFolder: true,
+          isCollapsed: false,
+        });
+      }
+
+      return groups;
     } catch (error) {
-      console.error('Error getting grouped shopping list items:', error);
+      console.error('Error getting grouped items (legacy):', error);
       return [];
     }
   }
 
+  /**
+   * @deprecated Use clearCompletedItems instead
+   */
   async clearCheckedItems(): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.filter(item => !item.isChecked);
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error clearing checked items:', error);
-    }
+    console.warn('clearCheckedItems is deprecated. Use clearCompletedItems instead.');
+    await this.clearCompletedItems();
   }
 
-  async clearAllItems(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(SHOPPING_LIST_KEY);
-    } catch (error) {
-      console.error('Error clearing all items:', error);
-    }
-  }
-
+  /**
+   * @deprecated Use getTotalItemCount instead
+   */
   async getItemCount(): Promise<number> {
-    try {
-      const items = await this.getShoppingList();
-      return items.filter(item => !item.isChecked).length;
-    } catch (error) {
-      console.error('Error getting item count:', error);
-      return 0;
-    }
+    console.warn('getItemCount is deprecated. Use getTotalItemCount instead.');
+    return await this.getTotalItemCount();
   }
 
+  /**
+   * @deprecated Folder collapse state now handled by UI components
+   */
   async toggleFolderCollapse(folderId: string): Promise<void> {
-    try {
-      const folderStates = await this.getFolderStates();
-      folderStates[folderId] = !folderStates[folderId];
-      await this.saveFolderStates(folderStates);
-    } catch (error) {
-      console.error('Error toggling folder collapse:', error);
-    }
+    console.warn('toggleFolderCollapse is deprecated. Folder state should be handled by UI components.');
   }
 
+  /**
+   * @deprecated Use createFolder instead
+   */
   async createCustomFolder(name: string): Promise<string> {
-    try {
-      const customFolders = await this.getCustomFolders();
-      const newFolder: CustomFolder = {
-        id: `custom_${Date.now()}_${Math.random()}`,
-        name,
-        createdAt: new Date(),
-      };
-      
-      customFolders.push(newFolder);
-      await this.saveCustomFolders(customFolders);
-      return newFolder.id;
-    } catch (error) {
-      console.error('Error creating custom folder:', error);
-      throw error;
-    }
+    console.warn('createCustomFolder is deprecated. Use createFolder instead.');
+    const folder = await this.createFolder({ name });
+    return folder?.id || '';
   }
 
+  /**
+   * @deprecated Use deleteFolder instead
+   */
   async deleteCustomFolder(folderId: string): Promise<void> {
-    try {
-      // Remove all items in the folder
-      await this.removeRecipeItems(folderId);
-      
-      // Remove the folder itself
-      const customFolders = await this.getCustomFolders();
-      const updatedFolders = customFolders.filter(folder => folder.id !== folderId);
-      await this.saveCustomFolders(updatedFolders);
-      
-      // Remove folder state
-      const folderStates = await this.getFolderStates();
-      delete folderStates[folderId];
-      await this.saveFolderStates(folderStates);
-    } catch (error) {
-      console.error('Error deleting custom folder:', error);
-    }
+    console.warn('deleteCustomFolder is deprecated. Use deleteFolder instead.');
+    await this.deleteFolder(folderId);
   }
 
+  /**
+   * @deprecated Use addItem instead
+   */
   async addCustomItem(folderId: string, folderName: string, itemName: string, amount: number = 1, unit: string = 'item'): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      
-      const newItem: ShoppingListItem = {
-        id: `custom_${folderId}_${itemName}_${Date.now()}_${Math.random()}`,
-        recipeName: folderName,
-        recipeId: folderId,
-        ingredient: {
-          name: itemName,
-          amount,
-          unit,
-        },
-        portionSize: 1,
-        addedAt: new Date(),
-        isChecked: false,
-        isCustom: true,
-      };
-
-      const updatedList = [...currentList, newItem];
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error adding custom item:', error);
-    }
+    console.warn('addCustomItem is deprecated. Use addItem instead.');
+    await this.addItem({
+      folder_id: folderId,
+      name: itemName,
+      quantity: `${amount} ${unit}`,
+    });
   }
 
+  /**
+   * @deprecated Use updateFolder instead
+   */
   async renameCustomFolder(folderId: string, newName: string): Promise<void> {
-    try {
-      // Update custom folder name
-      const customFolders = await this.getCustomFolders();
-      const updatedFolders = customFolders.map(folder =>
-        folder.id === folderId ? { ...folder, name: newName } : folder
-      );
-      await this.saveCustomFolders(updatedFolders);
-      
-      // Update all items in the folder
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.map(item =>
-        item.recipeId === folderId ? { ...item, recipeName: newName } : item
-      );
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error renaming custom folder:', error);
-    }
+    console.warn('renameCustomFolder is deprecated. Use updateFolder instead.');
+    await this.updateFolder(folderId, { name: newName });
   }
 
+  /**
+   * @deprecated Use clearCompletedItems with folderId instead
+   */
   async clearCompletedFromFolder(folderId: string): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.filter(item => 
-        item.recipeId !== folderId || !item.isChecked
-      );
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error clearing completed items from folder:', error);
-    }
+    console.warn('clearCompletedFromFolder is deprecated. Use clearCompletedItems with folderId instead.');
+    await this.clearCompletedItems(folderId);
   }
 
+  /**
+   * @deprecated Use clearAllItems with folderId instead
+   */
   async clearAllFromFolder(folderId: string): Promise<void> {
-    try {
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.filter(item => item.recipeId !== folderId);
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error clearing all items from folder:', error);
-    }
+    console.warn('clearAllFromFolder is deprecated. Use clearAllItems with folderId instead.');
+    await this.clearAllItems(folderId);
   }
 
+  /**
+   * @deprecated Use updateFolder instead
+   */
   async renameRecipeFolder(folderId: string, newName: string): Promise<void> {
-    try {
-      // Update all items in the recipe folder
-      const currentList = await this.getShoppingList();
-      const updatedList = currentList.map(item =>
-        item.recipeId === folderId ? { ...item, recipeName: newName } : item
-      );
-      await this.saveShoppingList(updatedList);
-    } catch (error) {
-      console.error('Error renaming recipe folder:', error);
-    }
+    console.warn('renameRecipeFolder is deprecated. Use updateFolder instead.');
+    await this.updateFolder(folderId, { name: newName });
   }
 
+  /**
+   * @deprecated Use deleteFolder instead
+   */
   async deleteRecipeFolder(folderId: string): Promise<void> {
-    try {
-      // Remove all items in the recipe folder
-      await this.removeRecipeItems(folderId);
-      
-      // Remove folder state
-      const folderStates = await this.getFolderStates();
-      delete folderStates[folderId];
-      await this.saveFolderStates(folderStates);
-    } catch (error) {
-      console.error('Error deleting recipe folder:', error);
-    }
+    console.warn('deleteRecipeFolder is deprecated. Use deleteFolder instead.');
+    await this.deleteFolder(folderId);
   }
 }
 

@@ -2,26 +2,68 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
+import { shoppingListService } from '../services/ShoppingListService';
+import { ShoppingListFolderSummary, ShoppingListItem } from '../types/ShoppingList';
 import { CustomFolderModal, FolderOptionsModal } from '../components';
 
+interface FolderWithItems extends ShoppingListFolderSummary {
+  items: ShoppingListItem[];
+  isCollapsed: boolean;
+}
+
 const ShoppingListScreen: React.FC = () => {
-  const [shoppingGroups, setShoppingGroups] = useState<ShoppingListGroup[]>([]);
+  const [folders, setFolders] = useState<FolderWithItems[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState<'createFolder' | 'addItem'>('createFolder');
   const [selectedFolder, setSelectedFolder] = useState<{ id: string; name: string } | undefined>();
   const [optionsModalVisible, setOptionsModalVisible] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<ShoppingListGroup | null>(null);
+  const [selectedFolder2, setSelectedFolder2] = useState<FolderWithItems | null>(null);
+  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Helper function to safely update state only if component is mounted
+  const safeSetFolders = useCallback((updater: React.SetStateAction<FolderWithItems[]>) => {
+    if (isMountedRef.current) {
+      setFolders(updater);
+    }
+  }, []);
 
   const loadShoppingList = useCallback(async () => {
     try {
-      const groups = await shoppingListService.getGroupedItems();
-      setShoppingGroups(groups);
+      const folderSummaries = await shoppingListService.getFoldersSummary();
+      const foldersWithItems: FolderWithItems[] = [];
+
+      for (const folder of folderSummaries) {
+        const items = await shoppingListService.getFolderItems(folder.id);
+        foldersWithItems.push({
+          ...folder,
+          items,
+          isCollapsed: false,
+        });
+      }
+
+      setFolders(foldersWithItems);
     } catch (error) {
       console.error('Error loading shopping list:', error);
     }
   }, []);
+
+  // Update folder collapse states when collapsedFolders changes
+  useEffect(() => {
+    setFolders(prev => 
+      prev.map(folder => ({
+        ...folder,
+        isCollapsed: collapsedFolders.has(folder.id),
+      }))
+    );
+  }, [collapsedFolders]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -36,43 +78,82 @@ const ShoppingListScreen: React.FC = () => {
   );
 
   const handleToggleItem = async (itemId: string) => {
+    // Optimistic update: Update UI immediately
+    setFolders(prevFolders => 
+      prevFolders.map(folder => ({
+        ...folder,
+        items: folder.items.map(item => 
+          item.id === itemId 
+            ? { ...item, is_completed: !item.is_completed }
+            : item
+        )
+      }))
+    );
+
+    // Background sync with database
     try {
-      await shoppingListService.toggleItemChecked(itemId);
-      await loadShoppingList();
+      await shoppingListService.toggleItemCompleted(itemId);
+      // Success - no need to reload, optimistic update was correct
     } catch (error) {
       console.error('Error toggling item:', error);
+      
+      // Revert the optimistic update on error
+      setFolders(prevFolders => 
+        prevFolders.map(folder => ({
+          ...folder,
+          items: folder.items.map(item => 
+            item.id === itemId 
+              ? { ...item, is_completed: !item.is_completed } // Revert
+              : item
+          )
+        }))
+      );
+      
+      // Show error to user
+      Alert.alert('Error', 'Failed to update item. Please try again.');
     }
   };
 
   const handleRemoveItem = async (itemId: string) => {
+    // Store the item for potential restoration
+    const itemToRemove = folders
+      .flatMap(folder => folder.items)
+      .find(item => item.id === itemId);
+    
+    if (!itemToRemove) return;
+
+    // Optimistic update: Remove from UI immediately
+    setFolders(prevFolders => 
+      prevFolders.map(folder => ({
+        ...folder,
+        items: folder.items.filter(item => item.id !== itemId)
+      }))
+    );
+
+    // Background sync with database
     try {
-      await shoppingListService.removeItem(itemId);
-      await loadShoppingList();
+      await shoppingListService.deleteItem(itemId);
+      // Success - item permanently removed
     } catch (error) {
       console.error('Error removing item:', error);
+      
+      // Revert the optimistic update on error - restore the item
+      setFolders(prevFolders => 
+        prevFolders.map(folder => 
+          folder.id === itemToRemove.folder_id
+            ? {
+                ...folder,
+                items: [...folder.items, itemToRemove].sort((a, b) => 
+                  new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                )
+              }
+            : folder
+        )
+      );
+      
+      // Show error to user
+      Alert.alert('Error', 'Failed to remove item. Please try again.');
     }
-  };
-
-  const handleRemoveRecipe = async (recipeId: string, recipeName: string) => {
-    Alert.alert(
-      'Remove Recipe Items',
-      `Remove all ingredients from "${recipeName}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await shoppingListService.removeRecipeItems(recipeId);
-              await loadShoppingList();
-            } catch (error) {
-              console.error('Error removing recipe items:', error);
-            }
-          },
-        },
-      ]
-    );
   };
 
   const handleClearChecked = async () => {
@@ -85,11 +166,44 @@ const ShoppingListScreen: React.FC = () => {
           text: 'Clear',
           style: 'destructive',
           onPress: async () => {
+            // Store completed items for potential restoration
+            const completedItems: ShoppingListItem[] = [];
+            folders.forEach(folder => {
+              folder.items.forEach(item => {
+                if (item.is_completed) {
+                  completedItems.push(item);
+                }
+              });
+            });
+
+            // Optimistic update: Remove completed items immediately
+            setFolders(prevFolders => 
+              prevFolders.map(folder => ({
+                ...folder,
+                items: folder.items.filter(item => !item.is_completed)
+              }))
+            );
+
             try {
-              await shoppingListService.clearCheckedItems();
-              await loadShoppingList();
+              await shoppingListService.clearCompletedItems();
+              // Success - items permanently removed
             } catch (error) {
               console.error('Error clearing checked items:', error);
+              
+              // Revert optimistic update on error
+              setFolders(prevFolders => 
+                prevFolders.map(folder => {
+                  const folderCompletedItems = completedItems.filter(item => item.folder_id === folder.id);
+                  return {
+                    ...folder,
+                    items: [...folder.items, ...folderCompletedItems].sort((a, b) => 
+                      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                    )
+                  };
+                })
+              );
+              
+              Alert.alert('Error', 'Failed to clear completed items. Please try again.');
             }
           },
         },
@@ -98,28 +212,33 @@ const ShoppingListScreen: React.FC = () => {
   };
 
   const getTotalItemCount = () => {
-    return shoppingGroups.reduce((total, group) => total + group.items.length, 0);
+    if (!folders || !Array.isArray(folders)) return 0;
+    return folders.reduce((total, folder) => total + (folder.items?.length || 0), 0);
   };
 
   const getUncheckedItemCount = () => {
-    return shoppingGroups.reduce(
-      (total, group) => total + group.items.filter(item => !item.isChecked).length,
+    if (!folders || !Array.isArray(folders)) return 0;
+    return folders.reduce(
+      (total, folder) => total + (folder.items?.filter(item => !item.is_completed)?.length || 0),
       0
     );
   };
 
-  const handleToggleCollapse = async (folderId: string) => {
-    try {
-      await shoppingListService.toggleFolderCollapse(folderId);
-      await loadShoppingList();
-    } catch (error) {
-      console.error('Error toggling folder collapse:', error);
-    }
+  const handleToggleCollapse = (folderId: string) => {
+    setCollapsedFolders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(folderId)) {
+        newSet.delete(folderId);
+      } else {
+        newSet.add(folderId);
+      }
+      return newSet;
+    });
   };
 
   const handleCreateFolder = async (name: string) => {
     try {
-      await shoppingListService.createCustomFolder(name);
+      await shoppingListService.createFolder({ name });
       await loadShoppingList();
     } catch (error) {
       console.error('Error creating custom folder:', error);
@@ -128,48 +247,103 @@ const ShoppingListScreen: React.FC = () => {
   };
 
   const handleAddCustomItem = async (folderId: string, folderName: string, itemName: string, amount: number, unit: string) => {
+    // Create temporary item for optimistic update
+    const tempItem: ShoppingListItem = {
+      id: `temp_${Date.now()}_${Math.random()}`, // Temporary ID
+      folder_id: folderId,
+      name: itemName,
+      quantity: `${amount} ${unit}`,
+      category: null,
+      notes: null,
+      is_completed: false,
+      priority: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Optimistic update: Add to UI immediately
+    setFolders(prevFolders => 
+      prevFolders.map(folder => 
+        folder.id === folderId
+          ? {
+              ...folder,
+              items: [...folder.items, tempItem]
+            }
+          : folder
+      )
+    );
+
     try {
-      await shoppingListService.addCustomItem(folderId, folderName, itemName, amount, unit);
-      await loadShoppingList();
+      // Background sync with database
+      const realItem = await shoppingListService.addItem({
+        folder_id: folderId,
+        name: itemName,
+        quantity: `${amount} ${unit}`,
+      });
+
+      if (realItem) {
+        // Replace temp item with real item from database
+        setFolders(prevFolders => 
+          prevFolders.map(folder => 
+            folder.id === folderId
+              ? {
+                  ...folder,
+                  items: folder.items.map(item => 
+                    item.id === tempItem.id ? realItem : item
+                  )
+                }
+              : folder
+          )
+        );
+      }
     } catch (error) {
       console.error('Error adding custom item:', error);
-      throw error;
+      
+      // Revert optimistic update on error
+      setFolders(prevFolders => 
+        prevFolders.map(folder => 
+          folder.id === folderId
+            ? {
+                ...folder,
+                items: folder.items.filter(item => item.id !== tempItem.id)
+              }
+            : folder
+        )
+      );
+      
+      throw error; // Re-throw so the modal can handle the error
     }
   };
 
-  const showFolderOptions = (group: ShoppingListGroup) => {
-    setSelectedGroup(group);
+  const showFolderOptions = (folder: FolderWithItems) => {
+    setSelectedFolder2(folder);
     setOptionsModalVisible(true);
   };
 
   const handleOptionSelect = (optionId: string) => {
-    if (!selectedGroup) return;
+    if (!selectedFolder2) return;
 
     switch (optionId) {
       case 'addItem':
-        setSelectedFolder({ id: selectedGroup.recipeId, name: selectedGroup.recipeName });
+        setSelectedFolder({ id: selectedFolder2.id, name: selectedFolder2.name });
         setModalMode('addItem');
         setModalVisible(true);
         break;
 
       case 'clearCompleted':
-        handleClearCompletedFromFolder(selectedGroup.recipeId, selectedGroup.recipeName);
+        handleClearCompletedFromFolder(selectedFolder2.id, selectedFolder2.name);
         break;
       case 'delete':
-        handleDeleteFolder(selectedGroup.recipeId, selectedGroup.recipeName, selectedGroup.isCustomFolder);
+        handleDeleteFolder(selectedFolder2.id, selectedFolder2.name);
         break;
     }
     
-    setSelectedGroup(null);
+    setSelectedFolder2(null);
   };
 
-  const handleRenameFolder = async (folderId: string, newName: string, isCustomFolder?: boolean) => {
+  const handleRenameFolder = async (folderId: string, newName: string) => {
     try {
-      if (isCustomFolder) {
-        await shoppingListService.renameCustomFolder(folderId, newName);
-      } else {
-        await shoppingListService.renameRecipeFolder(folderId, newName);
-      }
+      await shoppingListService.updateFolder(folderId, { name: newName });
       await loadShoppingList();
     } catch (error) {
       console.error('Error renaming folder:', error);
@@ -177,31 +351,21 @@ const ShoppingListScreen: React.FC = () => {
     }
   };
 
-  const handleDeleteFolder = (folderId: string, folderName: string, isCustomFolder?: boolean) => {
-    const title = isCustomFolder ? 'Delete Folder' : 'Remove All Items';
-    const message = isCustomFolder 
-      ? `Are you sure you want to permanently delete "${folderName}" and all its items?`
-      : `Are you sure you want to remove all items from "${folderName}"?`;
-    const buttonText = isCustomFolder ? 'Delete' : 'Remove';
-
+  const handleDeleteFolder = (folderId: string, folderName: string) => {
     Alert.alert(
-      title,
-      message,
+      'Delete Folder',
+      `Are you sure you want to permanently delete "${folderName}" and all its items?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: buttonText,
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
-              if (isCustomFolder) {
-                await shoppingListService.deleteCustomFolder(folderId);
-              } else {
-                await shoppingListService.deleteRecipeFolder(folderId);
-              }
+              await shoppingListService.deleteFolder(folderId);
               await loadShoppingList();
             } catch (error) {
-              Alert.alert('Error', `Failed to ${buttonText.toLowerCase()} folder. Please try again.`);
+              Alert.alert('Error', 'Failed to delete folder. Please try again.');
             }
           },
         },
@@ -220,7 +384,7 @@ const ShoppingListScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await shoppingListService.clearCompletedFromFolder(folderId);
+              await shoppingListService.clearCompletedItems(folderId);
               await loadShoppingList();
             } catch (error) {
               Alert.alert('Error', 'Failed to clear completed items. Please try again.');
@@ -271,7 +435,7 @@ const ShoppingListScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {shoppingGroups.length === 0 ? (
+        {!folders || folders.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="basket-outline" size={80} color="#ccc" />
             <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
@@ -281,44 +445,44 @@ const ShoppingListScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.itemsList}>
-            {shoppingGroups.map((group) => (
-              <View key={group.recipeId} style={styles.recipeGroup}>
-                {/* Recipe Header */}
+            {(folders || []).map((folder) => (
+              <View key={folder.id} style={styles.recipeGroup}>
+                {/* Folder Header */}
                 <TouchableOpacity 
                   style={styles.recipeHeader}
-                  onPress={() => handleToggleCollapse(group.recipeId)}
+                  onPress={() => handleToggleCollapse(folder.id)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.recipeHeaderLeft}>
                     <Ionicons 
-                      name={group.isCustomFolder ? "folder" : "restaurant"} 
+                      name="folder" 
                       size={20} 
-                      color={group.isCustomFolder ? "#FF9500" : "#007AFF"} 
+                      color={folder.color || "#007AFF"} 
                     />
-                    <Text style={styles.recipeName}>{group.recipeName}</Text>
+                    <Text style={styles.recipeName}>{folder.name}</Text>
                     <Text style={styles.recipeItemCount}>
-                      {group.items.filter(item => !item.isChecked).length} items
+                      {(folder.items || []).filter(item => !item.is_completed).length} items
                     </Text>
                   </View>
-                                     <View style={styles.recipeHeaderRight}>
-                     <TouchableOpacity
-                       style={styles.moreButton}
-                       onPress={(e) => {
-                         e.stopPropagation();
-                         showFolderOptions(group);
-                       }}
-                     >
-                       <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
-                     </TouchableOpacity>
+                  <View style={styles.recipeHeaderRight}>
+                    <TouchableOpacity
+                      style={styles.moreButton}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        showFolderOptions(folder);
+                      }}
+                    >
+                      <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
+                    </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.collapseButton}
                       onPress={(e) => {
                         e.stopPropagation();
-                        handleToggleCollapse(group.recipeId);
+                        handleToggleCollapse(folder.id);
                       }}
                     >
                       <Ionicons 
-                        name={group.isCollapsed ? "chevron-down" : "chevron-up"} 
+                        name={folder.isCollapsed ? "chevron-down" : "chevron-up"} 
                         size={18} 
                         color="#666" 
                       />
@@ -326,45 +490,47 @@ const ShoppingListScreen: React.FC = () => {
                   </View>
                 </TouchableOpacity>
 
-                {/* Recipe Items */}
-                {!group.isCollapsed && (
+                {/* Folder Items */}
+                {!folder.isCollapsed && (
                   <View style={styles.recipeItems}>
-                    {group.items.map((item) => (
-                    <View key={item.id} style={[styles.shoppingItem, item.isChecked && styles.checkedItem]}>
-                      <TouchableOpacity
-                        style={styles.checkboxContainer}
-                        onPress={() => handleToggleItem(item.id)}
-                      >
-                        <Ionicons
-                          name={item.isChecked ? "checkmark-circle" : "ellipse-outline"}
-                          size={24}
-                          color={item.isChecked ? "#34C759" : "#ccc"}
-                        />
-                      </TouchableOpacity>
-                      
-                      <View style={styles.itemInfo}>
-                        <Text style={[styles.itemName, item.isChecked && styles.checkedText]}>
-                          {item.ingredient.name}
-                        </Text>
-                        <Text style={[styles.itemAmount, item.isChecked && styles.checkedText]}>
-                          {item.ingredient.amount} {item.ingredient.unit}
-                        </Text>
-                      </View>
+                    {(folder.items || []).map((item) => (
+                      <View key={item.id} style={[styles.shoppingItem, item.is_completed && styles.checkedItem]}>
+                        <TouchableOpacity
+                          style={styles.checkboxContainer}
+                          onPress={() => handleToggleItem(item.id)}
+                        >
+                          <Ionicons
+                            name={item.is_completed ? "checkmark-circle" : "ellipse-outline"}
+                            size={24}
+                            color={item.is_completed ? "#34C759" : "#ccc"}
+                          />
+                        </TouchableOpacity>
+                        
+                        <View style={styles.itemInfo}>
+                          <Text style={[styles.itemName, item.is_completed && styles.checkedText]}>
+                            {item.name}
+                          </Text>
+                          {item.quantity && (
+                            <Text style={[styles.itemAmount, item.is_completed && styles.checkedText]}>
+                              {item.quantity}
+                            </Text>
+                          )}
+                        </View>
 
-                      <TouchableOpacity
-                        style={styles.removeItemButton}
-                        onPress={() => handleRemoveItem(item.id)}
-                      >
-                        <Ionicons name="close" size={20} color="#999" />
-                      </TouchableOpacity>
-                    </View>
-                                      ))}
+                        <TouchableOpacity
+                          style={styles.removeItemButton}
+                          onPress={() => handleRemoveItem(item.id)}
+                        >
+                          <Ionicons name="close" size={20} color="#999" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
                   </View>
                 )}
-                </View>
-              ))}
-            </View>
-          )}
+              </View>
+            ))}
+          </View>
+        )}
         </ScrollView>
 
         {/* Custom Folder Modal */}
@@ -382,17 +548,17 @@ const ShoppingListScreen: React.FC = () => {
           visible={optionsModalVisible}
           onClose={() => {
             setOptionsModalVisible(false);
-            setSelectedGroup(null);
+            setSelectedFolder2(null);
           }}
-          folderName={selectedGroup?.recipeName || ''}
-          isCustomFolder={selectedGroup?.isCustomFolder || false}
+          folderName={selectedFolder2?.name || ''}
+          isCustomFolder={true}
           onOptionSelect={handleOptionSelect}
           onRenameFolder={async (newName: string) => {
-            if (selectedGroup) {
-              await handleRenameFolder(selectedGroup.recipeId, newName, selectedGroup.isCustomFolder);
+            if (selectedFolder2) {
+              await handleRenameFolder(selectedFolder2.id, newName);
             }
           }}
-          itemCount={selectedGroup?.items.length || 0}
+          itemCount={selectedFolder2?.items.length || 0}
         />
       </View>
     );

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
-import { ShoppingListService } from '../services';
+import { shoppingListService } from '../services';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -39,10 +39,43 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   const [portionSize, setPortionSize] = useState(1);
   const [selectedIngredients, setSelectedIngredients] = useState<Set<number>>(new Set());
   const [isButtonFloating, setIsButtonFloating] = useState(true);
+  const [ingredientsInCurrentList, setIngredientsInCurrentList] = useState<Set<string>>(new Set());
+  const [ingredientsInOtherLists, setIngredientsInOtherLists] = useState<Map<string, string[]>>(new Map());
+  const [existingFolderId, setExistingFolderId] = useState<string | null>(null);
+  const [isLoadingShoppingList, setIsLoadingShoppingList] = useState(false);
   
   // Animation values
   const buttonTranslateY = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(1)).current;
+
+  // Load shopping list information when recipe changes
+  useEffect(() => {
+    if (recipe && visible) {
+      loadShoppingListInfo();
+    }
+  }, [recipe?.id, visible]);
+
+  const loadShoppingListInfo = async () => {
+    if (!recipe) return;
+    
+    setIsLoadingShoppingList(true);
+    try {
+      // Check if folder exists
+      const folder = await shoppingListService.findFolderByRecipeName(recipe.name);
+      setExistingFolderId(folder?.id || null);
+      
+      // Get comprehensive ingredient status
+      const ingredientNames = recipe.ingredients.map(ingredient => ingredient.name);
+      const status = await shoppingListService.getIngredientStatus(recipe.name, ingredientNames);
+      
+      setIngredientsInCurrentList(status.inCurrentRecipe);
+      setIngredientsInOtherLists(status.inOtherRecipes);
+    } catch (error) {
+      console.error('Error loading shopping list info:', error);
+    } finally {
+      setIsLoadingShoppingList(false);
+    }
+  };
 
   if (!recipe) return null;
 
@@ -118,8 +151,7 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         index => recipe.ingredients[index]
       );
 
-      await ShoppingListService.addIngredients(
-        recipe.id,
+      const result = await shoppingListService.smartAddIngredientsFromRecipe(
         recipe.name,
         selectedIngredientsList,
         portionSize
@@ -128,10 +160,18 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
       // Clear selected ingredients
       setSelectedIngredients(new Set());
 
-      // Show success message
+      // Reload shopping list info to update indicators
+      await loadShoppingListInfo();
+
+      // Show success message based on result
+      const actionText = result.isNewFolder ? 'Created new shopping list' : 'Added to existing shopping list';
+      const countText = result.addedCount === 0 
+        ? 'All selected ingredients were already in your list' 
+        : `${result.addedCount} ingredient${result.addedCount > 1 ? 's' : ''} added`;
+
       Alert.alert(
-        'Added to Shopping List',
-        `${selectedIngredientsList.length} ingredient${selectedIngredientsList.length > 1 ? 's' : ''} from "${recipe.name}" ${selectedIngredientsList.length > 1 ? 'have' : 'has'} been added to your shopping list.`,
+        actionText,
+        `${countText} for "${recipe.name}".`,
         [{ text: 'OK' }]
       );
     } catch (error) {
@@ -289,14 +329,24 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                 <View style={styles.ingredientsGrid}>
                   {recipe.ingredients.map((ingredient, idx) => {
                     const isSelected = selectedIngredients.has(idx);
+                    const ingredientKey = ingredient.name.toLowerCase().trim();
+                    const isInCurrentList = ingredientsInCurrentList.has(ingredientKey);
+                    const otherLists = ingredientsInOtherLists.get(ingredientKey) || [];
+                    const isInOtherLists = otherLists.length > 0;
+                    const isDisabled = isInCurrentList && !isSelected;
+                    
                     return (
                       <TouchableOpacity 
                         key={idx} 
                         style={[
                           styles.ingredientCard,
-                          isSelected && styles.ingredientCardSelected
+                          isSelected && styles.ingredientCardSelected,
+                          isInCurrentList && !isSelected && styles.ingredientCardInList,
+                          isInOtherLists && !isInCurrentList && !isSelected && styles.ingredientCardInOtherList
                         ]}
                         onPress={() => {
+                          if (isInCurrentList && !isSelected) return; // Don't allow selecting items already in current list
+                          
                           const newSelected = new Set(selectedIngredients);
                           if (isSelected) {
                             newSelected.delete(idx);
@@ -305,11 +355,15 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                           }
                           setSelectedIngredients(newSelected);
                         }}
-                        activeOpacity={0.8}
+                        activeOpacity={isDisabled ? 0.3 : 0.8}
                       >
                         <View style={styles.ingredientIconContainer}>
                           {isSelected ? (
                             <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                          ) : isInCurrentList ? (
+                            <Ionicons name="checkmark-circle" size={20} color="#34C759" />
+                          ) : isInOtherLists ? (
+                            <Ionicons name="duplicate-outline" size={20} color="#FF9500" />
                           ) : (
                             <Ionicons name="add-circle-outline" size={20} color="#007AFF" />
                           )}
@@ -317,16 +371,34 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                         
                         <Text style={[
                           styles.ingredientAmount,
-                          isSelected && styles.ingredientAmountSelected
+                          isSelected && styles.ingredientAmountSelected,
+                          isInCurrentList && !isSelected && styles.ingredientAmountInList,
+                          isInOtherLists && !isInCurrentList && !isSelected && styles.ingredientAmountInOtherList
                         ]}>
                           {(ingredient.amount * portionSize).toFixed(ingredient.amount * portionSize % 1 === 0 ? 0 : 1)} {ingredient.unit}
                         </Text>
                         <Text style={[
                           styles.ingredientName,
-                          isSelected && styles.ingredientNameSelected
+                          isSelected && styles.ingredientNameSelected,
+                          isInCurrentList && !isSelected && styles.ingredientNameInList,
+                          isInOtherLists && !isInCurrentList && !isSelected && styles.ingredientNameInOtherList
                         ]} numberOfLines={2}>
                           {ingredient.name}
                         </Text>
+                        
+                        {isInCurrentList && !isSelected && (
+                          <View style={styles.alreadyInListBadge}>
+                            <Text style={styles.alreadyInListText}>In List</Text>
+                          </View>
+                        )}
+                        
+                        {isInOtherLists && !isInCurrentList && !isSelected && (
+                          <View style={styles.inOtherListBadge}>
+                            <Text style={styles.inOtherListText}>
+                              {otherLists.length === 1 ? 'Other List' : `${otherLists.length} Lists`}
+                            </Text>
+                          </View>
+                        )}
                       </TouchableOpacity>
                     );
                   })}
@@ -342,10 +414,36 @@ const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                     <View style={styles.addToShoppingListContent}>
                       <Ionicons name="basket" size={20} color="#fff" />
                       <Text style={styles.addToShoppingListText}>
-                        Add {selectedIngredients.size} ingredient{selectedIngredients.size > 1 ? 's' : ''} to Shopping List
+                        {existingFolderId 
+                          ? `Add ${selectedIngredients.size} ingredient${selectedIngredients.size > 1 ? 's' : ''} to Existing List`
+                          : `Add ${selectedIngredients.size} ingredient${selectedIngredients.size > 1 ? 's' : ''} to Shopping List`
+                        }
                       </Text>
                     </View>
                   </TouchableOpacity>
+                )}
+                
+                {/* Shopping List Status */}
+                {!isLoadingShoppingList && (ingredientsInCurrentList.size > 0 || ingredientsInOtherLists.size > 0) && (
+                  <View style={styles.shoppingListStatusContainer}>
+                    {ingredientsInCurrentList.size > 0 && (
+                      <View style={styles.shoppingListStatus}>
+                        <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                        <Text style={styles.shoppingListStatusText}>
+                          {ingredientsInCurrentList.size} ingredient{ingredientsInCurrentList.size > 1 ? 's' : ''} already in this recipe's list
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {ingredientsInOtherLists.size > 0 && (
+                      <View style={styles.shoppingListStatusOther}>
+                        <Ionicons name="duplicate-outline" size={16} color="#FF9500" />
+                        <Text style={styles.shoppingListStatusOtherText}>
+                          {ingredientsInOtherLists.size} ingredient{ingredientsInOtherLists.size > 1 ? 's' : ''} in other lists (can still add to this recipe)
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 )}
               </View>
             )}
@@ -778,6 +876,88 @@ const styles = StyleSheet.create({
   },
   ingredientNameSelected: {
     color: '#fff',
+  },
+  ingredientCardInList: {
+    backgroundColor: '#f0f9ff',
+    borderColor: '#34C759',
+    opacity: 0.7,
+  },
+  ingredientCardInOtherList: {
+    backgroundColor: '#fff8ed',
+    borderColor: '#FF9500',
+    borderWidth: 1.5,
+  },
+  ingredientAmountInList: {
+    color: '#34C759',
+  },
+  ingredientNameInList: {
+    color: '#34C759',
+  },
+  ingredientAmountInOtherList: {
+    color: '#FF9500',
+  },
+  ingredientNameInOtherList: {
+    color: '#FF9500',
+  },
+  alreadyInListBadge: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: '#34C759',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  alreadyInListText: {
+    fontSize: 10,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  inOtherListBadge: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: '#FF9500',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  inOtherListText: {
+    fontSize: 10,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  shoppingListStatusContainer: {
+    marginTop: 12,
+    gap: 8,
+  },
+  shoppingListStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f9ff',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  shoppingListStatusText: {
+    fontSize: 14,
+    color: '#34C759',
+    fontWeight: '500',
+    flex: 1,
+  },
+  shoppingListStatusOther: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff8ed',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  shoppingListStatusOtherText: {
+    fontSize: 14,
+    color: '#FF9500',
+    fontWeight: '500',
+    flex: 1,
   },
   nutritionSection: {
     marginBottom: 24,

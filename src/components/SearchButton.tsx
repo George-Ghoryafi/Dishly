@@ -11,11 +11,11 @@ const SearchButton: React.FC<SearchButtonProps> = ({
   placeholder = "Search for recipes and dishes...", 
   onPress 
 }) => {
-  const buttonRef = useRef<TouchableOpacity>(null);
+  const buttonRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
 
   const handlePress = () => {
     if (buttonRef.current && onPress) {
-      buttonRef.current.measure((x, y, width, height, pageX, pageY) => {
+      buttonRef.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
         onPress({ x: pageX, y: pageY, width, height });
       });
     }
