@@ -2,28 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
-import { CustomFolderModal, FolderOptionsModal } from '../components';
-=======
->>>>>>> Stashed changes
-=======
-import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
-import { CustomFolderModal, FolderOptionsModal } from '../components';
-=======
->>>>>>> Stashed changes
 import LottieView from 'lottie-react-native';
 import { shoppingListService } from '../services/ShoppingListService';
 import { ShoppingListFolderSummary, ShoppingListItem } from '../types/ShoppingList';
 import { CustomFolderModal, FolderOptionsModal, RenameFolderModal } from '../components';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 import { 
   colors, 
   typography, 
@@ -32,22 +14,11 @@ import {
   componentBorderRadius,
   lightTheme
 } from '../styles';
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 interface FolderWithItems extends ShoppingListFolderSummary {
   items: ShoppingListItem[];
   isCollapsed: boolean;
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 const ShoppingListScreen: React.FC = () => {
   const [folders, setFolders] = useState<FolderWithItems[]>([]);
@@ -536,227 +507,6 @@ const ShoppingListScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                 {isLoading && !hasCachedData ? (
-           <View style={styles.loadingContainer}>
-             <View style={styles.loadingContent}>
-               <View style={styles.animationWrapper}>
-                 <LottieView
-                   source={require('../../assets/animations/cooking-professional.json')}
-                   autoPlay
-                   loop
-                   style={styles.loadingAnimation}
-                 />
-               </View>
-               <Text style={styles.loadingTitle}>Preparing your shopping list</Text>
-               <Text style={styles.loadingSubtitle}>Organizing your favorite ingredients...</Text>
-               <View style={styles.loadingIndicator}>
-                 <ActivityIndicator size="small" color="#007AFF" />
-               </View>
-             </View>
-           </View>
-         ) : (
-          <>
-            {!folders || folders.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Ionicons name="basket-outline" size={80} color="#ccc" />
-                <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
-                <Text style={styles.emptySubtitle}>
-                  Add ingredients from recipes to get started
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.itemsList}>
-                {(folders || []).map((folder) => (
-                  <View key={folder.id} style={styles.recipeGroup}>
-                    {/* Folder Header */}
-                    <TouchableOpacity 
-                      style={styles.recipeHeader}
-                      onPress={() => handleToggleCollapse(folder.id)}
-                      activeOpacity={0.7}
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-        {shoppingGroups.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="basket-outline" size={80} color="#ccc" />
-            <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
-            <Text style={styles.emptySubtitle}>
-              Add ingredients from recipes to get started
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.itemsList}>
-            {shoppingGroups.map((group) => (
-              <View key={group.recipeId} style={styles.recipeGroup}>
-                {/* Recipe Header */}
-                <TouchableOpacity 
-                  style={styles.recipeHeader}
-                  onPress={() => handleToggleCollapse(group.recipeId)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.recipeHeaderLeft}>
-                    <Ionicons 
-                      name={group.isCustomFolder ? "folder" : "restaurant"} 
-                      size={20} 
-                      color={group.isCustomFolder ? "#FF9500" : "#007AFF"} 
-                    />
-                    <Text style={styles.recipeName}>{group.recipeName}</Text>
-                    <Text style={styles.recipeItemCount}>
-                      {group.items.filter(item => !item.isChecked).length} items
-                    </Text>
-                  </View>
-                                     <View style={styles.recipeHeaderRight}>
-                     <TouchableOpacity
-                       style={styles.moreButton}
-                       onPress={(e) => {
-                         e.stopPropagation();
-                         showFolderOptions(group);
-                       }}
-                     >
-                       <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
-                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.collapseButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleToggleCollapse(group.recipeId);
-                      }}
->>>>>>> Stashed changes
-                    >
-                                        <View style={styles.recipeHeaderLeft}>
-                    {folder.icon ? (
-                      <Text style={styles.folderEmoji}>{folder.icon}</Text>
-                    ) : (
-                      <Ionicons 
-                        name="folder" 
-                        size={20} 
-                        color={folder.color || "#007AFF"} 
-                      />
-                    )}
-                    <Text style={styles.recipeName}>{folder.name}</Text>
-                        <Text style={styles.recipeItemCount}>
-                          {(folder.items || []).filter(item => !item.is_completed).length} items
-                        </Text>
-                      </View>
-                      <View style={styles.recipeHeaderRight}>
-                        <TouchableOpacity
-                          style={styles.moreButton}
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            showFolderOptions(folder);
-                          }}
-                        >
-                          <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.collapseButton}
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            handleToggleCollapse(folder.id);
-                          }}
-                        >
-                          <Ionicons 
-                            name={folder.isCollapsed ? "chevron-down" : "chevron-up"} 
-                            size={18} 
-                            color="#666" 
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </TouchableOpacity>
-
-                    {/* Folder Items */}
-                    {!folder.isCollapsed && (
-                      <View style={styles.recipeItems}>
-                        {(folder.items || []).map((item) => (
-                          <View key={item.id} style={[styles.shoppingItem, item.is_completed && styles.checkedItem]}>
-                            <TouchableOpacity
-                              style={styles.checkboxContainer}
-                              onPress={() => handleToggleItem(item.id)}
-                            >
-                              <Ionicons
-                                name={item.is_completed ? "checkmark-circle" : "ellipse-outline"}
-                                size={24}
-                                color={item.is_completed ? "#34C759" : "#ccc"}
-                              />
-                            </TouchableOpacity>
-                            
-                            <View style={styles.itemInfo}>
-                              <Text style={[styles.itemName, item.is_completed && styles.checkedText]}>
-                                {item.name}
-                              </Text>
-                              {item.quantity && (
-                                <Text style={[styles.itemAmount, item.is_completed && styles.checkedText]}>
-                                  {item.quantity}
-                                </Text>
-                              )}
-                            </View>
-
-                            <TouchableOpacity
-                              style={styles.removeItemButton}
-                              onPress={() => handleRemoveItem(item.id)}
-                            >
-                              <Ionicons name="close" size={20} color="#999" />
-                            </TouchableOpacity>
-                          </View>
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-          </>
-        )}
-        </ScrollView>
-
-        {/* Custom Folder Modal */}
-        <CustomFolderModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onCreateFolder={handleCreateFolder}
-          onAddItem={handleAddCustomItem}
-          existingFolder={selectedFolder}
-          mode={modalMode}
-        />
-
-        {/* Folder Options Modal */}
-        <FolderOptionsModal
-          visible={optionsModalVisible}
-          onClose={() => {
-            setOptionsModalVisible(false);
-            setSelectedFolder2(null);
-          }}
-          folderName={selectedFolder2?.name || ''}
-          isCustomFolder={true}
-          onOptionSelect={handleOptionSelect}
-          itemCount={selectedFolder2?.items.length || 0}
-        />
-
-        {/* Rename Folder Modal */}
-        <RenameFolderModal
-          visible={renameModalVisible}
-          onClose={() => {
-            setRenameModalVisible(false);
-            setSelectedFolder2(null);
-          }}
-          onRename={async (newName: string, color: string, icon?: string) => {
-            if (selectedFolder2) {
-              await handleRenameFolder(selectedFolder2.id, newName, color, icon);
-            }
-          }}
-          currentName={selectedFolder2?.name || ''}
-          currentColor={selectedFolder2?.color || '#007AFF'}
-          currentIcon={selectedFolder2?.icon}
-          itemCount={selectedFolder2?.items.length || 0}
-          isCustomFolder={true}
-        />
-      </View>
-    );
-  };
-=======
         {isLoading && !hasCachedData ? (
           <View style={styles.loadingContainer}>
             <View style={styles.loadingContent}>
@@ -925,7 +675,6 @@ const ShoppingListScreen: React.FC = () => {
     </View>
   );
 };
->>>>>>> Stashed changes
 
 const styles = StyleSheet.create({
   container: {
@@ -972,15 +721,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.l, // Using design system spacing (20px)
-<<<<<<< Updated upstream
   },
-<<<<<<< Updated upstream
-=======
-  loadingContainer: {
-=======
-  },
-<<<<<<< Updated upstream
-=======
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -1022,114 +763,6 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     marginTop: spacing.s, // Using design system spacing (8px)
   },
->>>>>>> Stashed changes
-  emptyState: {
->>>>>>> Stashed changes
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 40,
-  },
-<<<<<<< Updated upstream
-  loadingContent: {
-    alignItems: 'center',
-    maxWidth: 300,
-  },
-  animationWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.legacy.white, // White background for contrast
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xl, // Using design system spacing (32px)
-    ...componentShadows.card, // Using new shadow system
-  },
-  loadingAnimation: {
-    width: 100,
-    height: 100,
-  },
-  loadingTitle: {
-    ...typography.h3, // Using H3 typography (24px, SemiBold)
-    color: colors.deepNavy, // Changed from #333 to Deep Navy
-    textAlign: 'center',
-    marginBottom: spacing.s, // Using design system spacing (8px)
-  },
-  loadingSubtitle: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    color: colors.warmGray, // Changed from #666 to Warm Gray
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.xl, // Using design system spacing (32px)
-  },
-  loadingIndicator: {
-    marginTop: spacing.s, // Using design system spacing (8px)
-  },
-<<<<<<< Updated upstream
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 40,
-  },
-  loadingContent: {
-    alignItems: 'center',
-    maxWidth: 300,
-  },
-  animationWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  loadingAnimation: {
-    width: 100,
-    height: 100,
-  },
-  loadingTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  loadingSubtitle: {
-    fontSize: 16,
-    color: '#666',
-=======
-  emptyTitle: {
-    ...typography.h4, // Using H4 typography (20px, SemiBold)
-    color: colors.deepNavy, // Changed from #333 to Deep Navy
-    marginTop: spacing.l, // Using design system spacing (20px)
-    marginBottom: spacing.s, // Using design system spacing (8px)
-  },
-  emptySubtitle: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    color: colors.warmGray, // Changed from #666 to Warm Gray
->>>>>>> Stashed changes
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 32,
-  },
-  loadingIndicator: {
-    marginTop: 8,
-  },
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   emptyState: {
     flex: 1,
     justifyContent: 'center',
