@@ -16,9 +16,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
 import { 
@@ -30,6 +33,9 @@ import {
   lightTheme
 } from '../styles';
 >>>>>>> Stashed changes
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 interface CustomFolderModalProps {
@@ -203,8 +209,11 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                   <View style={[styles.inputContainer, styles.halfWidth]}>
                     <Text style={styles.inputLabel}>Unit</Text>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                     <View style={styles.unitContainer}>
                       <TextInput
                         style={styles.textInput}
@@ -215,6 +224,9 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                       />
                     </View>
 =======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                     <TextInput
                       style={styles.textInput}
@@ -222,8 +234,14 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                       onChangeText={setUnit}
                       placeholder="item"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                       placeholderTextColor="#999"
                     />
+=======
+                      placeholderTextColor={colors.warmGrayLight}
+                    />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 =======
                       placeholderTextColor={colors.warmGrayLight}
                     />
@@ -373,12 +391,63 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
               </View>
             </View>
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+            {/* Name Input Section */}
+            <View style={styles.inputSection}>
+              <Text style={styles.sectionTitle}>Name</Text>
+              <TextInput
+                style={styles.textInput}
+                value={folderName}
+                onChangeText={setFolderName}
+                placeholder="e.g., Weekly Groceries, Dinner Party"
+                placeholderTextColor={colors.warmGrayLight}
+                autoFocus
+                maxLength={50}
+                returnKeyType="done"
+                onSubmitEditing={handleSave}
+                editable={!isLoading}
+              />
+              <Text style={styles.characterCount}>
+                {folderName.length}/50 characters
+              </Text>
+            </View>
+
+            {/* Color Selection Section */}
+            <View style={styles.colorSection}>
+              <Text style={styles.sectionTitle}>Color</Text>
+              <View style={styles.colorGrid}>
+                {FOLDER_COLORS.map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorOption,
+                      { backgroundColor: color },
+                      selectedColor === color && styles.selectedColor,
+                    ]}
+                    onPress={() => setSelectedColor(color)}
+                    disabled={isLoading}
+                  >
+                    {selectedColor === color && (
+                      <Ionicons name="checkmark" size={16} color="#fff" />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+>>>>>>> Stashed changes
             {/* Icon Selection Section */}
             <View style={styles.iconSection}>
               <Text style={styles.sectionTitle}>Icon</Text>
               <View style={styles.iconGrid}>
                 {/* Default Icon Option */}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes
@@ -390,6 +459,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                   onPress={() => setSelectedIcon(undefined)}
                   disabled={isLoading}
                 >
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                   <Ionicons 
                     name="folder" 
@@ -403,6 +473,8 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                   )}
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                   <Ionicons name="add" size={20} color="#fff" />
                   <Text style={styles.createButtonText}>
                     {isLoading ? 'Adding...' : 'Add Item'}
@@ -468,13 +540,20 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                 ))}
               </View>
             </View>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
             {/* Tips Section */}
             <View style={styles.tipsSection}>
               <View style={styles.tip}>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 <Ionicons name="bulb-outline" size={16} color="#666" />
+=======
+                <Ionicons name="bulb-outline" size={16} color={colors.warmGray} />
+>>>>>>> Stashed changes
 =======
                 <Ionicons name="bulb-outline" size={16} color={colors.warmGray} />
 >>>>>>> Stashed changes
@@ -484,7 +563,11 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
               </View>
               <View style={styles.tip}>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 <Ionicons name="sparkles-outline" size={16} color="#666" />
+=======
+                <Ionicons name="sparkles-outline" size={16} color={colors.warmGray} />
+>>>>>>> Stashed changes
 =======
                 <Ionicons name="sparkles-outline" size={16} color={colors.warmGray} />
 >>>>>>> Stashed changes
@@ -495,6 +578,9 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
             </View>
           </ScrollView>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes
@@ -525,6 +611,7 @@ const styles = StyleSheet.create({
     padding: spacing.xs, // Using design system spacing (4px)
   },
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   closeText: {
     fontSize: 17,
     color: '#007AFF',
@@ -532,6 +619,8 @@ const styles = StyleSheet.create({
   },
 =======
 <<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   headerTitle: {
     fontSize: 17,
@@ -861,6 +950,9 @@ const styles = StyleSheet.create({
     color: colors.warmGray, // Changed from #666 to Warm Gray
     lineHeight: 20,
 >>>>>>> Stashed changes
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   },
   iconContainer: {
@@ -932,6 +1024,28 @@ const styles = StyleSheet.create({
   },
   selectedUnitChipText: {
     color: colors.legacy.white, // White text
+<<<<<<< Updated upstream
+=======
+  },
+  createButton: {
+    backgroundColor: '#007AFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+    marginTop: 'auto',
+    marginBottom: 32,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  createButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+>>>>>>> Stashed changes
   },
 });
 

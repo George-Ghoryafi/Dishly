@@ -221,8 +221,11 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
                       )}
                     </View>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
                     <Ionicons 
                       name="chevron-forward" 
                       size={18} 
@@ -233,15 +236,21 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
               </View>
             )}
 =======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                   </View>
                   <Ionicons 
                     name="chevron-forward" 
                     size={18} 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     color={option.destructive ? "#FF3B30" : "#ccc"} 
                   />
 =======
+=======
+>>>>>>> Stashed changes
                     color={option.destructive ? colors.error.primary : colors.warmGrayLight} 
                   />
                 </TouchableOpacity>
@@ -418,9 +427,12 @@ const styles = StyleSheet.create({
     color: colors.warmGray, // Changed from #666 to Warm Gray
   },
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
   renameContainer: {
     paddingHorizontal: 24,
     paddingVertical: 20,
@@ -480,6 +492,9 @@ const styles = StyleSheet.create({
   },
 =======
 >>>>>>> Stashed changes
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 });
 

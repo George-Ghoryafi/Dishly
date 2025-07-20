@@ -3,8 +3,14 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshCon
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 <<<<<<< Updated upstream
+import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
+import { CustomFolderModal, FolderOptionsModal } from '../components';
+=======
+>>>>>>> Stashed changes
+=======
 import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
 import { CustomFolderModal, FolderOptionsModal } from '../components';
 =======
@@ -14,7 +20,10 @@ import { shoppingListService } from '../services/ShoppingListService';
 import { ShoppingListFolderSummary, ShoppingListItem } from '../types/ShoppingList';
 import { CustomFolderModal, FolderOptionsModal, RenameFolderModal } from '../components';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 import { 
   colors, 
   typography, 
@@ -23,6 +32,9 @@ import {
   componentBorderRadius,
   lightTheme
 } from '../styles';
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 interface FolderWithItems extends ShoppingListFolderSummary {
@@ -30,6 +42,9 @@ interface FolderWithItems extends ShoppingListFolderSummary {
   isCollapsed: boolean;
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes
@@ -522,6 +537,7 @@ const ShoppingListScreen: React.FC = () => {
         }
       >
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                  {isLoading && !hasCachedData ? (
            <View style={styles.loadingContainer}>
              <View style={styles.loadingContent}>
@@ -561,6 +577,8 @@ const ShoppingListScreen: React.FC = () => {
                       activeOpacity={0.7}
 =======
 <<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
         {shoppingGroups.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="basket-outline" size={80} color="#ccc" />
@@ -954,6 +972,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.l, // Using design system spacing (20px)
+<<<<<<< Updated upstream
+  },
+<<<<<<< Updated upstream
+=======
+  loadingContainer: {
+=======
   },
 <<<<<<< Updated upstream
 =======
@@ -964,6 +988,50 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
     paddingHorizontal: 40,
   },
+  loadingContent: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
+  animationWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xl, // Using design system spacing (32px)
+    ...componentShadows.card, // Using new shadow system
+  },
+  loadingAnimation: {
+    width: 100,
+    height: 100,
+  },
+  loadingTitle: {
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    textAlign: 'center',
+    marginBottom: spacing.s, // Using design system spacing (8px)
+  },
+  loadingSubtitle: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
+  },
+  loadingIndicator: {
+    marginTop: spacing.s, // Using design system spacing (8px)
+  },
+>>>>>>> Stashed changes
+  emptyState: {
+>>>>>>> Stashed changes
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+<<<<<<< Updated upstream
   loadingContent: {
     alignItems: 'center',
     maxWidth: 300,
@@ -1041,6 +1109,17 @@ const styles = StyleSheet.create({
   loadingSubtitle: {
     fontSize: 16,
     color: '#666',
+=======
+  emptyTitle: {
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginTop: spacing.l, // Using design system spacing (20px)
+    marginBottom: spacing.s, // Using design system spacing (8px)
+  },
+  emptySubtitle: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+>>>>>>> Stashed changes
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32,
