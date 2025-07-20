@@ -1,5 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 interface KitchenStreakProps {
   currentStreak: number;
@@ -158,53 +166,39 @@ const KitchenStreak: React.FC<KitchenStreakProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 32,
-    marginHorizontal: 20,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    marginBottom: spacing.xl, // Using design system spacing (32px)
+    marginHorizontal: spacing.l, // Using design system spacing (24px)
+    backgroundColor: colors.legacy.white, // White background for contrast
+    borderRadius: componentBorderRadius.recipeCard, // Using design system border radius (16px)
+    padding: spacing.l, // Using design system spacing (24px)
+    ...componentShadows.recipeCard, // Using new shadow system
   },
   header: {
-    marginBottom: 20,
+    marginBottom: spacing.l, // Using design system spacing (24px)
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   content: {
-    gap: 24,
+    gap: spacing.l, // Using design system spacing (24px)
   },
   streakDisplay: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    backgroundColor: colors.info.background, // Changed from #f8f9fa to info background
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
     borderWidth: 2,
-    borderColor: '#FF6B35',
+    borderColor: colors.spiceOrange, // Changed from #FF6B35 to Spice Orange
   },
   streakInfo: {
     alignItems: 'center',
@@ -216,33 +210,33 @@ const styles = StyleSheet.create({
   },
   streakNumber: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: '#FF6B35',
+    fontWeight: typography.h1.fontWeight, // Bold weight
+    color: colors.spiceOrange, // Changed from #FF6B35 to Spice Orange
     lineHeight: 40,
   },
   streakEmoji: {
     fontSize: 24,
-    marginLeft: 8,
+    marginLeft: spacing.s, // Using design system spacing (8px)
   },
   streakLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
   },
   weeklyProgress: {
     alignItems: 'center',
   },
   weekLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.m, // Using design system spacing (16px)
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.s, // Using design system spacing (8px)
   },
   dayContainer: {
     alignItems: 'center',
@@ -250,81 +244,81 @@ const styles = StyleSheet.create({
   },
   dayLabel: {
     fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
-    fontWeight: '500',
+    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+    marginBottom: spacing.s, // Using design system spacing (8px)
+    fontWeight: typography.link.fontWeight, // Medium weight
   },
   todayLabel: {
-    color: '#007AFF',
-    fontWeight: 'bold',
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
   },
   progressDot: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
   },
   completedDot: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: colors.spiceOrange, // Changed from #FF6B35 to Spice Orange
+    borderColor: colors.spiceOrange, // Changed from #FF6B35 to Spice Orange
   },
   todayDot: {
-    borderColor: '#007AFF',
-    backgroundColor: '#fff',
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    backgroundColor: colors.legacy.white, // White background
   },
   futureDot: {
-    backgroundColor: '#f8f8f8',
-    borderColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f8f8 to Warm Cream Light
+    borderColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
   },
   incompleteDot: {
-    backgroundColor: '#f8f8f8',
-    borderColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f8f8 to Warm Cream Light
+    borderColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
   },
   checkmark: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.legacy.white, // White text
   },
   todayIndicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
   },
   goalContainer: {
     alignItems: 'center',
   },
   callToAction: {
-    backgroundColor: '#FFF3E0',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    backgroundColor: colors.warning.background, // Changed from #FFF3E0 to warning background
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    paddingHorizontal: spacing.m, // Using design system spacing (16px)
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
     borderWidth: 1,
-    borderColor: '#FFE0B2',
+    borderColor: colors.warning.border, // Changed from #FFE0B2 to warning border
   },
   goalText: {
-    fontSize: 14,
-    color: '#F57C00',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warning.primary, // Changed from #F57C00 to warning primary
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: typography.link.fontWeight, // Medium weight
   },
   completedMessage: {
-    backgroundColor: '#E8F5E8',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    backgroundColor: colors.success.background, // Changed from #E8F5E8 to success background
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    paddingHorizontal: spacing.m, // Using design system spacing (16px)
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
     borderWidth: 1,
-    borderColor: '#C8E6C9',
+    borderColor: colors.success.border, // Changed from #C8E6C9 to success border
   },
   completedText: {
-    fontSize: 14,
-    color: '#2E7D32',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.success.primary, // Changed from #2E7D32 to success primary
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: typography.link.fontWeight, // Medium weight
   },
 });
 

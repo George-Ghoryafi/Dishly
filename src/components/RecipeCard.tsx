@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Recipe } from '../types/Recipe';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -14,9 +22,6 @@ interface RecipeCardProps {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-// Cache to track loaded images
-const imageLoadCache = new Map<string, boolean>();
-
 const RecipeCard: React.FC<RecipeCardProps> = ({ 
   recipe, 
   onPress, 
@@ -25,19 +30,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   isFavorite = false,
   onFavoritePress 
 }) => {
-  const [imageLoading, setImageLoading] = useState(!imageLoadCache.has(recipe.image));
   const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    // Reset states when recipe changes
-    if (imageLoadCache.has(recipe.image)) {
-      setImageLoading(false);
-      setImageError(false);
-    } else {
-      setImageLoading(true);
-      setImageError(false);
-    }
-  }, [recipe.image]);
 
   // Get card dimensions based on variant
   const getCardDimensions = () => {
@@ -93,21 +86,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
       activeOpacity={0.8}
     >
       <View style={[styles.imageContainer, { height: imageHeight }]}>
-        {imageLoading && !imageError && (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>📷</Text>
-          </View>
-        )}
         {!imageError ? (
           <Image 
             source={{ uri: recipe.image }} 
             style={styles.image}
-            onLoad={() => {
-              setImageLoading(false);
-              imageLoadCache.set(recipe.image, true);
-            }}
             onError={() => {
-              setImageLoading(false);
               setImageError(true);
             }}
           />
@@ -126,7 +109,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             <Ionicons 
               name={isFavorite ? "heart" : "heart-outline"} 
               size={18} 
-              color={isFavorite ? "#FF3B30" : "#fff"} 
+              color={isFavorite ? colors.error.primary : colors.legacy.white} 
             />
           </View>
         </TouchableOpacity>
@@ -165,40 +148,18 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    ...componentShadows.card, // Using new shadow system
   },
   rouletteCard: {
-    borderRadius: 16,
+    borderRadius: componentBorderRadius.recipeCard, // Using design system border radius (16px)
   },
   selectedCard: {
     borderWidth: 2,
-    borderColor: '#007AFF',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#007AFF',
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    ...componentShadows.button, // Using button shadow for selected state
   },
   imageContainer: {
     position: 'relative',
@@ -208,67 +169,54 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-  loadingContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    zIndex: 1,
-  },
-  loadingText: {
-    fontSize: 24,
-    opacity: 0.5,
-  },
   imagePlaceholder: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
   },
   placeholderText: {
     fontSize: 24,
   },
   favoriteButton: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: spacing.s, // Using design system spacing (8px)
+    left: spacing.s, // Using design system spacing (8px)
     zIndex: 2,
   },
   favoriteIconContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
-    padding: 6,
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
+    padding: spacing.xs, // Using design system spacing (4px)
     justifyContent: 'center',
     alignItems: 'center',
   },
   difficultyBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: spacing.s, // Using design system spacing (8px)
+    right: spacing.s, // Using design system spacing (8px)
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.s, // Using design system spacing (8px)
+    paddingVertical: spacing.xs, // Using design system spacing (4px)
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
   },
   difficultyText: {
-    color: '#fff',
+    color: colors.legacy.white, // White text
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
   },
   contentContainer: {
     flex: 1,
-    padding: 12,
+    padding: spacing.m, // Using design system spacing (16px)
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
     lineHeight: 18,
-    marginBottom: 8,
+    marginBottom: spacing.s, // Using design system spacing (8px)
   },
   infoRow: {
     flexDirection: 'row',
@@ -281,12 +229,12 @@ const styles = StyleSheet.create({
   },
   timeIcon: {
     fontSize: 12,
-    marginRight: 4,
+    marginRight: spacing.xs, // Using design system spacing (4px)
   },
   timeText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   allergensContainer: {
     flexDirection: 'row',
@@ -294,12 +242,12 @@ const styles = StyleSheet.create({
   },
   allergenIcon: {
     fontSize: 12,
-    marginLeft: 2,
+    marginLeft: spacing.xs, // Using design system spacing (4px)
   },
   moreAllergens: {
     fontSize: 10,
-    color: '#999',
-    marginLeft: 4,
+    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+    marginLeft: spacing.xs, // Using design system spacing (4px)
   },
   selectedCardHighlight: {
     position: 'absolute',
@@ -309,7 +257,7 @@ const styles = StyleSheet.create({
     bottom: -4,
     borderRadius: 20,
     borderWidth: 3,
-    borderColor: '#007AFF',
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
     opacity: 0.6,
   },
 });

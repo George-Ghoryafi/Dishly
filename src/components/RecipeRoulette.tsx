@@ -2,6 +2,16 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Animated, Dimensions } from 'react-native';
 import { Recipe } from '../types/Recipe';
 import RecipeCard from './RecipeCard';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  shadows,
+  componentShadows,
+  componentBorderRadius,
+  componentSpacing,
+  lightTheme
+} from '../styles';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -197,71 +207,49 @@ const RecipeRoulette: React.FC<RecipeRouletteProps> = ({ recipes, onRecipeSelect
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
   },
   header: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
+    marginBottom: spacing.m, // Using design system spacing (16px)
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: spacing.m, // Using design system spacing (16px)
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   spinButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
     width: 44,
     height: 44,
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#007AFF',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    marginLeft: spacing.s, // Using design system spacing (8px)
+    ...componentShadows.button, // Using new shadow system
   },
   spinButtonDisabled: {
-    backgroundColor: '#ccc',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#ccc',
-        shadowOpacity: 0.1,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    backgroundColor: colors.warmGrayLight, // Changed from #ccc to Warm Gray Light
+    ...shadows.light, // Using lighter shadow for disabled state
   },
   spinButtonText: {
     fontSize: 20,
   },
   selectionPointer: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.s, // Using design system spacing (8px)
     zIndex: 10,
   },
   pointerTriangle: {
@@ -272,7 +260,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 12,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#007AFF',
+    borderTopColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
     marginBottom: 2,
   },
   pointerEmoji: {
@@ -280,13 +268,13 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   scrollView: {
-    paddingLeft: 20,
+    paddingLeft: spacing.l, // Using design system spacing (24px)
   },
   scrollContent: {
-    paddingRight: 20,
+    paddingRight: spacing.l, // Using design system spacing (24px)
   },
   cardContainer: {
-    marginRight: 16,
+    marginRight: spacing.m, // Using design system spacing (16px)
   },
   cardWrapper: {
     position: 'relative',
@@ -297,33 +285,33 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 16,
+    backgroundColor: colors.warmCreamLight + '66', // Using warm cream light with opacity
+    borderRadius: componentBorderRadius.recipeCard, // Using design system border radius (16px)
   },
   resultContainer: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#f8f9fa',
-    marginHorizontal: 20,
-    borderRadius: 12,
+    marginTop: spacing.m, // Using design system spacing (16px)
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    backgroundColor: colors.info.background, // Changed from #f8f9fa to info background
+    marginHorizontal: spacing.l, // Using design system spacing (24px)
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: colors.info.border, // Changed from #e9ecef to info border
   },
   resultText: {
-    fontSize: 18,
-    color: '#333',
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   resultRecipeName: {
-    fontWeight: 'bold',
-    color: '#007AFF',
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
   },
   resultSubtext: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
   },
 });

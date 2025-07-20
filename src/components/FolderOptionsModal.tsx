@@ -13,6 +13,14 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -52,21 +60,21 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
       title: 'Add Custom Item',
       subtitle: 'Add your own items to this list',
       icon: 'add-circle',
-      color: '#34C759',
+      color: colors.success.primary,
     },
     {
       id: 'clearCompleted',
       title: 'Clear Completed',
       subtitle: 'Remove all checked items',
       icon: 'checkmark-done-circle',
-      color: '#FF9500',
+      color: colors.warning.primary,
     },
     {
       id: 'rename',
       title: 'Rename Folder',
       subtitle: 'Change the folder name',
       icon: 'create',
-      color: '#007AFF',
+      color: colors.spiceOrange,
     },
     {
       id: 'delete',
@@ -75,7 +83,7 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
         ? 'Permanently delete this folder and all items'
         : 'Remove all items from this recipe list',
       icon: isCustomFolder ? 'trash-bin' : 'trash',
-      color: '#FF3B30',
+      color: colors.error.primary,
       destructive: true,
     },
   ];
@@ -155,7 +163,7 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
                   <Ionicons 
                     name={isCustomFolder ? "folder" : "restaurant"} 
                     size={24} 
-                    color={isCustomFolder ? "#FF9500" : "#007AFF"} 
+                    color={isCustomFolder ? colors.warning.primary : colors.spiceOrange} 
                   />
                 </View>
                 <View style={styles.folderDetails}>
@@ -168,7 +176,7 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
                 </View>
               </View>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color="#666" />
+                <Ionicons name="close" size={24} color={colors.warmGray} />
               </TouchableOpacity>
             </View>
 
@@ -212,12 +220,41 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
                         </Text>
                       )}
                     </View>
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+                    <Ionicons 
+                      name="chevron-forward" 
+                      size={18} 
+                      color={option.destructive ? "#FF3B30" : "#ccc"} 
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+=======
+>>>>>>> Stashed changes
                   </View>
                   <Ionicons 
                     name="chevron-forward" 
                     size={18} 
+<<<<<<< Updated upstream
                     color={option.destructive ? "#FF3B30" : "#ccc"} 
                   />
+=======
+                    color={option.destructive ? colors.error.primary : colors.warmGrayLight} 
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+>>>>>>> Stashed changes
+
+            {/* Footer - only show when not in rename mode */}
+            {!showRenameInput && (
+              <View style={styles.footer}>
+                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+>>>>>>> Stashed changes
                 </TouchableOpacity>
               ))}
             </View>
@@ -245,17 +282,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.warmCream, // Changed from #ffffff to Warm Cream
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 16,
+    ...componentShadows.button, // Using new shadow system
     maxHeight: screenHeight * 0.8,
   },
   safeArea: {
@@ -263,34 +293,34 @@ const styles = StyleSheet.create({
   },
   handleContainer: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: spacing.m, // Using design system spacing (12px)
   },
   handle: {
     width: 36,
     height: 4,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
     borderRadius: 2,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.xl, // Using design system spacing (24px)
+    paddingVertical: spacing.l, // Using design system spacing (20px)
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
   },
   folderInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 16,
+    gap: spacing.m, // Using design system spacing (16px)
   },
   folderIconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -298,46 +328,45 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   folderName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 2,
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #1a1a1a to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (2px)
   },
   folderSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     fontWeight: '500',
   },
   closeButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.warmCreamDark, // Changed from #f5f5f5 to Warm Cream Dark
     alignItems: 'center',
     justifyContent: 'center',
   },
   optionsContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.xl, // Using design system spacing (24px)
+    paddingVertical: spacing.m, // Using design system spacing (16px)
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    paddingHorizontal: spacing.m, // Using design system spacing (16px)
+    marginBottom: spacing.s, // Using design system spacing (8px)
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
   },
   destructiveOption: {
-    backgroundColor: '#fff5f5',
+    backgroundColor: colors.error.background, // Changed from #fff5f5 to error background
   },
   optionContent: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 16,
+    gap: spacing.m, // Using design system spacing (16px)
   },
   optionIconContainer: {
     width: 44,
@@ -347,48 +376,111 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   destructiveIconContainer: {
-    backgroundColor: '#ffebee',
+    backgroundColor: colors.error.background, // Changed from #ffebee to error background
   },
   optionTextContainer: {
     flex: 1,
   },
   optionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 2,
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #1a1a1a to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (2px)
   },
   optionSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     fontWeight: '400',
     lineHeight: 18,
   },
   destructiveText: {
-    color: '#FF3B30',
+    color: colors.error.primary, // Changed from #FF3B30 to error primary
   },
   destructiveSubtitle: {
-    color: '#ff8a80',
+    color: colors.error.primary, // Changed from #ff8a80 to error primary
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.xl, // Using design system spacing (24px)
+    paddingVertical: spacing.l, // Using design system spacing (20px)
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
+    backgroundColor: colors.warmCreamDark, // Changed from #f5f5f5 to Warm Cream Dark
+    paddingVertical: spacing.m, // Using design system spacing (16px)
+    paddingHorizontal: spacing.xl, // Using design system spacing (24px)
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 17,
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+  },
+<<<<<<< Updated upstream
+
+=======
+<<<<<<< Updated upstream
+  renameContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  renameTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  renameInputContainer: {
+    marginBottom: 20,
+  },
+  renameInput: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#1a1a1a',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  renameButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  renameCancelButton: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  renameCancelText: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#666',
   },
-
+  renameConfirmButton: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  renameConfirmText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  renameButtonDisabled: {
+    backgroundColor: '#cccccc',
+  },
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 });
 
 export default FolderOptionsModal; 

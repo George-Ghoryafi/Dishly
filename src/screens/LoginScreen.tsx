@@ -3,6 +3,16 @@ import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Plat
 import { Ionicons } from '@expo/vector-icons';
 import { supabaseAuthService } from '../services/SupabaseAuthService';
 import { EmailConfirmationModal, AlertModal, ForgotPasswordModal } from '../components';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  shadows, 
+  componentShadows,
+  componentBorderRadius,
+  componentSpacing,
+  lightTheme
+} from '../styles';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -72,11 +82,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
         <View style={styles.form}>
           {/* Email or Username Input */}
           <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+            <Ionicons name="person-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Email address or username"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.warmGrayLight}
               value={emailOrUsername}
               onChangeText={setEmailOrUsername}
               keyboardType="default"
@@ -87,11 +97,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
 
           {/* Password Input */}
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+            <Ionicons name="lock-closed-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.warmGrayLight}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -105,7 +115,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
               <Ionicons 
                 name={showPassword ? "eye-outline" : "eye-off-outline"} 
                 size={20} 
-                color="#666" 
+                color={colors.warmGray} 
               />
             </TouchableOpacity>
           </View>
@@ -129,7 +139,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
           {/* Coming Soon Section */}
           <View style={styles.comingSoonContainer}>
             <View style={styles.comingSoonContent}>
-              <Ionicons name="rocket-outline" size={24} color="#007AFF" />
+              <Ionicons name="rocket-outline" size={24} color={colors.spiceOrange} />
               <Text style={styles.comingSoonTitle}>More sign-in options coming soon</Text>
               <Text style={styles.comingSoonSubtitle}>We're working on additional ways to access Recipic</Text>
             </View>
@@ -175,131 +185,108 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignUp }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.warmCream, // Changed from #f5f5f5 to Warm Cream
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
     justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: spacing.xxl, // Using design system spacing (48px)
   },
   appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 8,
+    ...typography.h1, // Using H1 typography (32px, Bold, Deep Navy)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange for brand
+    marginBottom: spacing.s, // 8px
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    ...typography.h3, // Using H3 typography (24px, SemiBold, Deep Navy)
+    marginBottom: spacing.s, // 8px
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
   },
   form: {
-    marginBottom: 30,
+    marginBottom: spacing.xl, // 32px
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.legacy.white, // White background for inputs
+    borderRadius: componentBorderRadius.input, // 12px from design system
+    paddingHorizontal: componentSpacing.inputPadding.horizontal, // 16px
+    paddingVertical: componentSpacing.inputPadding.vertical, // 16px
+    marginBottom: spacing.m, // 16px
+    borderWidth: 2,
+    borderColor: lightTheme.borders, // #E8E0D8 from design system
+    ...componentShadows.input, // Using new shadow system
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: spacing.m, // 16px
   },
   input: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
   },
   eyeIcon: {
-    padding: 4,
+    padding: spacing.xs, // 4px
   },
   forgotButton: {
     alignSelf: 'flex-end',
-    marginBottom: 24,
+    marginBottom: spacing.l, // 24px
   },
   forgotText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: typography.link.fontWeight, // Medium weight for links
   },
   loginButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    paddingVertical: 16,
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    borderRadius: componentBorderRadius.button, // 12px from design system
+    paddingVertical: componentSpacing.buttonPadding.vertical, // 16px
+    paddingHorizontal: componentSpacing.buttonPadding.horizontal, // 24px
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#007AFF',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    marginBottom: spacing.l, // 24px
+    ...componentShadows.button, // Using new shadow system
   },
   loginButtonDisabled: {
-    backgroundColor: '#999',
-    shadowOpacity: 0.1,
+    backgroundColor: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+    ...shadows.light, // Lighter shadow for disabled state
   },
   loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.buttonText, // Using buttonText typography (16px, SemiBold, White)
   },
   comingSoonContainer: {
-    backgroundColor: '#f8f9ff',
-    borderRadius: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    backgroundColor: colors.info.background, // Using info background from design system
+    borderRadius: componentBorderRadius.card, // 12px from design system
+    paddingVertical: spacing.l, // 24px
+    paddingHorizontal: spacing.l, // 24px
+    marginBottom: spacing.l, // 24px
     borderWidth: 1,
-    borderColor: '#e6e9ff',
-    shadowColor: '#007AFF',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: colors.info.border, // Using info border from design system
+    ...shadows.light, // Using new shadow system
   },
   comingSoonContent: {
     alignItems: 'center',
   },
   comingSoonTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 12,
-    marginBottom: 4,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginTop: spacing.m, // 16px
+    marginBottom: spacing.xs, // 4px
     textAlign: 'center',
   },
   comingSoonSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: typography.bodySmall.lineHeight, // Using design system line height
   },
   signUpContainer: {
     flexDirection: 'row',
@@ -307,13 +294,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signUpText: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   signUpLink: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
+    ...typography.link, // Using link typography (16px, Medium, Spice Orange)
   },
 });
 

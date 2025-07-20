@@ -1,6 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  componentSpacing,
+  lightTheme
+} from '../styles';
 
 interface FlipBookPreviewProps {
   onFlipBookPress: () => void;
@@ -23,13 +32,13 @@ const FlipBookPreview: React.FC<FlipBookPreviewProps> = ({ onFlipBookPress }) =>
           activeOpacity={0.8}
         >
           <View style={styles.iconContainer}>
-            <Ionicons name="library" size={24} color="#007AFF" />
+            <Ionicons name="library" size={24} color={colors.spiceOrange} />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.buttonTitle}>Browse Collections</Text>
             <Text style={styles.buttonSubtitle}>Today's picks & monthly favorites</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color={colors.warmGray} />
         </TouchableOpacity>
       </View>
     </View>
@@ -38,64 +47,56 @@ const FlipBookPreview: React.FC<FlipBookPreviewProps> = ({ onFlipBookPress }) =>
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
   },
   header: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
+    marginBottom: spacing.m, // Using design system spacing (16px)
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
   },
   flipBookButton: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    padding: spacing.l, // Using design system spacing (24px)
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...componentShadows.card, // Using new shadow system
   },
   iconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: colors.info.background, // Changed from #f0f9ff to info background
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: spacing.m, // Using design system spacing (16px)
   },
   textContainer: {
     flex: 1,
   },
   buttonTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   buttonSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
 });
 

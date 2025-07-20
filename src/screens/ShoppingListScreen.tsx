@@ -2,15 +2,37 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+import { shoppingListService, type ShoppingListGroup, type ShoppingListItem } from '../services/ShoppingListService';
+import { CustomFolderModal, FolderOptionsModal } from '../components';
+=======
+>>>>>>> Stashed changes
 import LottieView from 'lottie-react-native';
 import { shoppingListService } from '../services/ShoppingListService';
 import { ShoppingListFolderSummary, ShoppingListItem } from '../types/ShoppingList';
 import { CustomFolderModal, FolderOptionsModal, RenameFolderModal } from '../components';
+<<<<<<< Updated upstream
+=======
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
+>>>>>>> Stashed changes
 
 interface FolderWithItems extends ShoppingListFolderSummary {
   items: ShoppingListItem[];
   isCollapsed: boolean;
 }
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 const ShoppingListScreen: React.FC = () => {
   const [folders, setFolders] = useState<FolderWithItems[]>([]);
@@ -461,8 +483,6 @@ const ShoppingListScreen: React.FC = () => {
     );
   };
 
-
-
   const openCreateFolderModal = () => {
     setModalMode('createFolder');
     setSelectedFolder(undefined);
@@ -483,11 +503,11 @@ const ShoppingListScreen: React.FC = () => {
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity style={styles.addFolderButton} onPress={openCreateFolderModal}>
-            <Ionicons name="folder-outline" size={20} color="#007AFF" />
+            <Ionicons name="folder-outline" size={20} color={colors.spiceOrange} />
           </TouchableOpacity>
           {getTotalItemCount() > 0 && (
             <TouchableOpacity style={styles.clearButton} onPress={handleClearChecked}>
-              <Ionicons name="checkmark-done" size={20} color="#007AFF" />
+              <Ionicons name="checkmark-done" size={20} color={colors.spiceOrange} />
               <Text style={styles.clearButtonText}>Clear Done</Text>
             </TouchableOpacity>
           )}
@@ -501,6 +521,7 @@ const ShoppingListScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+<<<<<<< Updated upstream
                  {isLoading && !hasCachedData ? (
            <View style={styles.loadingContainer}>
              <View style={styles.loadingContent}>
@@ -538,6 +559,54 @@ const ShoppingListScreen: React.FC = () => {
                       style={styles.recipeHeader}
                       onPress={() => handleToggleCollapse(folder.id)}
                       activeOpacity={0.7}
+=======
+<<<<<<< Updated upstream
+        {shoppingGroups.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="basket-outline" size={80} color="#ccc" />
+            <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
+            <Text style={styles.emptySubtitle}>
+              Add ingredients from recipes to get started
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.itemsList}>
+            {shoppingGroups.map((group) => (
+              <View key={group.recipeId} style={styles.recipeGroup}>
+                {/* Recipe Header */}
+                <TouchableOpacity 
+                  style={styles.recipeHeader}
+                  onPress={() => handleToggleCollapse(group.recipeId)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.recipeHeaderLeft}>
+                    <Ionicons 
+                      name={group.isCustomFolder ? "folder" : "restaurant"} 
+                      size={20} 
+                      color={group.isCustomFolder ? "#FF9500" : "#007AFF"} 
+                    />
+                    <Text style={styles.recipeName}>{group.recipeName}</Text>
+                    <Text style={styles.recipeItemCount}>
+                      {group.items.filter(item => !item.isChecked).length} items
+                    </Text>
+                  </View>
+                                     <View style={styles.recipeHeaderRight}>
+                     <TouchableOpacity
+                       style={styles.moreButton}
+                       onPress={(e) => {
+                         e.stopPropagation();
+                         showFolderOptions(group);
+                       }}
+                     >
+                       <Ionicons name="ellipsis-horizontal" size={18} color="#666" />
+                     </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.collapseButton}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleToggleCollapse(group.recipeId);
+                      }}
+>>>>>>> Stashed changes
                     >
                                         <View style={styles.recipeHeaderLeft}>
                     {folder.icon ? (
@@ -669,54 +738,267 @@ const ShoppingListScreen: React.FC = () => {
       </View>
     );
   };
+=======
+        {isLoading && !hasCachedData ? (
+          <View style={styles.loadingContainer}>
+            <View style={styles.loadingContent}>
+              <View style={styles.animationWrapper}>
+                <LottieView
+                  source={require('../../assets/animations/cooking-professional.json')}
+                  autoPlay
+                  loop
+                  style={styles.loadingAnimation}
+                />
+              </View>
+              <Text style={styles.loadingTitle}>Preparing your shopping list</Text>
+              <Text style={styles.loadingSubtitle}>Organizing your favorite ingredients...</Text>
+              <View style={styles.loadingIndicator}>
+                <ActivityIndicator size="small" color={colors.spiceOrange} />
+              </View>
+            </View>
+          </View>
+        ) : (
+          <>
+            {!folders || folders.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="basket-outline" size={80} color={colors.warmGrayLight} />
+                <Text style={styles.emptyTitle}>Your shopping list is empty</Text>
+                <Text style={styles.emptySubtitle}>
+                  Add ingredients from recipes to get started
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.itemsList}>
+                {(folders || []).map((folder) => (
+                  <View key={folder.id} style={styles.recipeGroup}>
+                    {/* Folder Header */}
+                    <TouchableOpacity 
+                      style={styles.recipeHeader}
+                      onPress={() => handleToggleCollapse(folder.id)}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.recipeHeaderLeft}>
+                        {folder.icon ? (
+                          <Text style={styles.folderEmoji}>{folder.icon}</Text>
+                        ) : (
+                          <Ionicons 
+                            name="folder" 
+                            size={20} 
+                            color={folder.color || colors.spiceOrange} 
+                          />
+                        )}
+                        <Text style={styles.recipeName}>{folder.name}</Text>
+                        <Text style={styles.recipeItemCount}>
+                          {(folder.items || []).filter(item => !item.is_completed).length} items
+                        </Text>
+                      </View>
+                      <View style={styles.recipeHeaderRight}>
+                        <TouchableOpacity
+                          style={styles.moreButton}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            showFolderOptions(folder);
+                          }}
+                        >
+                          <Ionicons name="ellipsis-horizontal" size={18} color={colors.warmGray} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.collapseButton}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            handleToggleCollapse(folder.id);
+                          }}
+                        >
+                          <Ionicons 
+                            name={folder.isCollapsed ? "chevron-down" : "chevron-up"} 
+                            size={18} 
+                            color={colors.warmGray} 
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableOpacity>
+
+                    {/* Folder Items */}
+                    {!folder.isCollapsed && (
+                      <View style={styles.recipeItems}>
+                        {(folder.items || []).map((item) => (
+                          <View key={item.id} style={[styles.shoppingItem, item.is_completed && styles.checkedItem]}>
+                            <TouchableOpacity
+                              style={styles.checkboxContainer}
+                              onPress={() => handleToggleItem(item.id)}
+                            >
+                              <Ionicons
+                                name={item.is_completed ? "checkmark-circle" : "ellipse-outline"}
+                                size={24}
+                                color={item.is_completed ? colors.success.primary : colors.warmGrayLight}
+                              />
+                            </TouchableOpacity>
+                            
+                            <View style={styles.itemInfo}>
+                              <Text style={[styles.itemName, item.is_completed && styles.checkedText]}>
+                                {item.name}
+                              </Text>
+                              {item.quantity && (
+                                <Text style={[styles.itemAmount, item.is_completed && styles.checkedText]}>
+                                  {item.quantity}
+                                </Text>
+                              )}
+                            </View>
+
+                            <TouchableOpacity
+                              style={styles.removeItemButton}
+                              onPress={() => handleRemoveItem(item.id)}
+                            >
+                              <Ionicons name="close" size={20} color={colors.warmGray} />
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+
+      {/* Custom Folder Modal */}
+      <CustomFolderModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onCreateFolder={handleCreateFolder}
+        onAddItem={handleAddCustomItem}
+        existingFolder={selectedFolder}
+        mode={modalMode}
+      />
+
+      {/* Folder Options Modal */}
+      <FolderOptionsModal
+        visible={optionsModalVisible}
+        onClose={() => {
+          setOptionsModalVisible(false);
+          setSelectedFolder2(null);
+        }}
+        folderName={selectedFolder2?.name || ''}
+        isCustomFolder={true}
+        onOptionSelect={handleOptionSelect}
+        itemCount={selectedFolder2?.items.length || 0}
+      />
+
+      {/* Rename Folder Modal */}
+      <RenameFolderModal
+        visible={renameModalVisible}
+        onClose={() => {
+          setRenameModalVisible(false);
+          setSelectedFolder2(null);
+        }}
+        onRename={async (newName: string, color: string, icon?: string) => {
+          if (selectedFolder2) {
+            await handleRenameFolder(selectedFolder2.id, newName, color, icon);
+          }
+        }}
+        currentName={selectedFolder2?.name || ''}
+        currentColor={selectedFolder2?.color || colors.spiceOrange}
+        currentIcon={selectedFolder2?.icon}
+        itemCount={selectedFolder2?.items.length || 0}
+        isCustomFolder={true}
+      />
+    </View>
+  );
+};
+>>>>>>> Stashed changes
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.warmCream, // Changed from #f8f9fa to Warm Cream
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (20px)
     paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: '#ffffff',
+    paddingBottom: spacing.l, // Using design system spacing (20px)
+    backgroundColor: colors.warmCream, // Changed from #ffffff to Warm Cream
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
   },
   headerLeft: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    ...typography.h1, // Using H1 typography (32px, Bold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
   },
   itemCount: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    marginTop: spacing.xs, // Using design system spacing (4px)
   },
   clearButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 4,
+    backgroundColor: colors.success.background, // Changed from #f0f8ff to success background
+    paddingHorizontal: spacing.m, // Using design system spacing (12px)
+    paddingVertical: spacing.s, // Using design system spacing (8px)
+    borderRadius: componentBorderRadius.button, // Using design system border radius (12px)
+    gap: spacing.xs, // Using design system spacing (4px)
   },
   clearButtonText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (20px)
   },
+<<<<<<< Updated upstream
+=======
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  loadingContent: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
+  animationWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xl, // Using design system spacing (32px)
+    ...componentShadows.card, // Using new shadow system
+  },
+  loadingAnimation: {
+    width: 100,
+    height: 100,
+  },
+  loadingTitle: {
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    textAlign: 'center',
+    marginBottom: spacing.s, // Using design system spacing (8px)
+  },
+  loadingSubtitle: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
+  },
+  loadingIndicator: {
+    marginTop: spacing.s, // Using design system spacing (8px)
+  },
+<<<<<<< Updated upstream
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -766,6 +1048,9 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     marginTop: 8,
   },
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   emptyState: {
     flex: 1,
     justifyContent: 'center',
@@ -773,53 +1058,44 @@ const styles = StyleSheet.create({
     paddingVertical: 100,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 20,
-    marginBottom: 8,
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginTop: spacing.l, // Using design system spacing (20px)
+    marginBottom: spacing.s, // Using design system spacing (8px)
   },
   emptySubtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 22,
   },
   itemsList: {
-    paddingVertical: 20,
+    paddingVertical: spacing.l, // Using design system spacing (20px)
   },
   recipeGroup: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
+    marginBottom: spacing.l, // Using design system spacing (20px)
+    ...componentShadows.card, // Using new shadow system
   },
   recipeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.m, // Using design system spacing (16px)
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
   },
   recipeHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 8,
+    gap: spacing.s, // Using design system spacing (8px)
   },
   recipeName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
     flex: 1,
   },
   folderEmoji: {
@@ -828,72 +1104,72 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recipeItemCount: {
-    fontSize: 12,
-    color: '#666',
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...typography.caption, // Using caption typography (12px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    backgroundColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
+    paddingHorizontal: spacing.s, // Using design system spacing (8px)
+    paddingVertical: spacing.xs, // Using design system spacing (4px)
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
   },
   removeRecipeButton: {
-    padding: 8,
+    padding: spacing.s, // Using design system spacing (8px)
   },
   recipeItems: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.m, // Using design system spacing (16px)
+    gap: spacing.m, // Using design system spacing (12px)
   },
   shoppingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    gap: 12,
+    paddingVertical: spacing.s, // Using design system spacing (8px)
+    gap: spacing.m, // Using design system spacing (12px)
   },
   checkedItem: {
     opacity: 0.6,
   },
   checkboxContainer: {
-    padding: 4,
+    padding: spacing.xs, // Using design system spacing (4px)
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 2,
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (2px)
   },
   itemAmount: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   checkedText: {
     textDecorationLine: 'line-through',
-    color: '#999',
+    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
   },
   removeItemButton: {
-    padding: 4,
+    padding: spacing.xs, // Using design system spacing (4px)
   },
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.s, // Using design system spacing (8px)
   },
   addFolderButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f8ff',
+    padding: spacing.s, // Using design system spacing (8px)
+    borderRadius: componentBorderRadius.button, // Using design system border radius (12px)
+    backgroundColor: colors.success.background, // Changed from #f0f8ff to success background
   },
   recipeHeaderRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.s, // Using design system spacing (8px)
   },
   moreButton: {
-    padding: 8,
+    padding: spacing.s, // Using design system spacing (8px)
   },
   collapseButton: {
-    padding: 8,
+    padding: spacing.s, // Using design system spacing (8px)
   },
 });
 

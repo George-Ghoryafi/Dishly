@@ -1,6 +1,14 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 interface HeaderProps {
   onProfilePress?: () => void;
@@ -33,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({
           onPress={handleSearchPress}
           activeOpacity={0.7}
         >
-          <Ionicons name="search" size={24} color="#007AFF" />
+          <Ionicons name="search" size={24} color={colors.spiceOrange} />
         </TouchableOpacity>
         
         {/* Centered app name */}
@@ -56,24 +64,17 @@ const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   outerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.warmCream, // Changed from #fff to Warm Cream
     paddingTop: Platform.OS === 'android' ? 45 : 70,
-    paddingBottom: 15,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    paddingBottom: spacing.m, // Using design system spacing (16px)
+    ...componentShadows.header, // Using new shadow system
     marginTop: Platform.OS === 'ios' ? -30 : 0,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
   },
   searchIconButton: {
     width: 44,
@@ -82,9 +83,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   appName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
+    ...typography.h2, // Using H2 typography (28px, Bold)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
     textAlign: 'center',
     flex: 1,
   },
@@ -98,15 +98,15 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
   },
   profileText: {
     fontSize: 18,
-    color: '#666',
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
 });
 

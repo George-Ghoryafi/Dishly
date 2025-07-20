@@ -3,6 +3,16 @@ import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Scro
 import { Ionicons } from '@expo/vector-icons';
 import { supabaseAuthService } from '../services/SupabaseAuthService';
 import { EmailConfirmationModal, AlertModal } from '../components';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  shadows, 
+  componentShadows,
+  componentBorderRadius,
+  componentSpacing,
+  lightTheme
+} from '../styles';
 
 interface SignUpScreenProps {
   onSignUp: () => void;
@@ -264,7 +274,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
         <View style={styles.content}>
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={onBackToLogin}>
-              <Ionicons name="arrow-back" size={24} color="#007AFF" />
+              <Ionicons name="arrow-back" size={24} color={colors.spiceOrange} />
             </TouchableOpacity>
             <Text style={styles.appName}>Recipic</Text>
             <Text style={styles.welcomeText}>Create Account</Text>
@@ -273,11 +283,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="person-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="First name"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
@@ -286,11 +296,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="person-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Last name"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={lastName}
                 onChangeText={setLastName}
                 autoCapitalize="words"
@@ -299,11 +309,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="at-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="at-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Username"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
@@ -312,11 +322,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
               {username.length >= 3 && (
                 <View style={styles.usernameStatus}>
                   {isCheckingUsername ? (
-                    <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
+                    <Ionicons name="ellipsis-horizontal" size={20} color={colors.warmGray} />
                   ) : usernameAvailable === true ? (
-                    <Ionicons name="checkmark-circle" size={20} color="#30D158" />
+                    <Ionicons name="checkmark-circle" size={20} color={colors.success.primary} />
                   ) : usernameAvailable === false ? (
-                    <Ionicons name="close-circle" size={20} color="#FF3B30" />
+                    <Ionicons name="close-circle" size={20} color={colors.error.primary} />
                   ) : null}
                 </View>
               )}
@@ -326,7 +336,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
               <View style={styles.usernameMessage}>
                 <Text style={[
                   styles.usernameMessageText,
-                  { color: usernameAvailable ? '#30D158' : '#FF3B30' }
+                  { color: usernameAvailable ? colors.success.primary : colors.error.primary }
                 ]}>
                   {usernameAvailable 
                     ? '✓ Username is available' 
@@ -336,11 +346,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             )}
 
             <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="mail-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Email address"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -350,11 +360,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             </View>
 
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="lock-closed-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
@@ -368,7 +378,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
                 <Ionicons 
                   name={showPassword ? "eye-outline" : "eye-off-outline"} 
                   size={20} 
-                  color="#666" 
+                  color={colors.warmGray} 
                 />
               </TouchableOpacity>
             </View>
@@ -403,12 +413,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
                       <Ionicons 
                         name={req.met ? "checkmark-circle" : "ellipse-outline"} 
                         size={16} 
-                        color={req.met ? passwordStrength.color : '#999'} 
+                        color={req.met ? passwordStrength.color : colors.warmGrayLight} 
                       />
                       <Text style={[
                         styles.requirementText,
                         { 
-                          color: req.met ? '#333' : '#666',
+                          color: req.met ? colors.deepNavy : colors.warmGray,
                           textDecorationLine: req.met ? 'line-through' : 'none',
                           opacity: req.met ? 0.7 : 1
                         }
@@ -425,7 +435,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
                 </View>
 
                 <View style={styles.strengthTip}>
-                  <Ionicons name="information-circle-outline" size={16} color="#007AFF" />
+                  <Ionicons name="information-circle-outline" size={16} color={colors.spiceOrange} />
                   <Text style={styles.strengthTipText}>
                     {passwordStrength.level === 'weak' 
                       ? 'Focus on length - longer passwords are more secure than complex short ones!'
@@ -440,11 +450,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
             )}
 
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="lock-closed-outline" size={20} color={colors.warmGray} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Confirm password"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.warmGrayLight}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
@@ -458,7 +468,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
                 <Ionicons 
                   name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
                   size={20} 
-                  color="#666" 
+                  color={colors.warmGray} 
                 />
               </TouchableOpacity>
             </View>
@@ -484,7 +494,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 
             <View style={styles.comingSoonContainer}>
               <View style={styles.comingSoonContent}>
-                <Ionicons name="rocket-outline" size={24} color="#007AFF" />
+                <Ionicons name="rocket-outline" size={24} color={colors.spiceOrange} />
                 <Text style={styles.comingSoonTitle}>More sign-up options coming soon</Text>
                 <Text style={styles.comingSoonSubtitle}>We're working on additional ways to join Recipic</Text>
               </View>
@@ -528,200 +538,168 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onBackToLogin }) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.warmCream, // Changed from #f5f5f5 to Warm Cream
   },
   scrollView: {
     flex: 1,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
+    paddingVertical: spacing.l, // 24px
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: spacing.xxl, // Using design system spacing (48px)
     position: 'relative',
   },
   backButton: {
     position: 'absolute',
     left: 0,
     top: 0,
-    padding: 8,
+    padding: spacing.s, // 8px
     zIndex: 1,
   },
   appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 8,
+    ...typography.h1, // Using H1 typography (32px, Bold, Deep Navy)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange for brand
+    marginBottom: spacing.s, // 8px
   },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    ...typography.h3, // Using H3 typography (24px, SemiBold, Deep Navy)
+    marginBottom: spacing.s, // 8px
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
   },
   form: {
-    marginBottom: 30,
+    marginBottom: spacing.xl, // 32px
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.legacy.white, // White background for inputs
+    borderRadius: componentBorderRadius.input, // 12px from design system
+    paddingHorizontal: componentSpacing.inputPadding.horizontal, // 16px
+    paddingVertical: componentSpacing.inputPadding.vertical, // 16px
+    marginBottom: spacing.m, // 16px
+    borderWidth: 2,
+    borderColor: lightTheme.borders, // #E8E0D8 from design system
+    ...componentShadows.input, // Using new shadow system
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: spacing.m, // 16px
   },
   input: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
   },
   eyeIcon: {
-    padding: 4,
+    padding: spacing.xs, // 4px
   },
   termsContainer: {
-    marginBottom: 24,
-    paddingHorizontal: 4,
+    marginBottom: spacing.l, // 24px
+    paddingHorizontal: spacing.xs, // 4px
   },
   termsText: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: typography.bodySmall.lineHeight, // Using design system line height
   },
   termsLink: {
-    color: '#007AFF',
-    fontWeight: '500',
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: typography.link.fontWeight, // Medium weight for links
   },
   signUpButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    paddingVertical: 16,
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    borderRadius: componentBorderRadius.button, // 12px from design system
+    paddingVertical: componentSpacing.buttonPadding.vertical, // 16px
+    paddingHorizontal: componentSpacing.buttonPadding.horizontal, // 24px
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#007AFF',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    marginBottom: spacing.l, // 24px
+    ...componentShadows.button, // Using new shadow system
   },
   signUpButtonDisabled: {
-    backgroundColor: '#999',
-    shadowOpacity: 0.1,
+    backgroundColor: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+    ...shadows.light, // Lighter shadow for disabled state
   },
   signUpButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.buttonText, // Using buttonText typography (16px, SemiBold, White)
   },
   comingSoonContainer: {
-    backgroundColor: '#f8f9ff',
-    borderRadius: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    marginBottom: 24,
+    backgroundColor: colors.info.background, // Using info background from design system
+    borderRadius: componentBorderRadius.card, // 12px from design system
+    paddingVertical: spacing.l, // 24px
+    paddingHorizontal: spacing.l, // 24px
+    marginBottom: spacing.l, // 24px
     borderWidth: 1,
-    borderColor: '#e6e9ff',
-    shadowColor: '#007AFF',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: colors.info.border, // Using info border from design system
+    ...shadows.light, // Using new shadow system
   },
   comingSoonContent: {
     alignItems: 'center',
   },
   comingSoonTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 12,
-    marginBottom: 4,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginTop: spacing.m, // 16px
+    marginBottom: spacing.xs, // 4px
     textAlign: 'center',
   },
   comingSoonSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: typography.bodySmall.lineHeight, // Using design system line height
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingBottom: spacing.l, // 24px
   },
   loginText: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   loginLink: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
+    ...typography.link, // Using link typography (16px, Medium, Spice Orange)
   },
   // Password Strength Indicator Styles
   passwordStrengthContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.legacy.white, // White background
+    borderRadius: componentBorderRadius.card, // 12px from design system
+    padding: spacing.m, // 16px
+    marginBottom: spacing.m, // 16px
+    ...shadows.light, // Using new shadow system
   },
   strengthHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.m, // 16px
   },
   strengthTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
   },
   strengthLevel: {
-    fontSize: 14,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    textTransform: 'capitalize' as const,
   },
   strengthBarContainer: {
-    marginBottom: 16,
+    marginBottom: spacing.m, // 16px
   },
   strengthBarBackground: {
     height: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.warmCreamDark, // Using warm cream dark for background
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -730,59 +708,59 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   requirementsContainer: {
-    marginBottom: 12,
+    marginBottom: spacing.m, // 16px
   },
   requirementItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 2,
+    paddingVertical: spacing.xs, // 4px
+    paddingHorizontal: spacing.xs, // 4px
   },
   requirementText: {
-    fontSize: 14,
-    marginLeft: 8,
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    marginLeft: spacing.s, // 8px
     flex: 1,
   },
   criticalBadge: {
-    backgroundColor: '#FF3B30',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    backgroundColor: colors.error.primary, // Using error color from design system
+    paddingHorizontal: spacing.s, // 8px
+    paddingVertical: spacing.xs, // 4px
     borderRadius: 10,
-    marginLeft: 8,
+    marginLeft: spacing.s, // 8px
   },
   criticalBadgeText: {
     fontSize: 10,
-    color: '#fff',
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    color: colors.legacy.white, // White text
+    fontWeight: typography.buttonText.fontWeight, // SemiBold weight
+    textTransform: 'uppercase' as const,
   },
   strengthTip: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#f8f9ff',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: colors.info.background, // Using info background from design system
+    padding: spacing.m, // 16px
+    borderRadius: componentBorderRadius.input, // 8px
     borderLeftWidth: 3,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
   },
   strengthTipText: {
     fontSize: 13,
-    color: '#333',
-    marginLeft: 8,
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginLeft: spacing.s, // 8px
     flex: 1,
     lineHeight: 18,
   },
   // Username availability styles
   usernameStatus: {
-    padding: 4,
+    padding: spacing.xs, // 4px
   },
   usernameMessage: {
-    paddingHorizontal: 4,
-    marginBottom: 8,
+    paddingHorizontal: spacing.xs, // 4px
+    marginBottom: spacing.s, // 8px
   },
   usernameMessageText: {
-    fontSize: 14,
-    fontWeight: '500',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    fontWeight: typography.link.fontWeight, // Medium weight
   },
 });
 

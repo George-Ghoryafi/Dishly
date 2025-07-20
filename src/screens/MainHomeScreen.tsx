@@ -11,6 +11,13 @@ import { Recipe } from '../types/Recipe';
 import { favoritesService } from '../services';
 import { BottomTabParamList } from '../navigation/BottomTabNavigator';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { 
+  colors, 
+  spacing, 
+  shadows,
+  componentShadows,
+  lightTheme
+} from '../styles';
 
 type MainHomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'> & StackNavigationProp<RootStackParamList>;
 
@@ -317,6 +324,7 @@ const MainHomeScreen: React.FC<MainHomeScreenProps> = ({ favorites: propFavorite
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.warmCream, // Changed from default to Warm Cream
   },
   headerContainer: {
     position: 'absolute',
@@ -324,15 +332,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: '#fff',
+    backgroundColor: colors.warmCream, // Changed from #fff to Warm Cream
+    ...componentShadows.header, // Using new shadow system for header
   },
   safeArea: {
     flex: 1,
-    backgroundColor: 'none',
+    backgroundColor: colors.warmCream, // Changed from 'none' to Warm Cream
   },
   scrollContent: {
-    paddingBottom: 10,
+    paddingBottom: spacing.m, // Using design system spacing (16px)
     paddingTop: -15,
+    backgroundColor: colors.warmCream, // Added background color for consistency
   },
 });
 

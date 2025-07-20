@@ -15,7 +15,22 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+<<<<<<< Updated upstream
 import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
+=======
+<<<<<<< Updated upstream
+=======
+import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 interface CustomFolderModalProps {
   visible: boolean;
@@ -150,7 +165,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
               <View style={styles.simpleContent}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="add-circle-outline" size={60} color="#34C759" />
+                  <Ionicons name="add-circle-outline" size={60} color={colors.success.primary} />
                 </View>
                 
                 <Text style={styles.description}>
@@ -164,7 +179,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                     value={itemName}
                     onChangeText={setItemName}
                     placeholder="e.g., Milk, Bread, Bananas"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.warmGrayLight}
                     autoFocus
                     maxLength={50}
                     returnKeyType="done"
@@ -180,20 +195,40 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                       value={amount}
                       onChangeText={setAmount}
                       placeholder="1"
-                      placeholderTextColor="#999"
+                      placeholderTextColor={colors.warmGrayLight}
                       keyboardType="numeric"
                     />
                   </View>
 
                   <View style={[styles.inputContainer, styles.halfWidth]}>
                     <Text style={styles.inputLabel}>Unit</Text>
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+                    <View style={styles.unitContainer}>
+                      <TextInput
+                        style={styles.textInput}
+                        value={unit}
+                        onChangeText={setUnit}
+                        placeholder="item"
+                        placeholderTextColor="#999"
+                      />
+                    </View>
+=======
+>>>>>>> Stashed changes
                     <TextInput
                       style={styles.textInput}
                       value={unit}
                       onChangeText={setUnit}
                       placeholder="item"
+<<<<<<< Updated upstream
                       placeholderTextColor="#999"
                     />
+=======
+                      placeholderTextColor={colors.warmGrayLight}
+                    />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                   </View>
                 </View>
 
@@ -286,6 +321,11 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
               </View>
             </View>
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
             {/* Name Input Section */}
             <View style={styles.inputSection}>
               <Text style={styles.sectionTitle}>Name</Text>
@@ -294,7 +334,11 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                 value={folderName}
                 onChangeText={setFolderName}
                 placeholder="e.g., Weekly Groceries, Dinner Party"
+<<<<<<< Updated upstream
                 placeholderTextColor="#999"
+=======
+                placeholderTextColor={colors.warmGrayLight}
+>>>>>>> Stashed changes
                 autoFocus
                 maxLength={50}
                 returnKeyType="done"
@@ -334,6 +378,10 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
               <Text style={styles.sectionTitle}>Icon</Text>
               <View style={styles.iconGrid}>
                 {/* Default Icon Option */}
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 <TouchableOpacity
                   style={[
                     styles.iconOption,
@@ -342,6 +390,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                   onPress={() => setSelectedIcon(undefined)}
                   disabled={isLoading}
                 >
+<<<<<<< Updated upstream
                   <Ionicons 
                     name="folder" 
                     size={24} 
@@ -352,6 +401,13 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                       <Ionicons name="checkmark" size={12} color="#007AFF" />
                     </View>
                   )}
+=======
+<<<<<<< Updated upstream
+                  <Ionicons name="add" size={20} color="#fff" />
+                  <Text style={styles.createButtonText}>
+                    {isLoading ? 'Adding...' : 'Add Item'}
+                  </Text>
+>>>>>>> Stashed changes
                 </TouchableOpacity>
 
                 {/* Emoji Options */}
@@ -375,23 +431,73 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                 ))}
               </View>
             </View>
+<<<<<<< Updated upstream
+=======
+          </TouchableWithoutFeedback>
+=======
+                  <Ionicons 
+                    name="folder" 
+                    size={24} 
+                    color={selectedColor} 
+                  />
+                  {!selectedIcon && (
+                    <View style={styles.iconCheckmark}>
+                      <Ionicons name="checkmark" size={12} color={colors.spiceOrange} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+
+                {/* Emoji Options */}
+                {FOLDER_ICONS.map((icon) => (
+                  <TouchableOpacity
+                    key={icon}
+                    style={[
+                      styles.iconOption,
+                      selectedIcon === icon && styles.selectedIcon,
+                    ]}
+                    onPress={() => setSelectedIcon(icon)}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.iconEmoji}>{icon}</Text>
+                    {selectedIcon === icon && (
+                      <View style={styles.iconCheckmark}>
+                        <Ionicons name="checkmark" size={12} color={colors.spiceOrange} />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+>>>>>>> Stashed changes
 
             {/* Tips Section */}
             <View style={styles.tipsSection}>
               <View style={styles.tip}>
+<<<<<<< Updated upstream
                 <Ionicons name="bulb-outline" size={16} color="#666" />
+=======
+                <Ionicons name="bulb-outline" size={16} color={colors.warmGray} />
+>>>>>>> Stashed changes
                 <Text style={styles.tipText}>
                   Choose colors and icons that match your shopping categories
                 </Text>
               </View>
               <View style={styles.tip}>
+<<<<<<< Updated upstream
                 <Ionicons name="sparkles-outline" size={16} color="#666" />
+=======
+                <Ionicons name="sparkles-outline" size={16} color={colors.warmGray} />
+>>>>>>> Stashed changes
                 <Text style={styles.tipText}>
                   Try: "🥕 Fresh Produce", "🥛 Dairy Items", "🧴 Household Supplies"
                 </Text>
               </View>
             </View>
           </ScrollView>
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
@@ -401,7 +507,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.warmCream, // Changed from #fff to Warm Cream
   },
   keyboardView: {
     flex: 1,
@@ -410,19 +516,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.l, // Using design system spacing (20px)
+    paddingVertical: spacing.m, // Using design system spacing (16px)
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
   },
   closeButton: {
-    padding: 4,
+    padding: spacing.xs, // Using design system spacing (4px)
   },
+<<<<<<< Updated upstream
   closeText: {
     fontSize: 17,
     color: '#007AFF',
     fontWeight: '400',
   },
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
@@ -581,79 +691,247 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flex: 1,
+<<<<<<< Updated upstream
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
+=======
+    paddingHorizontal: 20,
+    paddingTop: 40,
+=======
+  closeText: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: '400',
+  },
+  headerTitle: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+  },
+  saveButton: {
+    padding: spacing.xs, // Using design system spacing (4px)
+  },
+  saveText: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  disabledText: {
+    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+  },
+  scrollView: {
+    flex: 1,
+  },
+  simpleContent: {
+    padding: spacing.l, // Using design system spacing (20px)
+  },
+  previewSection: {
+    padding: spacing.l, // Using design system spacing (20px)
+    borderBottomWidth: 1,
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
+  },
+  sectionTitle: {
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.m, // Using design system spacing (12px)
+  },
+  previewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
+    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
+    padding: spacing.m, // Using design system spacing (16px)
+    gap: spacing.m, // Using design system spacing (16px)
+  },
+  previewIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  previewEmoji: {
+    fontSize: 28,
+  },
+  previewInfo: {
+    flex: 1,
+  },
+  previewName: {
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
+  },
+  previewDetails: {
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+  },
+  inputSection: {
+    padding: spacing.l, // Using design system spacing (20px)
+    borderBottomWidth: 1,
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
+  },
+  colorSection: {
+    padding: spacing.l, // Using design system spacing (20px)
+    borderBottomWidth: 1,
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.m, // Using design system spacing (12px)
+  },
+  colorOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: 'transparent',
+  },
+  selectedColor: {
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    transform: [{ scale: 1.1 }],
+  },
+  iconSection: {
+    padding: spacing.l, // Using design system spacing (20px)
+    borderBottomWidth: 1,
+    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.s, // Using design system spacing (8px)
+  },
+  iconOption: {
+    width: 52,
+    height: 52,
+    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
+    borderWidth: 2,
+    borderColor: 'transparent',
+    position: 'relative',
+  },
+  selectedIcon: {
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    backgroundColor: colors.success.background, // Changed from #f0f8ff to success background
+  },
+  iconEmoji: {
+    fontSize: 24,
+  },
+  iconCheckmark: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.legacy.white, // White background for contrast
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...componentShadows.light, // Using new shadow system
+  },
+  characterCount: {
+    ...typography.caption, // Using caption typography (12px, Regular)
+    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
+    textAlign: 'right',
+    marginTop: spacing.s, // Using design system spacing (8px)
+  },
+  tipsSection: {
+    padding: spacing.l, // Using design system spacing (20px)
+    gap: spacing.m, // Using design system spacing (12px)
+  },
+  tip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.s, // Using design system spacing (8px)
+  },
+  tipText: {
+    flex: 1,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    lineHeight: 20,
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   },
   iconContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xl, // Using design system spacing (24px)
   },
   description: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
     lineHeight: 22,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: spacing.l, // Using design system spacing (20px)
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.s, // Using design system spacing (8px)
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#f8f9fa',
+    borderColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
+    borderRadius: componentBorderRadius.input, // Using design system border radius (12px)
+    paddingHorizontal: spacing.m, // Using design system spacing (16px)
+    paddingVertical: spacing.m, // Using design system spacing (14px)
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
   },
   row: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.m, // Using design system spacing (12px)
   },
   halfWidth: {
     flex: 1,
   },
   unitsSection: {
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
   },
   unitsLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    marginBottom: spacing.m, // Using design system spacing (12px)
   },
   unitsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.s, // Using design system spacing (8px)
   },
   unitChip: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    backgroundColor: colors.warmCreamDark, // Changed from #f0f0f0 to Warm Cream Dark
+    paddingHorizontal: spacing.m, // Using design system spacing (12px)
+    paddingVertical: spacing.xs, // Using design system spacing (6px)
+    borderRadius: componentBorderRadius.button, // Using design system border radius (16px)
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
   },
   selectedUnitChip: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
   },
   unitChipText: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     fontWeight: '500',
   },
   selectedUnitChipText: {
-    color: '#fff',
+    color: colors.legacy.white, // White text
   },
 });
 

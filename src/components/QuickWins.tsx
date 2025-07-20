@@ -2,6 +2,14 @@ import React, { useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, Animated, Dimensions } from 'react-native';
 import { Recipe } from '../types/Recipe';
 import RecipeCard from './RecipeCard';
+import { 
+  colors, 
+  typography, 
+  spacing, 
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -101,33 +109,32 @@ const QuickWins: React.FC<QuickWinsProps> = ({ recipes, onRecipePress, favorites
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
   },
   header: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: spacing.l, // Using design system spacing (24px)
+    marginBottom: spacing.m, // Using design system spacing (16px)
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #333 to Deep Navy
+    marginBottom: spacing.xs, // Using design system spacing (4px)
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.bodySmall, // Using bodySmall typography (14px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
   },
   scrollView: {
-    paddingLeft: 20,
+    paddingLeft: spacing.l, // Using design system spacing (24px)
   },
   scrollContent: {
-    paddingRight: 20,
+    paddingRight: spacing.l, // Using design system spacing (24px)
   },
   cardContainer: {
-    marginRight: 16,
+    marginRight: spacing.m, // Using design system spacing (16px)
   },
   cardWrapper: {
     position: 'relative',
@@ -138,8 +145,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-    borderRadius: 16,
+    backgroundColor: colors.warmCreamLight + '66', // Using warm cream light with opacity
+    borderRadius: componentBorderRadius.recipeCard, // Using design system border radius (16px)
   },
 });
 

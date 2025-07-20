@@ -21,9 +21,17 @@ import { findRecipeById } from '../data/dummyRecipes';
 import { Recipe } from '../types/Recipe';
 import { RecipeCard, RecipeDetailModal, CookingTimerModal, FavoritesSearchModal } from '../components';
 import { BottomTabParamList } from '../navigation';
+import {
+  colors,
+  typography,
+  spacing,
+  componentShadows,
+  componentBorderRadius,
+  lightTheme
+} from '../styles';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-const cardWidth = (screenWidth - 48) / 2; // 2 cards per row with 16px margins and 16px gap
+const cardWidth = (screenWidth - spacing.l * 2 - spacing.m) / 2; // 2 cards per row with design system margins and gap
 
 type FavoritesScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Favorites'>;
 
@@ -54,12 +62,9 @@ const FavoritesScreen: React.FC = () => {
 
   // Calculate Android-specific top padding
   const androidTopPadding = React.useMemo(() => {
-    if (Platform.OS !== 'android') return 10;
-    
+    if (Platform.OS !== 'android') return spacing.m;
     const statusBarHeight = StatusBar.currentHeight || 0;
-    // Add extra padding based on screen height for different device sizes
-    const extraPadding = screenHeight > 800 ? 20 : screenHeight > 600 ? 15 : 10;
-    
+    const extraPadding = screenHeight > 800 ? spacing.xl : screenHeight > 600 ? spacing.l : spacing.m;
     return statusBarHeight + extraPadding;
   }, []);
 
@@ -69,7 +74,6 @@ const FavoritesScreen: React.FC = () => {
       const recipes = Array.from(favoriteIds)
         .map(id => findRecipeById(id))
         .filter((recipe): recipe is Recipe => recipe !== undefined);
-      
       setFavoriteRecipes(recipes);
       setFilteredRecipes(recipes);
     } catch (error) {
@@ -80,14 +84,12 @@ const FavoritesScreen: React.FC = () => {
     }
   };
 
-  // Load favorites when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       loadFavorites();
     }, [])
   );
 
-  // Update filtered recipes when favorites or filters change
   useEffect(() => {
     applyFilters();
   }, [favoriteRecipes, activeFilters]);
@@ -100,7 +102,6 @@ const FavoritesScreen: React.FC = () => {
   const handleRemoveFromFavorites = async (recipeId: string) => {
     try {
       await favoritesService.removeFromFavorites(recipeId);
-      // Remove from local state immediately for better UX
       setFavoriteRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
       setFilteredRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
     } catch (error) {
@@ -108,11 +109,8 @@ const FavoritesScreen: React.FC = () => {
     }
   };
 
-  // Apply all filters to recipes
   const applyFilters = () => {
     let filtered = favoriteRecipes;
-
-    // Text search
     if (activeFilters.searchQuery.trim()) {
       const query = activeFilters.searchQuery.toLowerCase();
       filtered = filtered.filter(recipe =>
@@ -124,22 +122,16 @@ const FavoritesScreen: React.FC = () => {
         recipe.difficulty.toLowerCase().includes(query)
       );
     }
-
-    // Cook time filter - recipe must match at least one selected time
     if (activeFilters.maxCookTimes.length > 0) {
       filtered = filtered.filter(recipe => 
         activeFilters.maxCookTimes.some(maxTime => recipe.cookTime <= maxTime)
       );
     }
-
-    // Difficulty filter - recipe must match at least one selected difficulty
     if (activeFilters.difficulties.length > 0) {
       filtered = filtered.filter(recipe => 
         activeFilters.difficulties.includes(recipe.difficulty)
       );
     }
-
-    // Allergen filter (avoid) - recipe must not contain any selected allergens
     if (activeFilters.allergensToAvoid.length > 0) {
       filtered = filtered.filter(recipe => 
         !recipe.allergens.some(allergen => 
@@ -147,8 +139,6 @@ const FavoritesScreen: React.FC = () => {
         )
       );
     }
-
-    // Ingredient filter (must include) - recipe must contain all selected ingredients
     if (activeFilters.ingredientsToInclude.length > 0) {
       filtered = filtered.filter(recipe =>
         activeFilters.ingredientsToInclude.every(selectedIngredient =>
@@ -158,10 +148,7 @@ const FavoritesScreen: React.FC = () => {
         )
       );
     }
-
-    // Sort by name by default
     filtered.sort((a, b) => a.name.localeCompare(b.name));
-
     setFilteredRecipes(filtered);
   };
 
@@ -221,7 +208,7 @@ const FavoritesScreen: React.FC = () => {
   const renderEmptyState = () => (
     <View style={styles.emptyStateContainer}>
       <View style={styles.emptyStateIconContainer}>
-        <Ionicons name="heart-outline" size={64} color="#E5E5E7" />
+        <Ionicons name="heart-outline" size={64} color={colors.warmGrayLight} />
       </View>
       <Text style={styles.emptyStateTitle}>No Favorites Yet</Text>
       <Text style={styles.emptyStateMessage}>
@@ -248,19 +235,16 @@ const FavoritesScreen: React.FC = () => {
       if (favoriteRecipes.length === 0) {
         return 'Your saved recipes will appear here';
       }
-
       const totalText = `${favoriteRecipes.length} recipe${favoriteRecipes.length !== 1 ? 's' : ''} saved`;
-      
       if (hasActiveFilters) {
         const filteredText = `${filteredRecipes.length} recipe${filteredRecipes.length !== 1 ? 's' : ''} displayed`;
         return `${totalText} • ${filteredText}`;
       }
-      
       return totalText;
     };
 
     return (
-      <View style={[styles.headerContainer, { paddingTop: androidTopPadding }]}>
+      <View style={[styles.headerContainer, { paddingTop: androidTopPadding }]}> 
         <Text style={styles.headerTitle}>My Favorites</Text>
         <Text style={styles.headerSubtitle}>
           {getSubtitleText()}
@@ -272,11 +256,11 @@ const FavoritesScreen: React.FC = () => {
               onPress={() => setSearchModalVisible(true)}
               activeOpacity={0.8}
             >
-              <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+              <Ionicons name="search" size={20} color={colors.warmGray} style={styles.searchIcon} />
               <Text style={styles.searchButtonText}>
                 {hasActiveFilters ? 'Filters Applied' : 'Search & Filter'}
               </Text>
-              <Ionicons name="options" size={20} color="#666" />
+              <Ionicons name="options" size={20} color={colors.warmGray} />
             </TouchableOpacity>
           </View>
         )}
@@ -288,7 +272,7 @@ const FavoritesScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.spiceOrange} />
           <Text style={styles.loadingText}>Loading your favorites...</Text>
         </View>
       </SafeAreaView>
@@ -305,13 +289,13 @@ const FavoritesScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.listContainer,
-          refreshing && { paddingTop: 60 } // Push content down when refreshing
+          refreshing && { paddingTop: 60 }
         ]}
         columnWrapperStyle={filteredRecipes.length > 0 ? styles.row : undefined}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={favoriteRecipes.length === 0 ? renderEmptyState : () => (
           <View style={styles.noResultsContainer}>
-            <Ionicons name="search" size={48} color="#E5E5E7" />
+            <Ionicons name="search" size={48} color={colors.warmGrayLight} />
             <Text style={styles.noResultsTitle}>No Results Found</Text>
             <Text style={styles.noResultsMessage}>
               Try adjusting your search to find what you're looking for
@@ -322,8 +306,8 @@ const FavoritesScreen: React.FC = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#007AFF']}
-            tintColor="#007AFF"
+            colors={[colors.spiceOrange]}
+            tintColor={colors.spiceOrange}
           />
         }
         ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
@@ -358,167 +342,138 @@ const FavoritesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.warmCream, // Changed from #f8f9fa to Warm Cream
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (20px)
   },
   loadingText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 16,
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
+    marginTop: spacing.l, // Using design system spacing (20px)
     textAlign: 'center',
   },
   listContainer: {
     flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: spacing.l, // Using design system spacing (20px)
+    paddingBottom: spacing.l, // Using design system spacing (20px)
   },
   headerContainer: {
-    paddingTop: Platform.OS === 'android' ? 0 : 10, // Android padding applied dynamically
-    paddingBottom: 24,
+    paddingTop: Platform.OS === 'android' ? 0 : spacing.m, // Android padding applied dynamically
+    paddingBottom: spacing.xl, // Using design system spacing (32px)
     alignItems: 'center',
-    backgroundColor: '#f8f9fa', // Ensure background matches container
+    backgroundColor: colors.warmCream, // Ensure background matches container
   },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 8,
+    ...typography.h1, // Using H1 typography (32px, Bold)
+    color: colors.deepNavy, // Changed from #1a1a1a to Deep Navy
+    marginBottom: spacing.s, // Using design system spacing (8px)
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
   },
   row: {
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.s, // Using design system spacing (8px)
   },
   cardContainer: {
     flex: 1,
     maxWidth: cardWidth,
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.s, // Using design system spacing (8px)
   },
   itemSeparator: {
-    height: 16,
+    height: spacing.l, // Using design system spacing (20px)
   },
   emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 60,
+    paddingHorizontal: spacing.xl, // Using design system spacing (32px)
+    paddingTop: spacing.xxl, // Using design system spacing (48px)
   },
   emptyStateIconContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.warmCreamLight, // Changed from #f5f5f5 to Warm Cream Light
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
     borderWidth: 2,
-    borderColor: '#E5E5E7',
+    borderColor: colors.warmGrayLight, // Changed from #E5E5E7 to Warm Gray Light
     borderStyle: 'dashed',
   },
   emptyStateTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 12,
+    ...typography.h3, // Using H3 typography (24px, SemiBold)
+    color: colors.deepNavy, // Changed from #1a1a1a to Deep Navy
+    marginBottom: spacing.m, // Using design system spacing (12px)
     textAlign: 'center',
   },
   emptyStateMessage: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 32,
+    marginBottom: spacing.xl, // Using design system spacing (32px)
   },
   exploreButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#007AFF',
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    backgroundColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
+    paddingHorizontal: spacing.xxl, // Using design system spacing (48px)
+    paddingVertical: spacing.l, // Using design system spacing (20px)
+    borderRadius: componentBorderRadius.button, // Using design system border radius (12px)
+    ...componentShadows.button, // Using new shadow system
   },
   exploreButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.legacy.white, // White text
+    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
+    fontWeight: typography.h4.fontWeight, // SemiBold weight
     textAlign: 'center',
   },
   searchContainer: {
-    paddingTop: 20,
+    paddingTop: spacing.xl, // Using design system spacing (32px)
   },
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.legacy.white, // Changed from #fff to White
+    borderRadius: componentBorderRadius.button, // Using design system border radius (12px)
+    paddingHorizontal: spacing.m, // Using design system spacing (16px)
+    paddingVertical: spacing.m, // Using design system spacing (12px)
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    borderColor: lightTheme.borders, // Changed from #e0e0e0 to design system border
+    ...componentShadows.card, // Using new shadow system
   },
   searchIcon: {
-    marginRight: 12,
+    marginRight: spacing.m, // Using design system spacing (12px)
   },
   searchButtonText: {
     flex: 1,
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     fontWeight: '500',
   },
   noResultsContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingTop: 60,
+    paddingHorizontal: spacing.xl, // Using design system spacing (32px)
+    paddingTop: spacing.xxl, // Using design system spacing (48px)
   },
   noResultsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginTop: 16,
-    marginBottom: 8,
+    ...typography.h4, // Using H4 typography (20px, SemiBold)
+    color: colors.deepNavy, // Changed from #1a1a1a to Deep Navy
+    marginTop: spacing.l, // Using design system spacing (20px)
+    marginBottom: spacing.s, // Using design system spacing (8px)
     textAlign: 'center',
   },
   noResultsMessage: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
+    color: colors.warmGray, // Changed from #666 to Warm Gray
     textAlign: 'center',
     lineHeight: 24,
   },
