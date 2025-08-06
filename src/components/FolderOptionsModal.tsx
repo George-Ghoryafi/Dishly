@@ -220,50 +220,12 @@ const FolderOptionsModal: React.FC<FolderOptionsModalProps> = ({
                         </Text>
                       )}
                     </View>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-                    <Ionicons 
-                      name="chevron-forward" 
-                      size={18} 
-                      color={option.destructive ? "#FF3B30" : "#ccc"} 
-                    />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
                   </View>
                   <Ionicons 
                     name="chevron-forward" 
                     size={18} 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                    color={option.destructive ? "#FF3B30" : "#ccc"} 
-                  />
-=======
-=======
->>>>>>> Stashed changes
                     color={option.destructive ? colors.error.primary : colors.warmGrayLight} 
                   />
-                </TouchableOpacity>
-              ))}
-            </View>
->>>>>>> Stashed changes
-
-            {/* Footer - only show when not in rename mode */}
-            {!showRenameInput && (
-              <View style={styles.footer}>
-                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
->>>>>>> Stashed changes
                 </TouchableOpacity>
               ))}
             </View>
@@ -426,76 +388,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.h4.fontWeight, // SemiBold weight
     color: colors.warmGray, // Changed from #666 to Warm Gray
   },
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-  renameContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-  },
-  renameTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  renameInputContainer: {
-    marginBottom: 20,
-  },
-  renameInput: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#1a1a1a',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  renameButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  renameCancelButton: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  renameCancelText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  renameConfirmButton: {
-    flex: 1,
-    backgroundColor: '#007AFF',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  renameConfirmText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-  renameButtonDisabled: {
-    backgroundColor: '#cccccc',
-  },
-=======
->>>>>>> Stashed changes
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 });
 
-export default FolderOptionsModal; 
+export default FolderOptionsModal;

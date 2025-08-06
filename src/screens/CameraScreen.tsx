@@ -291,59 +291,59 @@ const CameraScreen: React.FC = () => {
             facing={facing}
             flash={flash}
             zoom={zoom}
-          >
-            {/* Camera Header */}
-            <View style={styles.cameraHeader}>
-              <TouchableOpacity onPress={handleBackPress} style={styles.headerButton}>
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.cameraTitle}>Take Photo</Text>
-              <TouchableOpacity onPress={toggleFlash} style={styles.headerButton}>
-                <Ionicons 
-                  name={flash === 'on' ? 'flash' : 'flash-off'} 
-                  size={24} 
-                  color="#fff" 
-                />
-              </TouchableOpacity>
+          />
+          
+          {/* Camera Header */}
+          <View style={styles.cameraHeader}>
+            <TouchableOpacity onPress={handleBackPress} style={styles.headerButton}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.cameraTitle}>Take Photo</Text>
+            <TouchableOpacity onPress={toggleFlash} style={styles.headerButton}>
+              <Ionicons 
+                name={flash === 'on' ? 'flash' : 'flash-off'} 
+                size={24} 
+                color="#fff" 
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Zoom Indicator */}
+          <ReanimatedAnimated.View style={[styles.zoomIndicator, zoomIndicatorStyle]}>
+            <View style={styles.zoomIndicatorContainer}>
+              <Text style={styles.zoomIndicatorText}>{Math.round(zoom * 100)}%</Text>
             </View>
+          </ReanimatedAnimated.View>
 
-            {/* Zoom Indicator */}
-            <ReanimatedAnimated.View style={[styles.zoomIndicator, zoomIndicatorStyle]}>
-              <View style={styles.zoomIndicatorContainer}>
-                <Text style={styles.zoomIndicatorText}>{Math.round(zoom * 100)}%</Text>
-              </View>
-            </ReanimatedAnimated.View>
+          {/* Camera Controls */}
+          <View style={styles.cameraControls}>
+            <TouchableOpacity onPress={toggleCameraFacing} style={styles.controlButton}>
+              <Ionicons name="camera-reverse-outline" size={28} color="#fff" />
+            </TouchableOpacity>
 
-            {/* Camera Controls */}
-            <View style={styles.cameraControls}>
-              <TouchableOpacity onPress={toggleCameraFacing} style={styles.controlButton}>
-                <Ionicons name="camera-reverse-outline" size={28} color="#fff" />
+            {/* Capture Button */}
+            <Animated.View style={[styles.captureButton, { transform: [{ scale: captureButtonScale }] }]}>
+              <TouchableOpacity 
+                style={styles.captureButtonInner}
+                onPress={takePicture}
+                disabled={isCapturing}
+              >
+                <View style={styles.captureButtonIcon} />
               </TouchableOpacity>
+            </Animated.View>
 
-              {/* Capture Button */}
-              <Animated.View style={[styles.captureButton, { transform: [{ scale: captureButtonScale }] }]}>
-                <TouchableOpacity 
-                  style={styles.captureButtonInner}
-                  onPress={takePicture}
-                  disabled={isCapturing}
-                >
-                  <View style={styles.captureButtonIcon} />
-                </TouchableOpacity>
-              </Animated.View>
+            {/* Gallery Button */}
+            <TouchableOpacity onPress={pickImageFromGallery} style={styles.galleryButton}>
+              <Ionicons name="images-outline" size={28} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-              {/* Gallery Button */}
-              <TouchableOpacity onPress={pickImageFromGallery} style={styles.galleryButton}>
-                <Ionicons name="images-outline" size={28} color="#fff" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Camera Instructions */}
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructionsText}>
-                Take a photo or choose from gallery
-              </Text>
-            </View>
-          </CameraView>
+          {/* Camera Instructions */}
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsText}>
+              Take a photo or choose from gallery
+            </Text>
+          </View>
         </View>
       </GestureDetector>
     </SafeAreaView>
@@ -569,4 +569,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CameraScreen; 
+export default CameraScreen;

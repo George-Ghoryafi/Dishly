@@ -15,14 +15,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-=======
 import { FOLDER_COLORS, FOLDER_ICONS } from '../types/ShoppingList';
 import { 
   colors, 
@@ -32,11 +24,6 @@ import {
   componentBorderRadius,
   lightTheme
 } from '../styles';
->>>>>>> Stashed changes
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 interface CustomFolderModalProps {
   visible: boolean;
@@ -208,45 +195,13 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
 
                   <View style={[styles.inputContainer, styles.halfWidth]}>
                     <Text style={styles.inputLabel}>Unit</Text>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-                    <View style={styles.unitContainer}>
-                      <TextInput
-                        style={styles.textInput}
-                        value={unit}
-                        onChangeText={setUnit}
-                        placeholder="item"
-                        placeholderTextColor="#999"
-                      />
-                    </View>
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
                     <TextInput
                       style={styles.textInput}
                       value={unit}
                       onChangeText={setUnit}
                       placeholder="item"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                      placeholderTextColor="#999"
-                    />
-=======
                       placeholderTextColor={colors.warmGrayLight}
                     />
->>>>>>> Stashed changes
->>>>>>> Stashed changes
-=======
-                      placeholderTextColor={colors.warmGrayLight}
-                    />
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                   </View>
                 </View>
 
@@ -339,62 +294,7 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
               </View>
             </View>
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-            {/* Name Input Section */}
-            <View style={styles.inputSection}>
-              <Text style={styles.sectionTitle}>Name</Text>
-              <TextInput
-                style={styles.textInput}
-                value={folderName}
-                onChangeText={setFolderName}
-                placeholder="e.g., Weekly Groceries, Dinner Party"
-<<<<<<< Updated upstream
-                placeholderTextColor="#999"
-=======
-                placeholderTextColor={colors.warmGrayLight}
->>>>>>> Stashed changes
-                autoFocus
-                maxLength={50}
-                returnKeyType="done"
-                onSubmitEditing={handleSave}
-                editable={!isLoading}
-              />
-              <Text style={styles.characterCount}>
-                {folderName.length}/50 characters
-              </Text>
-            </View>
 
-            {/* Color Selection Section */}
-            <View style={styles.colorSection}>
-              <Text style={styles.sectionTitle}>Color</Text>
-              <View style={styles.colorGrid}>
-                {FOLDER_COLORS.map((color) => (
-                  <TouchableOpacity
-                    key={color}
-                    style={[
-                      styles.colorOption,
-                      { backgroundColor: color },
-                      selectedColor === color && styles.selectedColor,
-                    ]}
-                    onPress={() => setSelectedColor(color)}
-                    disabled={isLoading}
-                  >
-                    {selectedColor === color && (
-                      <Ionicons name="checkmark" size={16} color="#fff" />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
             {/* Name Input Section */}
             <View style={styles.inputSection}>
               <Text style={styles.sectionTitle}>Name</Text>
@@ -437,20 +337,11 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                 ))}
               </View>
             </View>
-
->>>>>>> Stashed changes
             {/* Icon Selection Section */}
             <View style={styles.iconSection}>
               <Text style={styles.sectionTitle}>Icon</Text>
               <View style={styles.iconGrid}>
                 {/* Default Icon Option */}
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 <TouchableOpacity
                   style={[
                     styles.iconOption,
@@ -459,54 +350,6 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                   onPress={() => setSelectedIcon(undefined)}
                   disabled={isLoading}
                 >
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                  <Ionicons 
-                    name="folder" 
-                    size={24} 
-                    color={selectedColor} 
-                  />
-                  {!selectedIcon && (
-                    <View style={styles.iconCheckmark}>
-                      <Ionicons name="checkmark" size={12} color="#007AFF" />
-                    </View>
-                  )}
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-                  <Ionicons name="add" size={20} color="#fff" />
-                  <Text style={styles.createButtonText}>
-                    {isLoading ? 'Adding...' : 'Add Item'}
-                  </Text>
->>>>>>> Stashed changes
-                </TouchableOpacity>
-
-                {/* Emoji Options */}
-                {FOLDER_ICONS.map((icon) => (
-                  <TouchableOpacity
-                    key={icon}
-                    style={[
-                      styles.iconOption,
-                      selectedIcon === icon && styles.selectedIcon,
-                    ]}
-                    onPress={() => setSelectedIcon(icon)}
-                    disabled={isLoading}
-                  >
-                    <Text style={styles.iconEmoji}>{icon}</Text>
-                    {selectedIcon === icon && (
-                      <View style={styles.iconCheckmark}>
-                        <Ionicons name="checkmark" size={12} color="#007AFF" />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-<<<<<<< Updated upstream
-=======
-          </TouchableWithoutFeedback>
-=======
                   <Ionicons 
                     name="folder" 
                     size={24} 
@@ -540,50 +383,23 @@ const CustomFolderModal: React.FC<CustomFolderModalProps> = ({
                 ))}
               </View>
             </View>
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
             {/* Tips Section */}
             <View style={styles.tipsSection}>
               <View style={styles.tip}>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                <Ionicons name="bulb-outline" size={16} color="#666" />
-=======
                 <Ionicons name="bulb-outline" size={16} color={colors.warmGray} />
->>>>>>> Stashed changes
-=======
-                <Ionicons name="bulb-outline" size={16} color={colors.warmGray} />
->>>>>>> Stashed changes
                 <Text style={styles.tipText}>
                   Choose colors and icons that match your shopping categories
                 </Text>
               </View>
               <View style={styles.tip}>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                <Ionicons name="sparkles-outline" size={16} color="#666" />
-=======
                 <Ionicons name="sparkles-outline" size={16} color={colors.warmGray} />
->>>>>>> Stashed changes
-=======
-                <Ionicons name="sparkles-outline" size={16} color={colors.warmGray} />
->>>>>>> Stashed changes
                 <Text style={styles.tipText}>
                   Try: "🥕 Fresh Produce", "🥛 Dairy Items", "🧴 Household Supplies"
                 </Text>
               </View>
             </View>
           </ScrollView>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
         </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
@@ -610,36 +426,29 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: spacing.xs, // Using design system spacing (4px)
   },
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
   closeText: {
     fontSize: 17,
-    color: '#007AFF',
+    color: colors.spiceOrange,
     fontWeight: '400',
   },
-=======
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#333',
+    color: colors.deepNavy,
   },
   saveButton: {
     padding: 4,
   },
   saveText: {
     fontSize: 17,
-    color: '#007AFF',
+    color: colors.spiceOrange,
     fontWeight: '600',
   },
   disabledButton: {
     opacity: 0.5,
   },
   disabledText: {
-    color: '#999',
+    color: colors.warmGray,
   },
   scrollView: {
     flex: 1,
@@ -655,13 +464,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.deepNavy,
     marginBottom: 12,
   },
   previewCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.warmCreamLight,
     borderRadius: 16,
     padding: 16,
     gap: 16,
@@ -684,22 +493,22 @@ const styles = StyleSheet.create({
   previewName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.deepNavy,
     marginBottom: 4,
   },
   previewDetails: {
     fontSize: 14,
-    color: '#666',
+    color: colors.warmGray,
   },
   inputSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: lightTheme.borders,
   },
   colorSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: lightTheme.borders,
   },
   colorGrid: {
     flexDirection: 'row',
@@ -716,13 +525,13 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selectedColor: {
-    borderColor: '#007AFF',
+    borderColor: colors.spiceOrange,
     transform: [{ scale: 1.1 }],
   },
   iconSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: lightTheme.borders,
   },
   iconGrid: {
     flexDirection: 'row',
@@ -735,14 +544,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.warmCreamLight,
     borderWidth: 2,
     borderColor: 'transparent',
     position: 'relative',
   },
   selectedIcon: {
-    borderColor: '#007AFF',
-    backgroundColor: '#f0f8ff',
+    borderColor: colors.spiceOrange,
+    backgroundColor: colors.warmCreamLight,
   },
   iconEmoji: {
     fontSize: 24,
@@ -754,7 +563,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#fff',
+    backgroundColor: colors.legacy.white,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -765,7 +574,7 @@ const styles = StyleSheet.create({
   },
   characterCount: {
     fontSize: 12,
-    color: '#999',
+    color: colors.warmGray,
     textAlign: 'right',
     marginTop: 8,
   },
@@ -780,180 +589,9 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flex: 1,
-<<<<<<< Updated upstream
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-=======
-    paddingHorizontal: 20,
-    paddingTop: 40,
-=======
-  closeText: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
-    fontWeight: '400',
-  },
-  headerTitle: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    fontWeight: typography.h4.fontWeight, // SemiBold weight
-    color: colors.deepNavy, // Changed from #333 to Deep Navy
-  },
-  saveButton: {
-    padding: spacing.xs, // Using design system spacing (4px)
-  },
-  saveText: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    color: colors.spiceOrange, // Changed from #007AFF to Spice Orange
-    fontWeight: typography.h4.fontWeight, // SemiBold weight
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  disabledText: {
-    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
-  },
-  scrollView: {
-    flex: 1,
-  },
-  simpleContent: {
-    padding: spacing.l, // Using design system spacing (20px)
-  },
-  previewSection: {
-    padding: spacing.l, // Using design system spacing (20px)
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
-  },
-  sectionTitle: {
-    ...typography.bodyLarge, // Using bodyLarge typography (18px, Regular)
-    fontWeight: typography.h4.fontWeight, // SemiBold weight
-    color: colors.deepNavy, // Changed from #333 to Deep Navy
-    marginBottom: spacing.m, // Using design system spacing (12px)
-  },
-  previewCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
-    borderRadius: componentBorderRadius.card, // Using design system border radius (12px)
-    padding: spacing.m, // Using design system spacing (16px)
-    gap: spacing.m, // Using design system spacing (16px)
-  },
-  previewIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  previewEmoji: {
-    fontSize: 28,
-  },
-  previewInfo: {
-    flex: 1,
-  },
-  previewName: {
-    ...typography.h4, // Using H4 typography (20px, SemiBold)
-    color: colors.deepNavy, // Changed from #333 to Deep Navy
-    marginBottom: spacing.xs, // Using design system spacing (4px)
-  },
-  previewDetails: {
-    ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
-    color: colors.warmGray, // Changed from #666 to Warm Gray
-  },
-  inputSection: {
-    padding: spacing.l, // Using design system spacing (20px)
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
-  },
-  colorSection: {
-    padding: spacing.l, // Using design system spacing (20px)
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
-  },
-  colorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.m, // Using design system spacing (12px)
-  },
-  colorOption: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: 'transparent',
-  },
-  selectedColor: {
-    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
-    transform: [{ scale: 1.1 }],
-  },
-  iconSection: {
-    padding: spacing.l, // Using design system spacing (20px)
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.borders, // Changed from #f0f0f0 to design system border
-  },
-  iconGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.s, // Using design system spacing (8px)
-  },
-  iconOption: {
-    width: 52,
-    height: 52,
-    borderRadius: componentBorderRadius.input, // Using design system border radius (8px)
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.warmCreamLight, // Changed from #f8f9fa to Warm Cream Light
-    borderWidth: 2,
-    borderColor: 'transparent',
-    position: 'relative',
-  },
-  selectedIcon: {
-    borderColor: colors.spiceOrange, // Changed from #007AFF to Spice Orange
-    backgroundColor: colors.success.background, // Changed from #f0f8ff to success background
-  },
-  iconEmoji: {
-    fontSize: 24,
-  },
-  iconCheckmark: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.legacy.white, // White background for contrast
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...componentShadows.light, // Using new shadow system
-  },
-  characterCount: {
-    ...typography.caption, // Using caption typography (12px, Regular)
-    color: colors.warmGrayLight, // Changed from #999 to Warm Gray Light
-    textAlign: 'right',
-    marginTop: spacing.s, // Using design system spacing (8px)
-  },
-  tipsSection: {
-    padding: spacing.l, // Using design system spacing (20px)
-    gap: spacing.m, // Using design system spacing (12px)
-  },
-  tip: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.s, // Using design system spacing (8px)
-  },
-  tipText: {
-    flex: 1,
     ...typography.bodyMedium, // Using bodyMedium typography (16px, Regular)
     color: colors.warmGray, // Changed from #666 to Warm Gray
     lineHeight: 20,
->>>>>>> Stashed changes
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   },
   iconContainer: {
     alignItems: 'center',
@@ -1024,29 +662,8 @@ const styles = StyleSheet.create({
   },
   selectedUnitChipText: {
     color: colors.legacy.white, // White text
-<<<<<<< Updated upstream
-=======
-  },
-  createButton: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 'auto',
-    marginBottom: 32,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  createButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
->>>>>>> Stashed changes
+
   },
 });
 
-export default CustomFolderModal; 
+export default CustomFolderModal;
